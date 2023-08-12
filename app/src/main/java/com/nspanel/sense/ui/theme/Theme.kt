@@ -28,7 +28,7 @@ private val LightColorPalette = lightColorScheme(
 )
 
 @Composable
-fun NSPanelSenseTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun NsPanelSenseTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     val colors = if (darkTheme) {
         DarkColorPalette
     } else {

@@ -1,8 +1,11 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
+
     }
 }
 dependencyResolutionManagement {
@@ -11,6 +14,10 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
+
+
 }
+
+
 rootProject.name = "NSPanelSense"
 include(":app")
