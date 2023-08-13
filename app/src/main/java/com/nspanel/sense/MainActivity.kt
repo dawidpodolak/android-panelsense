@@ -3,7 +3,13 @@ package com.nspanel.sense
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -13,18 +19,57 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.nspanel.sense.ui.theme.NsPanelSenseTheme
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             NsPanelSenseTheme {
+                val state  = object : PagerState() {
+                    override val pageCount: Int
+                        get() = 3
+                }
+
+
+                HorizontalPager(state = state) { panelIndex ->
+                    when (panelIndex) {
+                        0 -> ButtonPanel()
+                        1 -> CameraPanel()
+                        2 -> PhotoPanel()
+                    }
                     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                         Greeting("Android")
                     }
+                }
             }
         }
     }
 }
 
+@Composable
+fun ButtonPanel() {
+    LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+
+        items(count = 2) {
+            Button(onClick = { }) {
+                Text("Button 1")
+            }
+        }
+    }
+}
+
+@Composable
+fun CameraPanel() {
+    Surface {
+        Text("Camera panel")
+    }
+}
+
+@Composable
+fun PhotoPanel() {
+    Surface {
+        Text("Photo panel")
+    }
+}
 @Composable
 fun Greeting(name: String) {
     Text(text = "Hello $name!")
@@ -38,3 +83,4 @@ fun DefaultPreview() {
         Greeting("Android")
     }
 }
+
