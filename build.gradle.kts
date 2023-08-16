@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.android) apply false
     alias(libs.plugins.dev.detekt)
     alias(libs.plugins.androidLibrary) apply false
+    id("com.google.dagger.hilt.android") version "2.44" apply false
 }
 
 subprojects {

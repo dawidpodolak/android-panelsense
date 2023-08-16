@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":core")
+
+
 pluginManagement {
     repositories {
         google()
@@ -15,11 +18,20 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
     }
-
-
 }
 
 rootProject.name = "NSPanelSense"
 include(":app")
 include(":domain")
 include(":data")
+
+//buildscript {
+//    repositories {
+//        google()
+//        mavenCentral()
+//    }
+//
+//    dependencies {
+//        classpath("com.google.dagger:hilt-android-gradle-plugin:2.47")
+//    }
+//}

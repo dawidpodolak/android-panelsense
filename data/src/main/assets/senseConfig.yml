@@ -1,0 +1,8 @@
+panel:
+  - id: button_panel
+    type: button
+    name: "Panel przycisków"
+    buttons:
+      - id: button1
+        text: "Kuchnia ledy"
+        icon:
