@@ -3,25 +3,19 @@ package com.nspanel.sense
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.lifecycleScope
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.nspanel.data.icons.IconProvider
+import com.nspanel.sense.ui.panel.GridPanel
 import com.nspanel.sense.ui.theme.NsPanelSenseTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,12 +26,11 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var iconProvider: IconProvider
 
+    val viewModel: MainViewModel by viewModels<MainViewModel>()
+
     @ExperimentalFoundationApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-
 
         setContent {
             NsPanelSenseTheme {
@@ -48,7 +41,7 @@ class MainActivity : ComponentActivity() {
 
                 HorizontalPager(state = state) { panelIndex ->
                     when (panelIndex) {
-                        0 -> ButtonPanel(this@MainActivity.lifecycleScope)
+                        0 -> GridPanel()
                         1 -> CameraPanel()
                         2 -> PhotoPanel()
                     }
@@ -62,31 +55,8 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    @Composable
-    fun ButtonPanel(lifecycleScope: LifecycleCoroutineScope) {
-        LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-
-            items(count = 2) {
-                Button(onClick = { }) {
-                    Text("Button 1")
-
-                    val drawable =
-                        iconProvider.getIcon(this@MainActivity, "weather-partly-cloudy")
-                            .collectAsState(
-                                initial = null
-                            )
-
-                    Image(
-                        painter = rememberDrawablePainter(drawable = drawable.value),
-                        modifier = Modifier.fillMaxSize(),
-                        contentDescription = "Button 1"
-                    )
-                }
-            }
-        }
-    }
 }
+
 
 @Composable
 fun CameraPanel() {
