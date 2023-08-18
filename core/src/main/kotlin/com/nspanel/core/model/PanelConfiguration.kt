@@ -13,9 +13,10 @@ sealed class PanelConfiguration(open val id: String) {
     ) : PanelConfiguration(id)
 
     sealed class PanelItem(open val id: String) {
-        data class ButtonGridItem(
+        data class ButtonItem(
             override val id: String,
             val text: String,
+            val textColor: String = "#ffffff",
             val icon: String,
             val backgroundColor: String?,
             val entity: String?

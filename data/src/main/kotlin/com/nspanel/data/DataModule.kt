@@ -1,5 +1,7 @@
 package com.nspanel.data
 
+import com.nspanel.data.icons.IconProvider
+import com.nspanel.data.icons.PictogramIconProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,4 +34,7 @@ object DataModule {
 
     @Provides
     fun provideSnakeYaml(): Yaml = Yaml()
+
+    @Provides
+    fun provideIconProviderImpl(iconProvider: PictogramIconProvider): IconProvider = iconProvider
 }

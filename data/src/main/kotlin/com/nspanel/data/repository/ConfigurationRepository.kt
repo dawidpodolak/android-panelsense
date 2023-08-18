@@ -40,7 +40,8 @@ class ConfigurationRepository @Inject constructor(
 
     private fun YamlMap.getSystemConfiguration(): SystemConfiguration =
         SystemConfiguration(
-            mainPanelId = get("mainPanelId") as String
+            mainPanelId = get("mainPanelId") as String?,
+            backgroundImageUrl = get("backgroundImageUrl") as String?
         )
     private fun YamlList.getPanelList(): List<PanelConfiguration> =
         mapNotNull { panelObjectMap ->
@@ -71,11 +72,11 @@ class ConfigurationRepository @Inject constructor(
         }
 
     private fun YamlMap.parseGridButtonItem(): PanelConfiguration.PanelItem =
-        PanelConfiguration.PanelItem.ButtonGridItem(
+        PanelConfiguration.PanelItem.ButtonItem(
             id = get("id") as String,
             text = get("text") as String,
             icon = get("icon") as String,
-            backgroundColor = get("backgroundColor") as String?,
+            backgroundColor = get("background") as String?,
             entity = get("entity") as String?
         )
 

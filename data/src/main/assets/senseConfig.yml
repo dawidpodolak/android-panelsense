@@ -2,23 +2,6 @@ systemConfiguration:
   mainPanelId: "button_panel"
 
 panelList:
-  - id: home_panel
-    type: "home"
-    weather:
-    items:
-      - id: button_left
-        type: "button"
-        text: "Kuchnia"
-        icon: "ceiling-light-multiple"
-        background: "#cecece"
-        entity: "test"
-      - id: button_right
-        type: "button"
-        text: "Jadalnia"
-        icon: "ceiling-light-multiple"
-        background: "#cecece"
-        entity: "test"
-
   - id: button_panel
     type: grid
     columnCount : 2
@@ -28,23 +11,52 @@ panelList:
         type: "button"
         text: "Kuchnia ledy"
         icon: "led-strip-variant"
-        background: "#cecece"
+        background: "#cececece"
         entity: "test"
       - id: "button_2"
         type: "button"
         text: "Wyspa"
         icon: "ceiling-light-multiple"
-        background: "#cecece"
+        background: "#44cecece"
         entity: "test"
       - id: "button_3"
         type: "button"
         text: "Jadalnia"
         icon: "ceiling-light-multiple-outline"
-        background: "#cecece"
+        background: "#aacecece"
         entity: "test"
       - id: "button_4"
         type: "button"
         text: "Salon"
         icon: "chandelier"
-        background: "#cecece"
+        background: "#88cecece"
+        entity: "test"
+  - id: button_panel
+    type: grid
+    columnCount : 2
+    name: "Panel przycisków"
+    items:
+      - id: "button_1"
+        type: "button"
+        text: "Kuchnia ledy"
+        icon: "led-strip-variant"
+        background: "#cececece"
+        entity: "test"
+      - id: "button_2"
+        type: "button"
+        text: "Wyspa"
+        icon: "ceiling-light-multiple"
+        background: "#44cecece"
+        entity: "test"
+      - id: "button_3"
+        type: "button"
+        text: "Jadalnia"
+        icon: "ceiling-light-multiple-outline"
+        background: "#aacecece"
+        entity: "test"
+      - id: "button_4"
+        type: "button"
+        text: "Salon"
+        icon: "chandelier"
+        background: "#88cecece"
         entity: "test"

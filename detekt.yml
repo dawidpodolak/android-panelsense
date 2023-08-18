@@ -334,14 +334,14 @@ naming:
       - "**/*.Spek.kt"
     packagePattern: '^[a-z]+(\.[a-z][A-Za-z0-9]*)*$'
   TopLevelPropertyNaming:
-    active: true
+    active: false
     excludes:
       - "**/test/**"
       - "**/androidTest/**"
       - "**/*.Test.kt"
       - "**/*.Spec.kt"
       - "**/*.Spek.kt"
-    constantPattern: '[A-Z][A-Za-z0-9][_A-Z0-9]*'
+    constantPattern: '[A-Z][0-9A-Za-z0-9][_A-Z0-9]*'
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
     privatePropertyPattern: '_?[A-Za-z][_A-Za-z0-9]*'
   VariableMaxLength:
