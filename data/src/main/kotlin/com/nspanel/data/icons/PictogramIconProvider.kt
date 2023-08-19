@@ -12,8 +12,7 @@ import com.nspanel.core.di.DataStoreType.Type.SvgImage
 import com.nspanel.core.model.IconSpec
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import org.jsoup.Jsoup
 import org.xmlpull.v1.XmlPullParser
@@ -25,14 +24,11 @@ import javax.inject.Inject
 class PictogramIconProvider @Inject constructor(
     @ApplicationContext private val context: Context,
     @DataStoreType(SvgImage) private val svgDataStore: DataStore<Preferences>,
-): IconProvider {
+) : IconProvider {
 
-    suspend fun loadIconIfNeeded(name: String): String? =
+    private suspend fun loadIconIfNeeded(name: String): String? =
         runCatching {
-            Timber.d("SVG path: loading")
             val svgPath = downloadSVGPath(name) ?: return@runCatching null
-
-            Timber.d("SVG path: $svgPath")
             svgDataStore.edit {
                 it[stringPreferencesKey(name)] = svgPath
             }
@@ -41,13 +37,15 @@ class PictogramIconProvider @Inject constructor(
             .onFailure(Timber::e)
             .getOrNull()
 
-    override fun getIcon(iconSpec: IconSpec): Flow<Drawable> =
-        svgDataStore.data.mapNotNull {
-            val icon1 = it[stringPreferencesKey(iconSpec.name)]
-            Timber.d("Icon spec: $iconSpec")
-            icon1 ?: loadIconIfNeeded(iconSpec.name)
-        }
-            .mapNotNull { svgPath ->
+    override suspend fun getIcon(iconSpec: IconSpec): Drawable? =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val start = System.currentTimeMillis()
+                val dataStore = svgDataStore.data.firstOrNull() ?: return@runCatching null
+                val svgPath =
+                    dataStore[stringPreferencesKey(iconSpec.name)]
+                        ?: loadIconIfNeeded(iconSpec.name)
+                        ?: return@runCatching null
                 VectorDrawableCreator.getVectorDrawable(
                     context = context,
                     width = 24.dp,
@@ -57,11 +55,16 @@ class PictogramIconProvider @Inject constructor(
                     listOf(
                         PathData(
                             svgPath,
-                            iconSpec.color
+                            android.graphics.Color.BLACK
                         )
                     )
-                )
+                ).also {
+                    Timber.d("SVG path: ${System.currentTimeMillis() - start}ms")
+                }
             }
+                .onFailure(Timber::e)
+                .getOrNull()
+        }
 
     private suspend fun downloadSVGPath(name: String): String? = withContext(Dispatchers.IO) {
         val doc = Jsoup.connect("https://pictogrammers.com/library/mdi/icon/$name").get()

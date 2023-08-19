@@ -12,6 +12,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -26,6 +27,7 @@ import com.nspanel.sense.ui.panel.GridPanel
 import com.nspanel.sense.ui.panel.HomePanel
 import com.nspanel.sense.ui.theme.NsPanelSenseTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -81,9 +83,13 @@ fun PagerPanels(
                 get() = panels.size
         }
 
+    LaunchedEffect(key1 = true) {
+        delay(2000)
+        pagerState.animateScrollToPage( 1)
+    }
     HorizontalPager(state = pagerState) { panelIndex ->
         when (val panelConfig = panels[panelIndex]) {
-            is HomePanel -> HomePanel(panelConfig)
+            is HomePanel -> HomePanel(panelConfig, iconProvider)
             is GridPanel -> GridPanel(panelConfig, iconProvider)
         }
     }

@@ -75,6 +75,7 @@ class ConfigurationRepository @Inject constructor(
         PanelConfiguration.PanelItem.ButtonItem(
             id = get("id") as String,
             text = get("text") as String,
+            textColor = get("textColor") as String? ?: "#ffffff",
             icon = get("icon") as String,
             backgroundColor = get("background") as String?,
             entity = get("entity") as String?

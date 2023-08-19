@@ -2,34 +2,55 @@ systemConfiguration:
   mainPanelId: "button_panel"
 
 panelList:
+  - id: home_panel
+    type: "home"
+    weather:
+    items:
+      - id: button_left
+        type: "button"
+        text: "Kuchnia"
+        icon: "ceiling-light-multiple"
+        background: "#cecece"
+        entity: "test"
+      - id: button_right
+        type: "button"
+        text: "Jadalnia"
+        icon: "ceiling-light-multiple"
+        background: "#ffffff"
+        entity: "test"
+
   - id: button_panel
     type: grid
-    columnCount : 2
+    columnCount : 3
     name: "Panel przycisków"
     items:
       - id: "button_1"
         type: "button"
         text: "Kuchnia ledy"
+        textColor: "#ffffff"
         icon: "led-strip-variant"
-        background: "#cececece"
+        background: "#88cecece"
         entity: "test"
       - id: "button_2"
         type: "button"
         text: "Wyspa"
         icon: "ceiling-light-multiple"
-        background: "#44cecece"
+        textColor: "#ffffff"
+        background: "#88cecece"
         entity: "test"
       - id: "button_3"
         type: "button"
         text: "Jadalnia"
         icon: "ceiling-light-multiple-outline"
-        background: "#aacecece"
+        background: "#88cecece"
+        textColor: "#ffffff"
         entity: "test"
       - id: "button_4"
         type: "button"
         text: "Salon"
         icon: "chandelier"
-        background: "#88cecece"
+        textColor: "#ffffff"
+        background: "#88aeaeae"
         entity: "test"
   - id: button_panel
     type: grid
