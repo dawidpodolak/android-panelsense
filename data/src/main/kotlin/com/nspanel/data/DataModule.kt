@@ -2,6 +2,8 @@ package com.nspanel.data
 
 import com.nspanel.data.icons.IconProvider
 import com.nspanel.data.icons.PictogramIconProvider
+import com.nspanel.data.mqtt.MqttController
+import com.nspanel.data.mqtt.MqttControllerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,4 +39,7 @@ object DataModule {
 
     @Provides
     fun provideIconProviderImpl(iconProvider: PictogramIconProvider): IconProvider = iconProvider
+
+    @Provides
+    fun providerMqttControllerImpl(mqttController: MqttControllerImpl): MqttController = mqttController
 }

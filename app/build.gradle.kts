@@ -56,7 +56,6 @@ kapt {
 }
 
 dependencies {
-    implementation(project(":domain"))
     implementation(project(":data"))
     implementation(project(":core"))
     implementation(libs.core.ktx)
@@ -74,6 +73,7 @@ dependencies {
     implementation(libs.kt.coil)
     implementation(libs.compose.image.drawable)
     implementation(libs.hilt.android)
+    implementation(libs.gson)
 
     implementation(libs.kotlin.coroutines.android)
     implementation(libs.kotlin.coroutines.core)

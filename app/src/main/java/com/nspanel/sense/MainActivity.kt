@@ -19,16 +19,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.rememberAsyncImagePainter
-import com.nspanel.core.model.PanelConfiguration
-import com.nspanel.core.model.PanelConfiguration.GridPanel
-import com.nspanel.core.model.PanelConfiguration.HomePanel
+import com.nspanel.core.model.mqqt.MqttMessage
+import com.nspanel.core.model.panelconfig.PanelConfiguration
+import com.nspanel.core.model.panelconfig.PanelConfiguration.GridPanel
+import com.nspanel.core.model.panelconfig.PanelConfiguration.HomePanel
 import com.nspanel.data.icons.IconProvider
 import com.nspanel.sense.ui.panel.GridPanel
 import com.nspanel.sense.ui.panel.HomePanel
 import com.nspanel.sense.ui.theme.NsPanelSenseTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import timber.log.Timber
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @ExperimentalFoundationApi
@@ -48,16 +49,18 @@ class MainActivity : ComponentActivity() {
             NsPanelSenseTheme {
 
                 val uiState = viewModel.stateFlow.collectAsState()
-                Timber.d("Sense config ui: $uiState")
+//                Timber.d("Sense config ui: $uiState")
                 val senseConfig = uiState.value.senseConfiguration ?: return@NsPanelSenseTheme
-                Timber.d("Sense config: $senseConfig")
+//                Timber.d("Sense config: $senseConfig")
                 Background(senseConfig.systemConfiguration?.backgroundImageUrl)
                 if (senseConfig.panelList.isEmpty()) {
                     NoPanels()
                 } else {
                     PagerPanels(
                         panels = senseConfig.panelList,
-                        iconProvider = iconProvider
+                        iconProvider = iconProvider,
+                        stateFlow = viewModel.messageFlow,
+                        onClick = viewModel::onItemClick
                     )
                 }
             }
@@ -75,7 +78,9 @@ fun NoPanels() {
 @ExperimentalFoundationApi
 fun PagerPanels(
     panels: List<PanelConfiguration>,
-    iconProvider: IconProvider
+    iconProvider: IconProvider,
+    stateFlow: Flow<MqttMessage>,
+    onClick: (PanelConfiguration.PanelItem.ButtonItem) -> Unit
 ) {
 
     val pagerState = object : PagerState() {
@@ -90,7 +95,7 @@ fun PagerPanels(
     HorizontalPager(state = pagerState) { panelIndex ->
         when (val panelConfig = panels[panelIndex]) {
             is HomePanel -> HomePanel(panelConfig, iconProvider)
-            is GridPanel -> GridPanel(panelConfig, iconProvider)
+            is GridPanel -> GridPanel(panelConfig, iconProvider, stateFlow, onClick)
         }
     }
 }

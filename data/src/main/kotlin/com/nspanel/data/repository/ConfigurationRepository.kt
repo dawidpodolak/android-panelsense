@@ -1,11 +1,13 @@
 package com.nspanel.data.repository
 
 import android.content.Context
-import com.nspanel.core.model.PanelConfiguration
-import com.nspanel.core.model.PanelConfiguration.GridPanel
-import com.nspanel.core.model.PanelConfiguration.HomePanel
-import com.nspanel.core.model.SenseConfiguration
-import com.nspanel.core.model.SystemConfiguration
+import com.nspanel.core.model.mqqt.MqttConnConfig
+import com.nspanel.core.model.mqqt.PanelMqttTopic
+import com.nspanel.core.model.panelconfig.PanelConfiguration
+import com.nspanel.core.model.panelconfig.PanelConfiguration.GridPanel
+import com.nspanel.core.model.panelconfig.PanelConfiguration.HomePanel
+import com.nspanel.core.model.panelconfig.SenseConfiguration
+import com.nspanel.core.model.panelconfig.SystemConfiguration
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -41,8 +43,19 @@ class ConfigurationRepository @Inject constructor(
     private fun YamlMap.getSystemConfiguration(): SystemConfiguration =
         SystemConfiguration(
             mainPanelId = get("mainPanelId") as String?,
-            backgroundImageUrl = get("backgroundImageUrl") as String?
+            backgroundImageUrl = get("backgroundImageUrl") as String?,
+            mqttConnConfig = (get("mqtt") as YamlMap).getMqttConnConfig()
         )
+
+    private fun YamlMap.getMqttConnConfig(): MqttConnConfig? =
+        MqttConnConfig(
+            address = get("address") as String,
+            port = get("port") as? Int ?: 1883,
+            clientName = get("clientName") as String,
+            user = get("user") as String,
+            password = get("password") as String
+        )
+
     private fun YamlList.getPanelList(): List<PanelConfiguration> =
         mapNotNull { panelObjectMap ->
             when (panelObjectMap["type"]) {
@@ -78,8 +91,15 @@ class ConfigurationRepository @Inject constructor(
             textColor = get("textColor") as String? ?: "#ffffff",
             icon = get("icon") as String,
             backgroundColor = get("background") as String?,
-            entity = get("entity") as String?
+            mqttTopic = (get("mqtt") as YamlMap?)?.parseMqttTopic(),
         )
+
+    private fun YamlMap.parseMqttTopic(): PanelMqttTopic =
+        PanelMqttTopic(
+            publishTopic = get("publishTopic") as? String,
+            receiverTopic = get("receiverTopic") as? String
+        )
+
 
     private companion object {
         const val SENSE_CONFIG_FILE = "senseConfig.yml"

@@ -25,6 +25,7 @@ gson = "2.10.1"
 jsoup = "1.16.1"
 datastore = "1.0.0-beta01"
 yml = "2.1"
+mqtt = "1.2.5"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -63,6 +64,7 @@ datastore = { group = "androidx.datastore", name = "datastore", version.ref = "d
 datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
 yml = { group = "org.yaml", name = "snakeyaml", version.ref = "yml" }
+mqtt = { group = "org.eclipse.paho", name = "org.eclipse.paho.mqttv5.client", version.ref = "mqtt" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

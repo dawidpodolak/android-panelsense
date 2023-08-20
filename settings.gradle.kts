@@ -1,14 +1,11 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":core")
-
-
 pluginManagement {
     repositories {
         google()
         mavenCentral()
         gradlePluginPortal()
-
+        maven("https://repo.eclipse.org/content/repositories/paho-releases/")
     }
 }
 
@@ -17,21 +14,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven("https://repo.eclipse.org/content/repositories/paho-releases/")
     }
 }
 
 rootProject.name = "NSPanelSense"
 include(":app")
-include(":domain")
+include(":core")
 include(":data")
-
-//buildscript {
-//    repositories {
-//        google()
-//        mavenCentral()
-//    }
-//
-//    dependencies {
-//        classpath("com.google.dagger:hilt-android-gradle-plugin:2.47")
-//    }
-//}

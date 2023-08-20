@@ -9,7 +9,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.nspanel.core.di.DataStoreType
 import com.nspanel.core.di.DataStoreType.Type.SvgImage
-import com.nspanel.core.model.IconSpec
+import com.nspanel.core.model.icon.IconSpec
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -55,7 +55,7 @@ class PictogramIconProvider @Inject constructor(
                     listOf(
                         PathData(
                             svgPath,
-                            android.graphics.Color.BLACK
+                            iconSpec.color
                         )
                     )
                 ).also {

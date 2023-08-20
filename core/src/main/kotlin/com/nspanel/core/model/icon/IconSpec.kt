@@ -1,4 +1,4 @@
-package com.nspanel.core.model
+package com.nspanel.core.model.icon
 
 data class IconSpec(
     val name: String,

@@ -1,4 +1,4 @@
-package com.nspanel.core.model
+package com.nspanel.core.model.panelconfig
 
 data class SenseConfiguration (
     val systemConfiguration: SystemConfiguration? = null,

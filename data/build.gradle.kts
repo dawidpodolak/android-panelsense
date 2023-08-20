@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.jsoup)
     implementation(libs.yml)
+    implementation(libs.mqtt)
     implementation(libs.okhttp.logging)
     implementation(libs.kotlin.coroutines.android)
     implementation(libs.kotlin.coroutines.core)

@@ -12,8 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import com.nspanel.core.model.IconSpec
-import com.nspanel.core.model.PanelConfiguration.HomePanel
+import com.nspanel.core.model.icon.IconSpec
+import com.nspanel.core.model.panelconfig.PanelConfiguration.HomePanel
 import com.nspanel.data.icons.IconProvider
 
 @Suppress("EmptyFunctionBlock")
@@ -30,7 +30,8 @@ fun HomePanel(panel: HomePanel, iconProvider: IconProvider) {
             drawable.value = iconProvider.getIcon(iconSpec = IconSpec(
                 name = "weather-partly-cloudy",
                 color = Color.Black.value.toInt()
-            ))
+            )
+            )
         }
         Image(
             painter = rememberDrawablePainter(drawable = drawable.value),
