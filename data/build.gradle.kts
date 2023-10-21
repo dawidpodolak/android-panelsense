@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.panel.data"
+    namespace = "com.panelsense.data"
     compileSdk = 34
 
     defaultConfig {

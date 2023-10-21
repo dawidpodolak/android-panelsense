@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.panel.core"
+    namespace = "com.panelsense.core"
     compileSdk = 34
 
     defaultConfig {

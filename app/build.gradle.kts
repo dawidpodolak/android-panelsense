@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.panel.sense"
+    namespace = "com.panelsense.sense"
     compileSdk = 34
 
     defaultConfig {
