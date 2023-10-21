@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nspanel.data"
+    namespace = "com.panel.data"
     compileSdk = 34
 
     defaultConfig {

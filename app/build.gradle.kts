@@ -8,11 +8,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nspanel.sense"
+    namespace = "com.panel.sense"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.nspanel.sense"
+        applicationId = "com.panel.sense"
         minSdk = 24
         //noinspection EditedTargetSdkVersion
         targetSdk = 34
