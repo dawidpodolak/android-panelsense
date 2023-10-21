@@ -1,4 +1,4 @@
-package com.panelsense.app
+package com.panelsense.app.ui.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,14 +19,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.rememberAsyncImagePainter
+import com.panelsense.app.ui.main.panel.GridPanel
+import com.panelsense.app.ui.main.panel.HomePanel
+import com.panelsense.app.ui.main.theme.NsPanelSenseTheme
 import com.panelsense.core.model.mqqt.MqttMessage
 import com.panelsense.core.model.panelconfig.PanelConfiguration
 import com.panelsense.core.model.panelconfig.PanelConfiguration.GridPanel
 import com.panelsense.core.model.panelconfig.PanelConfiguration.HomePanel
 import com.panelsense.data.icons.IconProvider
-import com.panelsense.app.ui.panel.GridPanel
-import com.panelsense.app.ui.panel.HomePanel
-import com.panelsense.app.ui.theme.NsPanelSenseTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow

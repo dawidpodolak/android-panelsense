@@ -1,4 +1,4 @@
-package com.panelsense.app.ui.panel
+package com.panelsense.app.ui.main.panel
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image

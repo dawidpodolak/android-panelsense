@@ -1,4 +1,4 @@
-package com.panelsense.app.ui.panel
+package com.panelsense.app.ui.main.panel
 
 import android.content.Context
 import android.graphics.Color.parseColor

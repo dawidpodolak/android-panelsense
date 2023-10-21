@@ -1,4 +1,4 @@
-package com.panelsense.app.ui.panel
+package com.panelsense.app.ui.main.panel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

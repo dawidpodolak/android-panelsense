@@ -1,4 +1,4 @@
-package com.panelsense.app.ui.theme
+package com.panelsense.app.ui.main.theme
 
 import androidx.compose.ui.graphics.Color
 

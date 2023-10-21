@@ -1,4 +1,4 @@
-package com.panelsense.app
+package com.panelsense.app.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
