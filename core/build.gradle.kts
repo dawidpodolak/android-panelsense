@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.nspanel.core"
+    namespace = "com.panel.core"
     compileSdk = 34
 
     defaultConfig {
