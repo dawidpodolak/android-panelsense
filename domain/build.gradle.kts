@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.panelsense.core"
+    namespace = "com.panelsense.domain"
     compileSdk = 34
 
     compileOptions {
@@ -19,15 +19,9 @@ android {
 }
 
 dependencies {
-
-    implementation(libs.core.ktx)
-    implementation(libs.appcompat)
-    implementation(libs.datastore)
-    implementation(libs.datastore.preferences)
-    implementation(libs.datastore.preferences.core)
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.android)
-    testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }

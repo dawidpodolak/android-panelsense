@@ -1,4 +1,4 @@
-package com.panelsense.data
+package com.panelsense.data.di
 
 import com.panelsense.data.icons.IconProvider
 import com.panelsense.data.icons.PictogramIconProvider

@@ -1,6 +1,7 @@
 package com.panelsense.app.ui.main
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -18,10 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberAsyncImagePainter
+import com.panelsense.app.R
+import com.panelsense.app.ui.login.LoginActivity
 import com.panelsense.app.ui.main.panel.GridPanel
 import com.panelsense.app.ui.main.panel.HomePanel
-import com.panelsense.app.ui.main.theme.NsPanelSenseTheme
+import com.panelsense.app.ui.main.theme.PanelSenseTheme
 import com.panelsense.core.model.mqqt.MqttMessage
 import com.panelsense.core.model.panelconfig.PanelConfiguration
 import com.panelsense.core.model.panelconfig.PanelConfiguration.GridPanel
@@ -30,6 +34,8 @@ import com.panelsense.data.icons.IconProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @ExperimentalFoundationApi
@@ -41,16 +47,17 @@ class MainActivity : ComponentActivity() {
 
     val viewModel: MainViewModel by viewModels<MainViewModel>()
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        Log.d("MainActivity", "onCreate")
+        Timber.d("onCreate")
         setContent {
-            NsPanelSenseTheme {
+            PanelSenseTheme {
 
                 val uiState = viewModel.stateFlow.collectAsState()
 //                Timber.d("Sense config ui: $uiState")
-                val senseConfig = uiState.value.senseConfiguration ?: return@NsPanelSenseTheme
+
+                val senseConfig = uiState.value.senseConfiguration ?: return@PanelSenseTheme
 //                Timber.d("Sense config: $senseConfig")
                 Background(senseConfig.systemConfiguration?.backgroundImageUrl)
                 if (senseConfig.panelList.isEmpty()) {
@@ -64,6 +71,20 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
+        }
+        setupNavigation()
+    }
+
+    private fun setupNavigation() {
+        lifecycleScope.launch {
+            viewModel.collectNavCommand { navCommand ->
+                when (navCommand) {
+                    is MainNavCommand.NavigateToLogin -> {
+                        LoginActivity.start(this@MainActivity)
+                    }
+                }
+            }
+
         }
     }
 }
@@ -138,7 +159,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    NsPanelSenseTheme {
+    PanelSenseTheme {
         Greeting("Android")
     }
 }

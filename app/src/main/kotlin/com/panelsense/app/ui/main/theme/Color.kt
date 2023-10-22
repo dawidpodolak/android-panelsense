@@ -2,7 +2,9 @@ package com.panelsense.app.ui.main.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
+val Primary = Color(0xFF223b4c)
+val InversePrimary = Color(0xFF3f5b6f)
+val Secondary = Color(0xFF4686ae)
+
+val BackgroundColor = Color(0xFF95ACBB)
+val TextColor = Color(0xFF162833)

@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.panelsense.sense"
+    namespace = "com.panelsense.app"
     compileSdk = 34
 
     defaultConfig {
@@ -58,6 +58,7 @@ kapt {
 dependencies {
     implementation(project(":data"))
     implementation(project(":core"))
+    implementation(project(":domain"))
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)

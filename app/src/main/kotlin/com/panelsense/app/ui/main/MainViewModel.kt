@@ -1,13 +1,14 @@
 package com.panelsense.app.ui.main
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.panelsense.core.base.NavViewModel
 import com.panelsense.core.model.panelconfig.PanelConfiguration
 import com.panelsense.core.model.panelconfig.PanelConfiguration.PanelItem
 import com.panelsense.core.model.panelconfig.SenseConfiguration
 import com.panelsense.core.model.state.PanelState
 import com.panelsense.data.mqtt.MqttController
 import com.panelsense.data.repository.ConfigurationRepository
+import com.panelsense.domain.interactor.LoginInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +19,9 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val configRepository: ConfigurationRepository,
-    private val mqttController: MqttController
-) : ViewModel() {
+    private val mqttController: MqttController,
+    private val loginInteractor: LoginInteractor
+) : NavViewModel<MainNavCommand>() {
 
     private val _stateFlow = MutableStateFlow(MainViewState())
     val stateFlow: StateFlow<MainViewState> = _stateFlow
@@ -27,6 +29,15 @@ class MainViewModel @Inject constructor(
 
     init {
         loadConfiguration()
+        checkIfUserIsLoggedIn()
+    }
+
+    private fun checkIfUserIsLoggedIn() {
+        viewModelScope.launch {
+            if (!loginInteractor.isUserLoggedIn()) {
+                navigateTo(MainNavCommand.NavigateToLogin)
+            }
+        }
     }
 
     private fun loadConfiguration() {
