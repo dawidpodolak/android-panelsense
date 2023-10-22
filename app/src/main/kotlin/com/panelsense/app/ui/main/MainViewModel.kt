@@ -10,8 +10,6 @@ import com.panelsense.data.mqtt.MqttController
 import com.panelsense.data.repository.ConfigurationRepository
 import com.panelsense.domain.interactor.LoginInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -21,10 +19,9 @@ class MainViewModel @Inject constructor(
     private val configRepository: ConfigurationRepository,
     private val mqttController: MqttController,
     private val loginInteractor: LoginInteractor
-) : NavViewModel<MainNavCommand>() {
+) : NavViewModel<MainNavCommand, MainViewModel.MainViewState>() {
 
-    private val _stateFlow = MutableStateFlow(MainViewState())
-    val stateFlow: StateFlow<MainViewState> = _stateFlow
+    override fun defaultState(): MainViewState = MainViewState()
     val messageFlow = mqttController.messageFlow
 
     init {
@@ -43,8 +40,7 @@ class MainViewModel @Inject constructor(
     private fun loadConfiguration() {
         viewModelScope.launch {
             val senseConfig = configRepository.getConfiguration()
-            Timber.d("Sense config: $senseConfig")
-            _stateFlow.value = MainViewState(senseConfig)
+            modify { copy(senseConfiguration = senseConfig) }
             mqttSetup(senseConfig)
         }
     }

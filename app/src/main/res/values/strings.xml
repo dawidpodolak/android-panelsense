@@ -10,4 +10,8 @@
     <string name="loginScreenPassword">Password</string>
     <string name="loginScreenShowPassword">Show password</string>
     <string name="loginScreenConnect">Connect</string>
+    <string name="loginScreenErrorMessage">Can not connect to server with given credentials</string>
+
+    <!--  General  -->
+    <string name="errorTitle">Error</string>
 </resources>

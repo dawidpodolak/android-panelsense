@@ -1,3 +1,0 @@
-package com.panelsense.domain.repository
-
-interface HomeAssistantAddonRepository

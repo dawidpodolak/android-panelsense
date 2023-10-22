@@ -1,5 +1,7 @@
 package com.panelsense.app.ui.login
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -18,9 +20,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,9 +45,16 @@ import com.panelsense.app.ui.main.theme.FontStyleButton
 import com.panelsense.app.ui.main.theme.FontStyleH3
 import com.panelsense.app.ui.main.theme.FontStyleH4
 import com.panelsense.app.ui.main.theme.FontStyleH4_SemiBold
+import com.panelsense.app.ui.util.ErrorScreen
+import com.panelsense.domain.model.ServerConnectionData
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    state: State<LoginViewState>,
+    errorState: State<Throwable?>,
+    loginRequest: (ServerConnectionData) -> Unit,
+    clearError: () -> Unit = {}
+) {
     Box(modifier = Modifier.background(BackgroundColor)) {
         val scrollState by remember { mutableStateOf(ScrollState(0)) }
         Column(
@@ -53,6 +64,7 @@ fun LoginScreen() {
                 .padding(10.dp)
                 .verticalScroll(scrollState, enabled = true)
         ) {
+
             var addressText by remember { mutableStateOf("") }
             var portText by remember { mutableStateOf("") }
             var userNameText by remember { mutableStateOf("") }
@@ -77,8 +89,6 @@ fun LoginScreen() {
             )
 
             Row {
-
-
                 OutlinedTextField(
                     modifier = Modifier.weight(2f),
                     value = addressText,
@@ -150,21 +160,61 @@ fun LoginScreen() {
                 )
             }
 
-            Button(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
-                enabled = validateData(addressText, portText, userNameText, passwordText),
-                onClick = { },
+                    .fillMaxWidth(0.5f)
+                    .height(60.dp)
+                    .align(Alignment.CenterHorizontally)
             ) {
-                Text(
-                    modifier = Modifier.padding(8.dp),
-                    text = stringResource(id = R.string.loginScreenConnect),
-                    style = FontStyleButton,
-                )
+
+                androidx.compose.animation.AnimatedVisibility(
+                    modifier = Modifier.align(Alignment.Center),
+                    visible = !state.value.isConnecting,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Button(
+                        enabled = validateData(addressText, portText, userNameText, passwordText),
+                        onClick = {
+                            loginRequest(
+                                ServerConnectionData(
+                                    serverAddressIp = addressText,
+                                    serverPort = portText,
+                                    userName = userNameText,
+                                    password = passwordText
+                                )
+                            )
+                        },
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(8.dp),
+                            text = stringResource(id = R.string.loginScreenConnect),
+                            style = FontStyleButton,
+                        )
+                    }
+                }
+
+                androidx.compose.animation.AnimatedVisibility(
+                    modifier = Modifier.align(Alignment.Center),
+                    visible = state.value.isConnecting,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
     }
+
+    val error by remember { errorState }
+    error?.let {
+        ErrorScreen(
+            message = stringResource(id = R.string.loginScreenErrorMessage),
+            onConfirm = clearError
+        )
+    }
 }
+
 
 fun validateData(addressIp: String, port: String, userName: String, password: String): Boolean {
     val ipRegex = Regex("^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\$")
@@ -172,9 +222,13 @@ fun validateData(addressIp: String, port: String, userName: String, password: St
 }
 
 @Suppress("StringLiteralDuplication")
-@Preview(showSystemUi = false, widthDp = 480, heightDp = 480)
+@Preview(showSystemUi = false, widthDp = 480, heightDp = 1480)
 @Composable
 @ExperimentalFoundationApi
 fun LoginScreenRenderer() {
-    LoginScreen()
+    LoginScreen(
+        state = remember { mutableStateOf(LoginViewState()) },
+        errorState = remember { mutableStateOf(null) },
+        {},
+        {})
 }

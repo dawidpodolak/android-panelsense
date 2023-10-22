@@ -55,10 +55,8 @@ class MainActivity : ComponentActivity() {
             PanelSenseTheme {
 
                 val uiState = viewModel.stateFlow.collectAsState()
-//                Timber.d("Sense config ui: $uiState")
 
-                val senseConfig = uiState.value.senseConfiguration ?: return@PanelSenseTheme
-//                Timber.d("Sense config: $senseConfig")
+                val senseConfig = uiState.value?.senseConfiguration ?: return@PanelSenseTheme
                 Background(senseConfig.systemConfiguration?.backgroundImageUrl)
                 if (senseConfig.panelList.isEmpty()) {
                     NoPanels()
