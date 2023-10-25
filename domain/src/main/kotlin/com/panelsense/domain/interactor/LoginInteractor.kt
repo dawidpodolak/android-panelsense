@@ -10,7 +10,7 @@ class LoginInteractor @Inject constructor(
     private val userDataRepository: UserDataRepository,
     private val serverRepository: ServerRepository
 ) {
-    suspend fun isUserLoggedIn(): Boolean = userDataRepository.isUserLoggedIn()
+    suspend fun isUserLoggedIn(): Boolean = userDataRepository.getServerConnectionData() != null
 
     suspend fun login(serverConnectionData: ServerConnectionData): Result<LoginSuccess> {
         val result = serverRepository.login(serverConnectionData)
@@ -18,5 +18,17 @@ class LoginInteractor @Inject constructor(
             userDataRepository.saveServerConnectionData(serverConnectionData)
         }
         return result
+    }
+
+    suspend fun relogin(): Result<LoginSuccess> {
+        val serverConnectionData =
+            userDataRepository.getServerConnectionData() ?: return Result.failure(
+                IllegalStateException("No server connection data")
+            )
+        return serverRepository.login(serverConnectionData)
+    }
+
+    suspend fun logout() {
+        userDataRepository.clearData()
     }
 }

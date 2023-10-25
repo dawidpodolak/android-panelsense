@@ -33,6 +33,12 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             if (!loginInteractor.isUserLoggedIn()) {
                 navigateTo(MainNavCommand.NavigateToLogin)
+                return@launch
+            }
+
+            val result = loginInteractor.relogin()
+            if (result.isFailure) {
+                navigateTo(MainNavCommand.NavigateToLogin)
             }
         }
     }

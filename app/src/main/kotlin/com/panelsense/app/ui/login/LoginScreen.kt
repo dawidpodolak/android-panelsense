@@ -66,11 +66,11 @@ fun LoginScreen(
                 .verticalScroll(scrollState, enabled = true)
         ) {
 
-            var addressText by remember { mutableStateOf("") }
-            var portText by remember { mutableStateOf("") }
-            var panelSenseNameText by remember { mutableStateOf("") }
-            var userNameText by remember { mutableStateOf("") }
-            var passwordText by remember { mutableStateOf("") }
+            var addressText by remember { mutableStateOf("192.168.1.32") }
+            var portText by remember { mutableStateOf("8652") }
+            var panelSenseNameText by remember { mutableStateOf("NsPanel Salon") }
+            var userNameText by remember { mutableStateOf("admin") }
+            var passwordText by remember { mutableStateOf("admin") }
             var passwordShow by remember { mutableStateOf(false) }
 
             Image(
@@ -192,7 +192,7 @@ fun LoginScreen(
                         onClick = {
                             loginRequest(
                                 ServerConnectionData(
-                                    serverAddressIp = addressText,
+                                    serverIPAddress = addressText,
                                     serverPort = portText,
                                     panelSenseName = panelSenseNameText,
                                     userName = userNameText,
@@ -224,7 +224,8 @@ fun LoginScreen(
     val error by remember { errorState }
     error?.let {
         ErrorScreen(
-            message = stringResource(id = R.string.loginScreenErrorMessage), onConfirm = clearError
+            message = stringResource(id = R.string.loginScreenErrorMessage),
+            onConfirm = clearError
         )
     }
 }
@@ -240,7 +241,8 @@ fun validateData(addressIp: String, port: String, userName: String, password: St
 @Composable
 @ExperimentalFoundationApi
 fun LoginScreenRenderer() {
-    LoginScreen(state = remember { mutableStateOf(LoginViewState()) },
+    LoginScreen(
+        state = remember { mutableStateOf(LoginViewState()) },
         errorState = remember { mutableStateOf(null) },
         {},
         {})

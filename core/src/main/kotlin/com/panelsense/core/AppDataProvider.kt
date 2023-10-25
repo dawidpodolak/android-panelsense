@@ -1,11 +1,31 @@
 package com.panelsense.core
 
-import android.os.Build
-import android.provider.Settings.Secure.ANDROID_ID
-import androidx.annotation.RequiresApi
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.stringPreferencesKey
+import com.panelsense.core.di.DataStoreType
+import kotlinx.coroutines.flow.firstOrNull
+import java.util.UUID
 import javax.inject.Inject
 
-class AppDataProvider @Inject constructor() {
-    @RequiresApi(Build.VERSION_CODES.CUPCAKE)
-    fun installationId(): String = ANDROID_ID
+class AppDataProvider @Inject constructor(
+    @DataStoreType(DataStoreType.Type.AppData)
+    private val appDataStore: DataStore<Preferences>
+) {
+    suspend fun installationId(): String {
+        var installationId: String? = appDataStore.data.firstOrNull()?.get(INSTALLATION_ID)
+
+        if (installationId == null) {
+            installationId = UUID.randomUUID().toString()
+            appDataStore.edit {
+                it[INSTALLATION_ID] = installationId
+            }
+        }
+        return installationId
+    }
+
+    private companion object {
+        val INSTALLATION_ID = stringPreferencesKey("installation_id")
+    }
 }

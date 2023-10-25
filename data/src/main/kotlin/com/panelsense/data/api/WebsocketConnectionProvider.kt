@@ -75,6 +75,8 @@ class WebsocketConnectionProvider @Inject constructor(private val gson: Gson) {
         .shareIn(websocketScope, SharingStarted.Eagerly, 1)
 
     fun sendMessage(message: Any) = websocketScope.launch {
-        webSocket?.send(gson.toJson(message))
+        val jsonMessage = gson.toJson(message)
+        Timber.d("Sending message: $jsonMessage")
+        webSocket?.send(jsonMessage)
     }
 }

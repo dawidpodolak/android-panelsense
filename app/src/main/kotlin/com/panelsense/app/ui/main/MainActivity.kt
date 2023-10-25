@@ -1,5 +1,7 @@
 package com.panelsense.app.ui.main
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -79,10 +81,17 @@ class MainActivity : ComponentActivity() {
                 when (navCommand) {
                     is MainNavCommand.NavigateToLogin -> {
                         LoginActivity.start(this@MainActivity)
+                        finish()
                     }
                 }
             }
 
+        }
+    }
+
+    companion object {
+        fun start(activity: Activity) {
+            activity.startActivity(Intent(activity, MainActivity::class.java))
         }
     }
 }

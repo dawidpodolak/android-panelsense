@@ -15,7 +15,9 @@ import com.panelsense.domain.repository.ServerRepository
 import kotlinx.coroutines.flow.first
 import java.nio.charset.Charset
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class PanelSenseRepository @Inject constructor(
     private val connectionProvider: WebsocketConnectionProvider,
     private val versionDataProvider: VersionDataProvider,
@@ -26,7 +28,7 @@ class PanelSenseRepository @Inject constructor(
     @Suppress("MagicNumber")
     override suspend fun login(serverConnectionData: ServerConnectionData): Result<LoginSuccess> {
         connectionProvider.connectToClient(
-            serverConnectionData.serverAddressIp,
+            serverConnectionData.serverIPAddress,
             serverConnectionData.serverPort
         )
             .getOrNull() ?: return Result.failure(IllegalStateException("Connection failed"))
@@ -61,6 +63,8 @@ class PanelSenseRepository @Inject constructor(
 
     private fun ServerConnectionData.getToken(): String {
         val token = "$userName:$password"
-        return Base64.encodeToString(token.toByteArray(Charset.defaultCharset()), Base64.DEFAULT)
+        val data =
+            Base64.encodeToString(token.toByteArray(Charset.defaultCharset()), Base64.DEFAULT)
+        return data.replace("\n", "")
     }
 }
