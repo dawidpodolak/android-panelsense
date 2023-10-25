@@ -1,9 +1,14 @@
 package com.panelsense.data.di
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.panelsense.data.icons.IconProvider
 import com.panelsense.data.icons.PictogramIconProvider
+import com.panelsense.data.model.MessageType
 import com.panelsense.data.mqtt.MqttController
 import com.panelsense.data.mqtt.MqttControllerImpl
+import com.panelsense.data.serializer.MessageTypeDeserializer
+import com.panelsense.data.serializer.MessageTypeSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,5 +46,13 @@ object DataModule {
     fun provideIconProviderImpl(iconProvider: PictogramIconProvider): IconProvider = iconProvider
 
     @Provides
-    fun providerMqttControllerImpl(mqttController: MqttControllerImpl): MqttController = mqttController
+    fun providerMqttControllerImpl(mqttController: MqttControllerImpl): MqttController =
+        mqttController
+
+    @Provides
+    fun provideGson(): Gson = GsonBuilder()
+        .disableHtmlEscaping()
+        .registerTypeAdapter(MessageType::class.java, MessageTypeSerializer())
+        .registerTypeAdapter(MessageType::class.java, MessageTypeDeserializer())
+        .create()
 }

@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.panel.sense"
-        minSdk = 24
+        minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 34
         versionCode = 1

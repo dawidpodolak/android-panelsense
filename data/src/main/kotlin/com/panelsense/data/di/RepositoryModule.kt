@@ -1,6 +1,6 @@
 package com.panelsense.data.di
 
-import com.panelsense.data.repository.HomeAssistantRepository
+import com.panelsense.data.repository.PanelSenseRepository
 import com.panelsense.data.repository.StorageUserDataRepository
 import com.panelsense.domain.repository.ServerRepository
 import com.panelsense.domain.repository.UserDataRepository
@@ -17,5 +17,5 @@ interface RepositoryModule {
     fun bindUserDataRepository(storageUserDataRepository: StorageUserDataRepository): UserDataRepository
 
     @Binds
-    fun bindServerRepository(haRepository: HomeAssistantRepository): ServerRepository
+    fun bindServerRepository(panelSenseRepository: PanelSenseRepository): ServerRepository
 }

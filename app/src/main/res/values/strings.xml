@@ -6,6 +6,7 @@
     <string name="loginScreenProvideUserAndPass">Provide user name and password</string>
     <string name="loginScreenServerAddress">Server IP</string>
     <string name="loginScreenServerPort">Port</string>
+    <string name="loginScreenPanelName">Panel name</string>
     <string name="loginScreenUserName">User name</string>
     <string name="loginScreenPassword">Password</string>
     <string name="loginScreenShowPassword">Show password</string>

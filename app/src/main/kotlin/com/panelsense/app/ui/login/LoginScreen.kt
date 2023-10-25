@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -67,6 +68,7 @@ fun LoginScreen(
 
             var addressText by remember { mutableStateOf("") }
             var portText by remember { mutableStateOf("") }
+            var panelSenseNameText by remember { mutableStateOf("") }
             var userNameText by remember { mutableStateOf("") }
             var passwordText by remember { mutableStateOf("") }
             var passwordShow by remember { mutableStateOf(false) }
@@ -124,25 +126,37 @@ fun LoginScreen(
                 style = FontStyleH4_SemiBold
             )
 
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = userNameText,
-                singleLine = true,
-                onValueChange = { userNameText = it },
-                label = { Text(stringResource(id = R.string.loginScreenUserName)) },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
-            )
+            Row {
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = userNameText,
+                    singleLine = true,
+                    onValueChange = { userNameText = it },
+                    label = { Text(stringResource(id = R.string.loginScreenUserName)) },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
+                )
 
+                Spacer(modifier = Modifier.weight(0.1f))
+
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    value = passwordText,
+                    singleLine = true,
+                    onValueChange = { passwordText = it },
+                    label = { Text(stringResource(id = R.string.loginScreenPassword)) },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done
+                    ),
+                    visualTransformation = if (passwordShow) VisualTransformation.None else PasswordVisualTransformation(),
+                )
+            }
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = passwordText,
+                value = panelSenseNameText,
                 singleLine = true,
-                onValueChange = { passwordText = it },
-                label = { Text(stringResource(id = R.string.loginScreenPassword)) },
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Done
-                ),
-                visualTransformation = if (passwordShow) VisualTransformation.None else PasswordVisualTransformation(),
+                onValueChange = { panelSenseNameText = it },
+                label = { Text(stringResource(id = R.string.loginScreenPanelName)) },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
 
             Row(
@@ -180,6 +194,7 @@ fun LoginScreen(
                                 ServerConnectionData(
                                     serverAddressIp = addressText,
                                     serverPort = portText,
+                                    panelSenseName = panelSenseNameText,
                                     userName = userNameText,
                                     password = passwordText
                                 )
@@ -209,8 +224,7 @@ fun LoginScreen(
     val error by remember { errorState }
     error?.let {
         ErrorScreen(
-            message = stringResource(id = R.string.loginScreenErrorMessage),
-            onConfirm = clearError
+            message = stringResource(id = R.string.loginScreenErrorMessage), onConfirm = clearError
         )
     }
 }
@@ -222,12 +236,11 @@ fun validateData(addressIp: String, port: String, userName: String, password: St
 }
 
 @Suppress("StringLiteralDuplication")
-@Preview(showSystemUi = false, widthDp = 480, heightDp = 1480)
+@Preview(showSystemUi = false, widthDp = 480, heightDp = 480)
 @Composable
 @ExperimentalFoundationApi
 fun LoginScreenRenderer() {
-    LoginScreen(
-        state = remember { mutableStateOf(LoginViewState()) },
+    LoginScreen(state = remember { mutableStateOf(LoginViewState()) },
         errorState = remember { mutableStateOf(null) },
         {},
         {})

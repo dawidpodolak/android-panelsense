@@ -8,6 +8,6 @@ import javax.inject.Qualifier
 
 annotation class DataStoreType(val type: Type) {
     enum class Type {
-        SvgImage
+        SvgImage, AppData
     }
 }
