@@ -81,6 +81,11 @@ val FontStyleH3_SemiBold = TextStyle(
     fontWeight = FontWeight.SemiBold,
     color = TextColor
 )
+val FontStyleH3_Medium = TextStyle(
+    fontSize = 19.sp,
+    fontWeight = FontWeight.Medium,
+    color = TextColor
+)
 val FontStyleH3 = TextStyle(
     fontSize = 19.sp,
     fontWeight = FontWeight.Normal,

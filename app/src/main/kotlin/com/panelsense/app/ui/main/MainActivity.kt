@@ -9,7 +9,11 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.Surface
@@ -17,16 +21,22 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import coil.compose.rememberAsyncImagePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.login.LoginActivity
 import com.panelsense.app.ui.main.panel.GridPanel
 import com.panelsense.app.ui.main.panel.HomePanel
+import com.panelsense.app.ui.main.theme.FontStyleH3_Medium
 import com.panelsense.app.ui.main.theme.PanelSenseTheme
 import com.panelsense.core.model.mqqt.MqttMessage
 import com.panelsense.core.model.panelconfig.PanelConfiguration
@@ -53,22 +63,41 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Log.d("MainActivity", "onCreate")
         Timber.d("onCreate")
-        setContent {
-            PanelSenseTheme {
 
+        setContent {
+
+            PanelSenseTheme {
                 val uiState = viewModel.stateFlow.collectAsState()
 
                 val senseConfig = uiState.value?.senseConfiguration ?: return@PanelSenseTheme
                 Background(senseConfig.systemConfiguration?.backgroundImageUrl)
-                if (senseConfig.panelList.isEmpty()) {
-                    NoPanels()
-                } else {
-                    PagerPanels(
-                        panels = senseConfig.panelList,
-                        iconProvider = iconProvider,
-                        stateFlow = viewModel.messageFlow,
-                        onClick = viewModel::onItemClick
-                    )
+
+                Box(modifier = Modifier.fillMaxSize()) {
+                    if (senseConfig.panelList.isEmpty()) {
+                        NoPanels()
+                    } else {
+                        PagerPanels(
+                            panels = senseConfig.panelList,
+                            iconProvider = iconProvider,
+                            stateFlow = viewModel.messageFlow,
+                            onClick = viewModel::onItemClick
+                        )
+
+                    }
+
+                    if (!uiState.value.serverConnected) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .requiredHeight(30.dp)
+                                .align(Alignment.BottomCenter)
+                                .background(Color.Red),
+                            color = Color.White,
+                            textAlign = TextAlign.Center,
+                            style = FontStyleH3_Medium,
+                            text = stringResource(id = R.string.serverDisconnected)
+                        )
+                    }
                 }
             }
         }
@@ -112,13 +141,13 @@ fun PagerPanels(
 ) {
 
     val pagerState = object : PagerState() {
-            override val pageCount: Int
-                get() = panels.size
-        }
+        override val pageCount: Int
+            get() = panels.size
+    }
 
     LaunchedEffect(key1 = true) {
         delay(2000)
-        pagerState.animateScrollToPage( 1)
+        pagerState.animateScrollToPage(1)
     }
     HorizontalPager(state = pagerState) { panelIndex ->
         when (val panelConfig = panels[panelIndex]) {

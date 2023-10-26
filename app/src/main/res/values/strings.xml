@@ -15,4 +15,5 @@
 
     <!--  General  -->
     <string name="errorTitle">Error</string>
+    <string name="serverDisconnected">Server disconnected!</string>
 </resources>

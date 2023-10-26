@@ -3,7 +3,7 @@ package com.panelsense.data.model
 import com.panelsense.domain.model.Configuration
 
 enum class MessageType(val value: String, val dataClass: Class<out Any>) {
-    AUTH("auth", AuthDataModel::class.java),
+    AUTH("auth", AuthResultModel::class.java),
     CONFIGURATION("configuration", Configuration::class.java),
     ERROR("error", Any::class.java),
     LIGHT("ha_action_light", Any::class.java),

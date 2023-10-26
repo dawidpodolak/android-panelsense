@@ -1,6 +1,5 @@
 package com.panelsense.domain.model
 
-
 data class Configuration(
     val system: ConfigurationSystem,
     val panelList: List<Panel>

@@ -3,6 +3,7 @@ package com.panelsense.data.api
 import com.google.gson.Gson
 import com.panelsense.data.model.MessageType
 import com.panelsense.data.model.WebsocketModel
+import com.panelsense.domain.model.ConnectionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -23,19 +24,31 @@ import okhttp3.WebSocketListener
 import timber.log.Timber
 import javax.inject.Inject
 
-class WebsocketConnectionProvider @Inject constructor(private val gson: Gson) {
+class WebsocketConnectionProvider @Inject constructor(
+    private val reconnectHelper: ReconnectHelper,
+    private val okHttpClient: OkHttpClient,
+    private val gson: Gson
+) {
 
+
+    private var webSocket: WebSocket? = null
+    private val websocketScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val messageFlow: MutableStateFlow<WebsocketModel?> = MutableStateFlow(null)
+    private val _connectionStateFlow: MutableStateFlow<ConnectionState> =
+        MutableStateFlow(ConnectionState.DISCONNECTED)
+    val connectionStateFlow: Flow<ConnectionState> = _connectionStateFlow
+        .shareIn(websocketScope, SharingStarted.Eagerly, 1)
 
     object ConnectionOpen
 
     private var connectionFlow: MutableStateFlow<Result<ConnectionOpen>?>? = null
-    private val okHttpClient = OkHttpClient.Builder()
-        .build()
+
 
     private val webSocketListener = object : WebSocketListener() {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             Timber.d("onOpen")
+            _connectionStateFlow.value = ConnectionState.CONNECTED
+            reconnectHelper.connectionOpen(webSocket)
             connectionFlow?.value = Result.success(ConnectionOpen)
         }
 
@@ -47,21 +60,23 @@ class WebsocketConnectionProvider @Inject constructor(private val gson: Gson) {
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            _connectionStateFlow.value = ConnectionState.DISCONNECTED
+            reconnectHelper.connectionClosed()
             Timber.d("onClosing: code: $code, reason: $reason")
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            _connectionStateFlow.value = ConnectionState.DISCONNECTED
             Timber.d("onClosed: code: $code, reason: $reason")
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            Timber.e(t)
+            _connectionStateFlow.value = ConnectionState.DISCONNECTED
+            Timber.e(t, "Websocket connection failure!")
+            reconnectHelper.connectionClosed()
             connectionFlow?.value = Result.failure(t)
         }
     }
-
-    private var webSocket: WebSocket? = null
-    private val websocketScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     suspend fun connectToClient(serverIp: String, port: String): Result<ConnectionOpen> {
         val request: Request = Request.Builder()
@@ -69,7 +84,7 @@ class WebsocketConnectionProvider @Inject constructor(private val gson: Gson) {
             .build()
         connectionFlow = MutableStateFlow<Result<ConnectionOpen>?>(null)
         webSocket = okHttpClient.newWebSocket(request, webSocketListener)
-
+        reconnectHelper.initialize(request, webSocketListener) { webSocket = it }
         return connectionFlow!!.mapNotNull { it }.first()
     }
 

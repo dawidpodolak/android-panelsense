@@ -9,6 +9,8 @@ import com.panelsense.core.model.state.PanelState
 import com.panelsense.data.mqtt.MqttController
 import com.panelsense.data.repository.ConfigurationRepository
 import com.panelsense.domain.interactor.LoginInteractor
+import com.panelsense.domain.interactor.PanelSenseInteractor
+import com.panelsense.domain.model.ConnectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -18,7 +20,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val configRepository: ConfigurationRepository,
     private val mqttController: MqttController,
-    private val loginInteractor: LoginInteractor
+    private val loginInteractor: LoginInteractor,
+    private val panelSenseInteractor: PanelSenseInteractor
 ) : NavViewModel<MainNavCommand, MainViewModel.MainViewState>() {
 
     override fun defaultState(): MainViewState = MainViewState()
@@ -27,6 +30,7 @@ class MainViewModel @Inject constructor(
     init {
         loadConfiguration()
         checkIfUserIsLoggedIn()
+        observerConnection()
     }
 
     private fun checkIfUserIsLoggedIn() {
@@ -48,6 +52,14 @@ class MainViewModel @Inject constructor(
             val senseConfig = configRepository.getConfiguration()
             modify { copy(senseConfiguration = senseConfig) }
             mqttSetup(senseConfig)
+        }
+    }
+
+    private fun observerConnection() {
+        viewModelScope.launch {
+            panelSenseInteractor.connectionState().collect { state ->
+                modify { copy(serverConnected = state == ConnectionState.CONNECTED) }
+            }
         }
     }
 
@@ -99,6 +111,7 @@ class MainViewModel @Inject constructor(
     }
 
     data class MainViewState(
-        val senseConfiguration: SenseConfiguration? = null
+        val senseConfiguration: SenseConfiguration? = null,
+        val serverConnected: Boolean = true
     )
 }
