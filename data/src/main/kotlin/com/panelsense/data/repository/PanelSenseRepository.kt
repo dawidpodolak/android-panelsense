@@ -9,9 +9,11 @@ import com.panelsense.data.model.AuthDataModel
 import com.panelsense.data.model.AuthModelRequest
 import com.panelsense.data.model.AuthResultModel
 import com.panelsense.data.model.MessageType
+import com.panelsense.domain.model.Configuration
 import com.panelsense.domain.model.LoginSuccess
 import com.panelsense.domain.model.ServerConnectionData
 import com.panelsense.domain.repository.ServerRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.nio.charset.Charset
 import javax.inject.Inject
@@ -38,28 +40,27 @@ class PanelSenseRepository @Inject constructor(
     private suspend fun loginToPanelSenseAddon(serverConnectionData: ServerConnectionData): Result<LoginSuccess> {
         val authData = AuthDataModel(
             token = serverConnectionData.getToken(),
-            version_name = versionDataProvider.versionName,
-            version_code = versionDataProvider.versionCode,
+            versionName = versionDataProvider.versionName,
+            versionCode = versionDataProvider.versionCode,
             name = serverConnectionData.panelSenseName,
-            installation_id = appDataProvider.installationId()
+            installationId = appDataProvider.installationId()
         )
 
         connectionProvider.sendMessage(AuthModelRequest(data = authData))
 
         return runCatching {
-            val message = connectionProvider.listenForMessages().first()
+            val message =
+                connectionProvider.listenForMessages<AuthResultModel>(MessageType.AUTH).first()
 
-            if (message.type != MessageType.AUTH) {
-                throw IllegalStateException("Expected AUTH message, got $message")
-            }
-
-            val loginResult = gson.fromJson(message.data.toString(), AuthResultModel::class.java)
-            if (loginResult.auth_result == AuthResultModel.Result.FAILURE) {
+            if (message.authResult == AuthResultModel.Result.FAILURE) {
                 throw IllegalStateException("Login failed")
             }
             LoginSuccess
         }
     }
+
+    override fun configuration(): Flow<Configuration> =
+        connectionProvider.listenForMessages(MessageType.CONFIGURATION)
 
     private fun ServerConnectionData.getToken(): String {
         val token = "$userName:$password"

@@ -1,6 +1,7 @@
 package com.panelsense.data.api
 
 import com.google.gson.Gson
+import com.panelsense.data.model.MessageType
 import com.panelsense.data.model.WebsocketModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -8,7 +9,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -70,9 +73,13 @@ class WebsocketConnectionProvider @Inject constructor(private val gson: Gson) {
         return connectionFlow!!.mapNotNull { it }.first()
     }
 
-    fun listenForMessages(): Flow<WebsocketModel> = messageFlow
-        .mapNotNull { it }
+    fun <DATA_TYPE> listenForMessages(messageType: MessageType): Flow<DATA_TYPE> = messageFlow
         .shareIn(websocketScope, SharingStarted.Eagerly, 1)
+        .mapNotNull { it }
+        .filter { it.type == messageType }
+        .map {
+            gson.fromJson(it.data, messageType.dataClass) as DATA_TYPE
+        }
 
     fun sendMessage(message: Any) = websocketScope.launch {
         val jsonMessage = gson.toJson(message)

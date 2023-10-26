@@ -1,5 +1,3 @@
-@file:Suppress("ConstructorParameterNaming")
-
 package com.panelsense.data.model
 
 data class AuthModelRequest(
@@ -9,14 +7,14 @@ data class AuthModelRequest(
 
 data class AuthDataModel(
     val token: String,
-    val version_name: String,
-    val version_code: Int,
+    val versionName: String,
+    val versionCode: Int,
     val name: String,
-    val installation_id: String
+    val installationId: String
 )
 
 data class AuthResultModel(
-    val auth_result: Result
+    val authResult: Result
 ) {
     enum class Result {
         SUCCESS,

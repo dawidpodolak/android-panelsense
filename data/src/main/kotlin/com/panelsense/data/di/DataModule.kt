@@ -1,5 +1,6 @@
 package com.panelsense.data.di
 
+import com.google.gson.FieldNamingPolicy
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.panelsense.data.icons.IconProvider
@@ -53,5 +54,6 @@ object DataModule {
         .disableHtmlEscaping()
         .registerTypeAdapter(MessageType::class.java, MessageTypeSerializer())
         .registerTypeAdapter(MessageType::class.java, MessageTypeDeserializer())
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
 }
