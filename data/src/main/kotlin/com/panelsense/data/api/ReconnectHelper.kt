@@ -11,6 +11,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
+import timber.log.Timber
 import javax.inject.Inject
 
 class ReconnectHelper @Inject constructor(private val okHttpClient: OkHttpClient) {
@@ -38,8 +39,8 @@ class ReconnectHelper @Inject constructor(private val okHttpClient: OkHttpClient
     }
 
     fun connectionOpen(webSocket: WebSocket) {
+        repeatScope?.cancel()
         if (connectionClosedAccidentally) {
-            repeatScope?.cancel()
             this.callback(webSocket)
         }
     }
@@ -50,6 +51,7 @@ class ReconnectHelper @Inject constructor(private val okHttpClient: OkHttpClient
         repeatScope?.launch {
             while (true) {
                 delay(RECONNECT_DELAY)
+                Timber.d("Reconnecting to websocket")
                 okHttpClient.newWebSocket(request, webSocketListener)
             }
         }

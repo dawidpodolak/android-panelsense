@@ -16,6 +16,7 @@ class LoginInteractor @Inject constructor(
         val result = serverRepository.login(serverConnectionData)
         if (result.isSuccess) {
             userDataRepository.saveServerConnectionData(serverConnectionData)
+            serverRepository.requestEntitiesState(true)
         }
         return result
     }
@@ -25,7 +26,11 @@ class LoginInteractor @Inject constructor(
             userDataRepository.getServerConnectionData() ?: return Result.failure(
                 IllegalStateException("No server connection data")
             )
-        return serverRepository.login(serverConnectionData)
+        val loginResult = serverRepository.login(serverConnectionData)
+        if (loginResult.isSuccess) {
+            serverRepository.requestEntitiesState(true)
+        }
+        return loginResult
     }
 
     suspend fun logout() {

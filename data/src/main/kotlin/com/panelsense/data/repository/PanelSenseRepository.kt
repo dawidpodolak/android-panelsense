@@ -8,12 +8,14 @@ import com.panelsense.data.model.AuthDataModel
 import com.panelsense.data.model.AuthModelRequest
 import com.panelsense.data.model.AuthResultModel
 import com.panelsense.data.model.MessageType
+import com.panelsense.data.model.RequestEnitiesStates
 import com.panelsense.domain.model.Configuration
 import com.panelsense.domain.model.ConnectionState
 import com.panelsense.domain.model.LoginSuccess
 import com.panelsense.domain.model.ServerConnectionData
 import com.panelsense.domain.repository.ServerRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -69,7 +71,8 @@ class PanelSenseRepository @Inject constructor(
     override fun connectionState(): Flow<ConnectionState> = connectionProvider.connectionStateFlow
         .flatMapLatest { connectionState ->
             if (connectionState == ConnectionState.CONNECTED && successServerConnectionData != null) {
-                login(serverConnectionData = successServerConnectionData!!)
+                loginToPanelSenseAddon(serverConnectionData = successServerConnectionData!!)
+                requestEntitiesState(true)
             }
             flowOf(connectionState)
         }
@@ -77,10 +80,21 @@ class PanelSenseRepository @Inject constructor(
     override fun configuration(): Flow<Configuration> =
         connectionProvider.listenForMessages(MessageType.CONFIGURATION)
 
+    override suspend fun requestEntitiesState(delay: Boolean) {
+        if (delay) {
+            delay(REQUEST_STATE_DELAY)
+        }
+        connectionProvider.sendMessage(RequestEnitiesStates())
+    }
+
     private fun ServerConnectionData.getToken(): String {
         val token = "$userName:$password"
         val data =
             Base64.encodeToString(token.toByteArray(Charset.defaultCharset()), Base64.DEFAULT)
         return data.replace("\n", "")
+    }
+
+    private companion object {
+        const val REQUEST_STATE_DELAY = 500L
     }
 }

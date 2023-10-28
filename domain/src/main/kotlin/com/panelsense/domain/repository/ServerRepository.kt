@@ -12,4 +12,6 @@ interface ServerRepository {
     fun configuration(): Flow<Configuration>
 
     fun connectionState(): Flow<ConnectionState>
+
+    suspend fun requestEntitiesState(delay: Boolean = false)
 }

@@ -62,11 +62,13 @@ class WebsocketConnectionProvider @Inject constructor(
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
             _connectionStateFlow.value = ConnectionState.DISCONNECTED
             reconnectHelper.connectionClosed()
+            webSocket.cancel()
             Timber.d("onClosing: code: $code, reason: $reason")
         }
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             _connectionStateFlow.value = ConnectionState.DISCONNECTED
+            webSocket.cancel()
             Timber.d("onClosed: code: $code, reason: $reason")
         }
 
@@ -74,11 +76,13 @@ class WebsocketConnectionProvider @Inject constructor(
             _connectionStateFlow.value = ConnectionState.DISCONNECTED
             Timber.e(t, "Websocket connection failure!")
             reconnectHelper.connectionClosed()
+            webSocket.cancel()
             connectionFlow?.value = Result.failure(t)
         }
     }
 
     suspend fun connectToClient(serverIp: String, port: String): Result<ConnectionOpen> {
+        Timber.d("Connecting to websocket")
         val request: Request = Request.Builder()
             .url("ws://$serverIp:$port")
             .build()
