@@ -8,12 +8,12 @@ plugins {
 }
 
 android {
-    namespace = "com.panel.sense"
+    namespace = "com.panelsense.app"
     compileSdk = 34
 
     defaultConfig {
         applicationId = "com.panel.sense"
-        minSdk = 24
+        minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 34
         versionCode = 1
@@ -58,6 +58,7 @@ kapt {
 dependencies {
     implementation(project(":data"))
     implementation(project(":core"))
+    implementation(project(":domain"))
     implementation(libs.core.ktx)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.activity.compose)
