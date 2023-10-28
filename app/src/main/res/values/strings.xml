@@ -1,3 +1,19 @@
 <resources>
     <string name="app_name">PanelSense</string>
+
+    <!--  Login scree  -->
+    <string name="loginScreenProvideServerAddress">Provide server address and port</string>
+    <string name="loginScreenProvideUserAndPass">Provide user name and password</string>
+    <string name="loginScreenServerAddress">Server IP</string>
+    <string name="loginScreenServerPort">Port</string>
+    <string name="loginScreenPanelName">Panel name</string>
+    <string name="loginScreenUserName">User name</string>
+    <string name="loginScreenPassword">Password</string>
+    <string name="loginScreenShowPassword">Show password</string>
+    <string name="loginScreenConnect">Connect</string>
+    <string name="loginScreenErrorMessage">Can not connect to server with given credentials</string>
+
+    <!--  General  -->
+    <string name="errorTitle">Error</string>
+    <string name="serverDisconnected">Server disconnected!</string>
 </resources>

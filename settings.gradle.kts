@@ -21,4 +21,5 @@ dependencyResolutionManagement {
 rootProject.name = "NSPanelSense"
 include(":app")
 include(":core")
+include(":domain")
 include(":data")
