@@ -41,11 +41,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.panelsense.app.R
-import com.panelsense.app.ui.main.theme.BackgroundColor
-import com.panelsense.app.ui.main.theme.FontStyleButton
-import com.panelsense.app.ui.main.theme.FontStyleH3
-import com.panelsense.app.ui.main.theme.FontStyleH4
-import com.panelsense.app.ui.main.theme.FontStyleH4_SemiBold
+import com.panelsense.app.ui.theme.BackgroundColor
+import com.panelsense.app.ui.theme.FontStyleButton
+import com.panelsense.app.ui.theme.FontStyleH3
+import com.panelsense.app.ui.theme.FontStyleH4
+import com.panelsense.app.ui.theme.FontStyleH4_SemiBold
 import com.panelsense.app.ui.util.ErrorScreen
 import com.panelsense.domain.model.ServerConnectionData
 

@@ -6,24 +6,32 @@ import com.panelsense.core.model.panelconfig.PanelConfiguration
 import com.panelsense.core.model.panelconfig.PanelConfiguration.PanelItem
 import com.panelsense.core.model.panelconfig.SenseConfiguration
 import com.panelsense.core.model.state.PanelState
+import com.panelsense.data.icons.IconProvider
 import com.panelsense.data.mqtt.MqttController
 import com.panelsense.data.repository.ConfigurationRepository
 import com.panelsense.domain.interactor.LoginInteractor
 import com.panelsense.domain.interactor.PanelSenseInteractor
 import com.panelsense.domain.model.Configuration
 import com.panelsense.domain.model.ConnectionState
+import com.panelsense.domain.model.entity.command.EntityCommand
+import com.panelsense.domain.model.entity.state.EntityState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.reflect.KClass
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val configRepository: ConfigurationRepository,
     private val mqttController: MqttController,
     private val loginInteractor: LoginInteractor,
-    private val panelSenseInteractor: PanelSenseInteractor
-) : NavViewModel<MainNavCommand, MainViewModel.MainViewState>() {
+    private val panelSenseInteractor: PanelSenseInteractor,
+    private var iconProvider: IconProvider
+) : NavViewModel<MainNavCommand, MainViewModel.MainViewState>(), EntityInteractor {
 
     override fun defaultState(): MainViewState = MainViewState()
     val messageFlow = mqttController.messageFlow
@@ -119,6 +127,18 @@ class MainViewModel @Inject constructor(
             }
         }
     }
+
+    override fun <T : EntityState> listenOnState(entityId: String, kType: KClass<T>): Flow<T> {
+        return panelSenseInteractor.listenOnEntityState()
+            .mapNotNull { it as? T }
+            .filter { it.entityId == entityId }
+    }
+
+    override fun sendCommand(command: EntityCommand) {
+        Timber.d("Send Command: $command")
+    }
+
+    override fun getIconProvider(): IconProvider = iconProvider
 
     data class MainViewState(
         @Deprecated("Use panelConfiguration")

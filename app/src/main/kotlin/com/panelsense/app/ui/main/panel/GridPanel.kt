@@ -2,47 +2,21 @@ package com.panelsense.app.ui.main.panel
 
 import android.content.Context
 import android.graphics.Color.parseColor
-import android.graphics.drawable.Drawable
 import android.media.AudioManager
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.google.accompanist.drawablepainter.rememberDrawablePainter
-import com.panelsense.core.model.icon.IconSpec
-import com.panelsense.core.model.mqqt.MqttMessage
-import com.panelsense.core.model.panelconfig.PanelConfiguration.GridPanel
-import com.panelsense.core.model.panelconfig.PanelConfiguration.PanelItem.ButtonItem
-import com.panelsense.core.model.state.PanelState
-import com.panelsense.data.icons.IconProvider
-import kotlinx.coroutines.flow.Flow
-import android.graphics.Color as AndroidColor
+import com.panelsense.app.ui.main.EntityInteractor
+import com.panelsense.domain.model.Panel
+import com.panelsense.domain.model.PanelItem
 
 @Suppress("TopLevelPropertyNaming")
 const val DefaultButtonBackground = "#88cecece"
@@ -52,115 +26,117 @@ val ButtonMiddleSpace = 20.dp
 
 @Composable
 @ExperimentalFoundationApi
-fun GridPanel(
-    panelConfiguration: GridPanel,
-    iconProvider: IconProvider,
-    stateFlow: Flow<MqttMessage>,
-    onClick: (ButtonItem) -> Unit
+fun GridPanelView(
+    panelConfiguration: Panel.GridPanel,
+    entityInteractor: EntityInteractor
 ) {
     var gridParentHeight: Int = remember {
         200
     }
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(panelConfiguration.columnCount),
-        modifier = Modifier
-            .onGloballyPositioned {
-                gridParentHeight = it.size.height
-            },
-        contentPadding = PaddingValues(GridPadding),
-        verticalArrangement = Arrangement.spacedBy(GridPadding),
-        horizontalArrangement = Arrangement.spacedBy(GridPadding)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
 
-        items(count = panelConfiguration.gridItems.size) { index ->
-            when (val item = panelConfiguration.gridItems[index]) {
-                is ButtonItem -> PanelButton(
-                    buttonConfig = item,
-                    iconProvider = iconProvider,
-                    parentHeight = gridParentHeight,
-                    stateFlow = stateFlow,
-                    onClick = onClick,
-                )
-            }
+        panelConfiguration.background?.let {
+            Background(imageUrl = it)
         }
+        Text(
+            modifier = Modifier.align(Alignment.Center),
+            text = panelConfiguration.id ?: "Grid panel"
+        )
     }
+    /*  LazyVerticalGrid(
+          columns = GridCells.Fixed(panelConfiguration.columnCount),
+          modifier = Modifier
+              .onGloballyPositioned {
+                  gridParentHeight = it.size.height
+              },
+          contentPadding = PaddingValues(GridPadding),
+          verticalArrangement = Arrangement.spacedBy(GridPadding),
+          horizontalArrangement = Arrangement.spacedBy(GridPadding)
+      ) {
+
+          items(count = panelConfiguration.itemList.size) { index ->
+              when (val item = panelConfiguration.itemList[index]) {
+                  is PanelItem -> PanelButtonView(
+                      buttonConfig = item,
+                      entityInteractor = entityInteractor,
+                      parentHeight = gridParentHeight,
+                  )
+              }
+          }
+      }*/
 }
 
 
 @Composable
-fun PanelButton(
-    buttonConfig: ButtonItem,
-    iconProvider: IconProvider,
+fun PanelButtonView(
+    buttonConfig: PanelItem,
+    entityInteractor: EntityInteractor,
     parentHeight: Int,
-    stateFlow: Flow<MqttMessage>,
-    onClick: (ButtonItem) -> Unit
 ) {
-    val buttonColor = Color(
-        parseColor(
-            buttonConfig.backgroundColor ?: DefaultButtonBackground
-        )
-    )
+    val buttonColor = Color(parseColor(DefaultButtonBackground))
 
-    val buttonState: MutableState<PanelState.ButtonState> =
-        stateFlow.getState<PanelState.ButtonState>(buttonConfig)
+//    val buttonState: MutableState<PanelState.ButtonState> =
+//        entityInteractor.listenOnState(buttonConfig.entity, LightEntityState::class).collectAsState(
+//            initial =
+//        )
 
-    Button(
-        onClick = {
-            onClick(buttonConfig.copy(state = buttonState.value))
-        }.withSound(context = LocalContext.current),
-        shape = ButtonShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = buttonColor,
-        ),
-        contentPadding = PaddingValues(0.dp),
-        modifier = Modifier
-            .height(parentHeight.dp)
-    ) {
+    /*    Button(
+            onClick = {
+                onClick(buttonConfig.copy(state = buttonState.value))
+            }.withSound(context = LocalContext.current),
+            shape = ButtonShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = buttonColor,
+            ),
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier
+                .height(parentHeight.dp)
+        ) {
 
-        Box {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-            ) {
+            Box {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                ) {
 
-                val drawableState = remember { mutableStateOf<Drawable?>(null) }
-                LaunchedEffect(key1 = buttonState.value) {
-                    val iconColor = if (buttonState.value.enabled) {
-                        AndroidColor.YELLOW
-                    } else {
-                        AndroidColor.BLACK
+                    val drawableState = remember { mutableStateOf<Drawable?>(null) }
+                    LaunchedEffect(key1 = buttonState.value) {
+                        val iconColor = if (buttonState.value.enabled) {
+                            AndroidColor.YELLOW
+                        } else {
+                            AndroidColor.BLACK
+                        }
+
+                        val iconSpec = IconSpec(
+                            name = buttonConfig.icon,
+                            color = iconColor
+                        )
+                        drawableState.value = iconProvider.getIcon(iconSpec = iconSpec)
                     }
 
-                    val iconSpec = IconSpec(
-                        name = buttonConfig.icon,
-                        color = iconColor
+                    Image(
+                        painter = rememberDrawablePainter(drawable = drawableState.value),
+                        modifier = Modifier
+                            .fillMaxSize(0.4f)
+                            .align(Alignment.CenterHorizontally),
+                        contentDescription = buttonConfig.text,
+                        alignment = Alignment.Center
                     )
-                    drawableState.value = iconProvider.getIcon(iconSpec = iconSpec)
+                    Spacer(modifier = Modifier.height(ButtonMiddleSpace))
+                    Text(
+                        text = buttonConfig.text,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally),
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.Center,
+                        color = Color(parseColor(buttonConfig.textColor))
+                    )
                 }
-
-                Image(
-                    painter = rememberDrawablePainter(drawable = drawableState.value),
-                    modifier = Modifier
-                        .fillMaxSize(0.4f)
-                        .align(Alignment.CenterHorizontally),
-                    contentDescription = buttonConfig.text,
-                    alignment = Alignment.Center
-                )
-                Spacer(modifier = Modifier.height(ButtonMiddleSpace))
-                Text(
-                    text = buttonConfig.text,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally),
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center,
-                    color = Color(parseColor(buttonConfig.textColor))
-                )
             }
-        }
-    }
+        }*/
 }
 
 fun (() -> Unit).withSound(context: Context): (() -> Unit) = {

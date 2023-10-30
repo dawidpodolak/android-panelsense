@@ -20,7 +20,8 @@ sealed class Panel {
         val weatherEntity: String? = null,
         val time24h: Boolean = false,
         val itemLeft: PanelItem? = null,
-        val itemRight: PanelItem? = null
+        val itemRight: PanelItem? = null,
+        val background: String? = null
     ) : Panel()
 
     data class GridPanel(
@@ -28,7 +29,8 @@ sealed class Panel {
         val type: PanelType = PanelType.GRID,
         val name: String? = null,
         val columnCount: Int = 0,
-        val itemList: List<PanelItem> = emptyList()
+        val itemList: List<PanelItem> = emptyList(),
+        val background: String? = null
     ) : Panel()
 }
 
