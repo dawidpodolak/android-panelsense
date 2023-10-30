@@ -14,12 +14,17 @@ import com.panelsense.domain.model.ConnectionState
 import com.panelsense.domain.model.LoginSuccess
 import com.panelsense.domain.model.ServerConnectionData
 import com.panelsense.domain.repository.ServerRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.shareIn
 import timber.log.Timber
 import java.nio.charset.Charset
 import javax.inject.Inject
@@ -33,7 +38,7 @@ class PanelSenseRepository @Inject constructor(
 ) : ServerRepository {
 
     private var successServerConnectionData: ServerConnectionData? = null
-
+    private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     @Suppress("MagicNumber")
     override suspend fun login(serverConnectionData: ServerConnectionData): Result<LoginSuccess> {
         connectionProvider.connectToClient(
@@ -78,7 +83,8 @@ class PanelSenseRepository @Inject constructor(
         }
 
     override fun configuration(): Flow<Configuration> =
-        connectionProvider.listenForMessages(MessageType.CONFIGURATION)
+        connectionProvider.listenForMessages<Configuration>(MessageType.CONFIGURATION)
+            .shareIn(coroutineScope, SharingStarted.Eagerly, replay = 1)
 
     override suspend fun requestEntitiesState(delay: Boolean) {
         if (delay) {

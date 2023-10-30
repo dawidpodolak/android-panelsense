@@ -10,6 +10,10 @@ import com.panelsense.data.mqtt.MqttController
 import com.panelsense.data.mqtt.MqttControllerImpl
 import com.panelsense.data.serializer.MessageTypeDeserializer
 import com.panelsense.data.serializer.MessageTypeSerializer
+import com.panelsense.data.serializer.PanelDeserializer
+import com.panelsense.data.serializer.PanelTypeDeserializer
+import com.panelsense.domain.model.Panel
+import com.panelsense.domain.model.PanelType
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -54,6 +58,8 @@ object DataModule {
         .disableHtmlEscaping()
         .registerTypeAdapter(MessageType::class.java, MessageTypeSerializer())
         .registerTypeAdapter(MessageType::class.java, MessageTypeDeserializer())
+        .registerTypeAdapter(Panel::class.java, PanelDeserializer())
+        .registerTypeAdapter(PanelType::class.java, PanelTypeDeserializer())
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
 }
