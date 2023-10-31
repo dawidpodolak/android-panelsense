@@ -33,11 +33,12 @@ fun GridPanelView(
     var gridParentHeight: Int = remember {
         200
     }
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .applyBackground(panelConfiguration.background)
+    ) {
 
-        panelConfiguration.background?.let {
-            Background(imageUrl = it)
-        }
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = panelConfiguration.id ?: "Grid panel"

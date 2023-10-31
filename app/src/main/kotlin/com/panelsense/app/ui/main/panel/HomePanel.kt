@@ -24,12 +24,11 @@ import com.panelsense.domain.model.Panel
 fun HomePanelView(homePanel: Panel.HomePanel, entityInteractor: EntityInteractor) {
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .applyBackground(homePanel.background)
     ) {
 
-        homePanel.background?.let {
-            Background(imageUrl = it)
-        }
         Text(
             modifier = Modifier.align(Alignment.Center),
             text = homePanel.id ?: "Home Panel"

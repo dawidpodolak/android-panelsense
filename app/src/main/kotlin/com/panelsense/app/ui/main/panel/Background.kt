@@ -1,48 +1,25 @@
 package com.panelsense.app.ui.main.panel
 
 import android.util.Patterns
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import coil.compose.rememberAsyncImagePainter
-import com.panelsense.app.R
 
 @Composable
-fun Background(imageUrl: String?) {
-    when (val bg = imageUrl.getBackgroundType()) {
-        is BackgroundType.BackgroundURL -> {
-            val painter = rememberAsyncImagePainter(model = bg.url)
-            Image(
-                painter = painter,
-                contentDescription = "Background",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        is BackgroundType.BackgroundColor -> Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(bg.color)
+fun Modifier.applyBackground(background: String?): Modifier =
+    when (val backgroundType = background.getBackgroundType()) {
+        is BackgroundType.BackgroundColor -> this.background(backgroundType.color)
+        is BackgroundType.BackgroundURL -> this.paint(
+            rememberAsyncImagePainter(model = backgroundType.url),
+            contentScale = ContentScale.Crop
         )
 
-        is BackgroundType.BackgroundNone -> {
-            val painter = painterResource(id = R.drawable.background)
-            Image(
-                painter = painter,
-                contentDescription = "Background",
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
+        else -> this
     }
-}
 
 sealed class BackgroundType {
 

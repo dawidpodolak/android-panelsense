@@ -33,6 +33,7 @@ import com.panelsense.app.ui.login.LoginActivity
 import com.panelsense.app.ui.main.panel.GridPanelView
 import com.panelsense.app.ui.main.panel.HomePanelView
 import com.panelsense.app.ui.main.panel.NavigationBar
+import com.panelsense.app.ui.main.panel.applyBackground
 import com.panelsense.app.ui.theme.FontStyleH3_Medium
 import com.panelsense.app.ui.theme.PanelSenseTheme
 import com.panelsense.data.icons.IconProvider
@@ -63,7 +64,11 @@ class MainActivity : ComponentActivity() {
 
                 val senseConfig = uiState.value.panelConfiguration ?: return@PanelSenseTheme
 
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .applyBackground(senseConfig.system.background)
+                        .fillMaxSize()
+                ) {
                     if (senseConfig.panelList.isEmpty()) {
                         NoPanels()
                     } else {

@@ -7,7 +7,8 @@ data class Configuration(
 
 data class ConfigurationSystem(
     val mainPanelId: String? = null,
-    val showNavBar: Boolean = false
+    val showNavBar: Boolean = false,
+    val background: String? = null
 )
 
 
