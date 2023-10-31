@@ -27,6 +27,8 @@ jsoup = "1.16.1"
 datastore = "1.0.0-beta01"
 yml = "2.1"
 mqtt = "1.2.5"
+threetenabp = "1.4.6"
+threetenadapter = "1.0.2"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -67,6 +69,8 @@ datastore-preferences = { group = "androidx.datastore", name = "datastore-prefer
 datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastore" }
 yml = { group = "org.yaml", name = "snakeyaml", version.ref = "yml" }
 mqtt = { group = "org.eclipse.paho", name = "org.eclipse.paho.mqttv5.client", version.ref = "mqtt" }
+threetenabp = { group = "com.jakewharton.threetenabp", name = "threetenabp", version.ref = "threetenabp" }
+threetenadapter = { group = "org.aaronhe", name = "threetenbp-gson-adapter", version.ref = "threetenadapter" }
 
 [plugins]
 com-android-application = { id = "com.android.application", version.ref = "agp" }

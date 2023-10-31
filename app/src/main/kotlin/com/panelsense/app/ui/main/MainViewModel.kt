@@ -17,7 +17,6 @@ import com.panelsense.domain.model.entity.command.EntityCommand
 import com.panelsense.domain.model.entity.state.EntityState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -129,9 +128,9 @@ class MainViewModel @Inject constructor(
     }
 
     override fun <T : EntityState> listenOnState(entityId: String, kType: KClass<T>): Flow<T> {
-        return panelSenseInteractor.listenOnEntityState()
+        return panelSenseInteractor.observeEntityState(entityId)
             .mapNotNull { it as? T }
-            .filter { it.entityId == entityId }
+
     }
 
     override fun sendCommand(command: EntityCommand) {
