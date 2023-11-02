@@ -3,6 +3,7 @@
 package com.panelsense.app.ui.main.panel.item
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import com.panelsense.app.ui.theme.FontStyleH3
+import com.panelsense.app.ui.theme.FontStyleLarge_Light
 import com.panelsense.app.ui.theme.FontStyleXLarge_Light
 import com.panelsense.domain.model.Panel
 import kotlinx.coroutines.delay
@@ -23,10 +25,13 @@ import org.threeten.bp.format.DateTimeFormatter
 
 data class ClockItemState(
     val time: String = "12:00",
+    val timeAbbreviation: String? = null,
     val date: String = ""
 )
 
-const val TIME_FORMAT = "HH:mm"
+const val TIME_FORMAT_24 = "HH:mm"
+const val TIME_FORMAT_12 = "hh:mm"
+const val TIME_ABBREVIATION = "a"
 const val DATE_FORMAT = "EEEE, dd MMMM"
 
 @Composable
@@ -44,12 +49,21 @@ fun ClockItemView(
         modifier = modifier,
         horizontalAlignment = Alignment.End
     ) {
-        Text(
-            modifier = Modifier,
-            style = FontStyleXLarge_Light,
-            color = Color.White,
-            text = state.time
-        )
+        Row(verticalAlignment = Alignment.Bottom) {
+
+            Text(
+                style = FontStyleXLarge_Light,
+                color = Color.White,
+                text = state.time
+            )
+            if (state.timeAbbreviation != null) {
+                Text(
+                    style = FontStyleLarge_Light,
+                    color = Color.White,
+                    text = state.timeAbbreviation!!,
+                )
+            }
+        }
         Text(
             modifier = Modifier,
             style = FontStyleH3,
@@ -66,9 +80,12 @@ fun ClockItemLaunchEffect(
 ) = LaunchedEffect(key1 = homePanel) {
     while (true) {
         val zonedDateTime = ZonedDateTime.now()
-        val time = zonedDateTime.format(DateTimeFormatter.ofPattern(TIME_FORMAT))
+        val time =
+            zonedDateTime.format(DateTimeFormatter.ofPattern(if (homePanel.time24h) TIME_FORMAT_24 else TIME_FORMAT_12))
+        val timeAbbreviation = zonedDateTime.format(DateTimeFormatter.ofPattern(TIME_ABBREVIATION))
+            .takeIf { !homePanel.time24h }?.lowercase()
         val date = zonedDateTime.format(DateTimeFormatter.ofPattern(DATE_FORMAT))
-        callback(ClockItemState(time, date))
+        callback(ClockItemState(time, timeAbbreviation, date))
         delay(6000)
     }
 }
@@ -81,6 +98,7 @@ fun ClockItemPreview() {
         homePanel = Panel.HomePanel(),
         initState = ClockItemState(
             time = "12:00",
+            timeAbbreviation = null,
             date = "Mon, 01 January 2021"
         )
     )
