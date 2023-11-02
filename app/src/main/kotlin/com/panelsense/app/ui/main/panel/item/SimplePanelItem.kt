@@ -45,14 +45,25 @@ import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.domain.model.EntityDomain
 import com.panelsense.domain.model.PanelItem
+import com.panelsense.domain.model.entity.command.EntityCommand
+import com.panelsense.domain.model.entity.state.EntityState
 import com.panelsense.domain.model.entity.state.LightEntityState
 import com.panelsense.domain.model.entity.state.SwitchEntityState
+import com.panelsense.domain.toDomain
 import kotlinx.coroutines.launch
 
 data class SimplePanelItemState(
     val icon: Drawable? = null,
-    val title: String = ""
-)
+    val title: String = "",
+    val entityState: EntityState? = null
+) {
+    val toggleCommand: EntityCommand?
+        get() = when (entityState) {
+            is LightEntityState -> entityState.getToggleCommand()
+            is SwitchEntityState -> entityState.getToggleCommand()
+            else -> null
+        }
+}
 
 @Composable
 fun SimplePanelItemView(
@@ -61,6 +72,8 @@ fun SimplePanelItemView(
     entityInteractor: EntityInteractor,
     initState: SimplePanelItemState = SimplePanelItemState()
 ) {
+
+    var state by remember { mutableStateOf(initState) }
     val orientationHelper = getOrientationHelper()
     Box(
         modifier = modifier
@@ -71,17 +84,17 @@ fun SimplePanelItemView(
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
-                onClick = {},
+                onClick = {
+                    state.toggleCommand?.let(entityInteractor::sendCommand)
+                },
             )
             .padding(GridPadding)
             .onSizeChanged(orientationHelper::onSizeChanged)
     ) {
 
-        var state by remember { mutableStateOf(initState) }
-
         LaunchedEffect(key1 = panelItem) {
             launch {
-                if (panelItem.domain == EntityDomain.LIGHT) {
+                if (panelItem.entity.toDomain == EntityDomain.LIGHT) {
                     entityInteractor.listenOnState(panelItem.entity, LightEntityState::class)
                         .collect { entityState ->
                             state = SimplePanelItemState(
@@ -90,10 +103,11 @@ fun SimplePanelItemView(
                                     entityState.on
                                 ),
                                 title = panelItem.title ?: entityState.friendlyName
-                                ?: entityState.entityId
+                                ?: entityState.entityId,
+                                entityState = entityState
                             )
                         }
-                } else if (panelItem.domain == EntityDomain.SWITCH) {
+                } else if (panelItem.entity.toDomain == EntityDomain.SWITCH) {
                     entityInteractor.listenOnState(panelItem.entity, SwitchEntityState::class)
                         .collect { entityState ->
                             state = SimplePanelItemState(
@@ -102,7 +116,8 @@ fun SimplePanelItemView(
                                     entityState.on
                                 ),
                                 title = panelItem.title ?: entityState.friendlyName
-                                ?: entityState.entityId
+                                ?: entityState.entityId,
+                                entityState = entityState
                             )
                         }
                 }

@@ -45,7 +45,4 @@ data class PanelItem(
     val entity: String,
     val title: String? = null,
     val icon: String? = null
-) {
-    val domain: EntityDomain
-        get() = EntityDomain.valueOf(entity.substringBefore(".").uppercase())
-}
+)

@@ -1,5 +1,8 @@
 package com.panelsense.domain.model.entity.state
 
+import com.panelsense.domain.model.entity.command.LightEntityCommand
+import com.panelsense.domain.model.entity.command.ToggleLightCommand
+
 data class LightEntityState(
     override val entityId: String,
     val on: Boolean,
@@ -34,4 +37,10 @@ data class LightEntityState(
         val min: Int,
         val max: Int
     )
+
+    fun getToggleCommand(): LightEntityCommand =
+        ToggleLightCommand(
+            entityId = entityId,
+            on = !on
+        )
 }

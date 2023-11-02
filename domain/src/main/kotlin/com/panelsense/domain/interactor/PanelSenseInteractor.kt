@@ -1,5 +1,6 @@
 package com.panelsense.domain.interactor
 
+import com.panelsense.domain.model.entity.command.EntityCommand
 import com.panelsense.domain.model.entity.state.EntityState
 import com.panelsense.domain.repository.ServerRepository
 import kotlinx.coroutines.flow.Flow
@@ -15,5 +16,9 @@ class PanelSenseInteractor @Inject constructor(
     fun observeEntityState(entityId: String): Flow<EntityState> {
         return serverRepository.observerEntitiesState()
             .filter { it.entityId == entityId }
+    }
+
+    fun sendCommand(command: EntityCommand) {
+        serverRepository.sendCommand(command)
     }
 }

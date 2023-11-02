@@ -1,3 +1,3 @@
 package com.panelsense.domain.model.entity.command
 
-sealed interface EntityCommand
+sealed class EntityCommand(@Transient open val entityId: String)

@@ -18,6 +18,7 @@ import com.panelsense.domain.model.Configuration
 import com.panelsense.domain.model.ConnectionState
 import com.panelsense.domain.model.LoginSuccess
 import com.panelsense.domain.model.ServerConnectionData
+import com.panelsense.domain.model.entity.command.EntityCommand
 import com.panelsense.domain.model.entity.state.EntityState
 import com.panelsense.domain.repository.ServerRepository
 import kotlinx.coroutines.CoroutineScope
@@ -109,6 +110,10 @@ class PanelSenseRepository @Inject constructor(
             delay(REQUEST_STATE_DELAY)
         }
         connectionProvider.sendMessage(RequestEntitiesStates())
+    }
+
+    override fun sendCommand(command: EntityCommand) {
+        connectionProvider.sendCommand(command)
     }
 
     override fun observerEntitiesState(): Flow<EntityState> {

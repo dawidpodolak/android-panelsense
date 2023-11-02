@@ -8,6 +8,7 @@ import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.domain.model.EntityDomain
 import com.panelsense.domain.model.PanelItem
+import com.panelsense.domain.toDomain
 
 @Composable
 fun PanelItemView(
@@ -33,7 +34,7 @@ enum class PanelItemViewType {
     NONE
 }
 
-fun PanelItem.getItemViewType(): PanelItemViewType = when (this.domain) {
+fun PanelItem.getItemViewType(): PanelItemViewType = when (this.entity.toDomain) {
     EntityDomain.LIGHT -> PanelItemViewType.SIMPLE
     EntityDomain.SWITCH -> PanelItemViewType.SIMPLE
     else -> PanelItemViewType.NONE

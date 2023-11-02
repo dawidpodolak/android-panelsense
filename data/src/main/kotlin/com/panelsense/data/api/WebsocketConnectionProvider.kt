@@ -1,9 +1,11 @@
 package com.panelsense.data.api
 
 import com.google.gson.Gson
+import com.panelsense.data.mapper.toWebsocketModel
 import com.panelsense.data.model.MessageType
 import com.panelsense.data.model.WebsocketModel
 import com.panelsense.domain.model.ConnectionState
+import com.panelsense.domain.model.entity.command.EntityCommand
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -103,6 +105,11 @@ class WebsocketConnectionProvider @Inject constructor(
     fun sendMessage(message: Any) = websocketScope.launch {
         val jsonMessage = gson.toJson(message)
         Timber.d("Sending message: $jsonMessage")
+        webSocket?.send(jsonMessage)
+    }
+
+    fun sendCommand(command: EntityCommand) {
+        val jsonMessage = gson.toJson(command.toWebsocketModel(gson))
         webSocket?.send(jsonMessage)
     }
 }

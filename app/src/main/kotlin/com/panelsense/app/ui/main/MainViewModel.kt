@@ -134,7 +134,7 @@ class MainViewModel @Inject constructor(
     }
 
     override fun sendCommand(command: EntityCommand) {
-        Timber.d("Send Command: $command")
+        panelSenseInteractor.sendCommand(command)
     }
 
     override fun getIconProvider(): IconProvider = iconProvider
