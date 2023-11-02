@@ -54,6 +54,16 @@ val FontStyleH1 = TextStyle(
     fontWeight = FontWeight.Normal,
     color = TextColor
 )
+val FontStyleLarge_Light = TextStyle(
+    fontSize = 48.sp,
+    fontWeight = FontWeight.Light,
+    color = TextColor
+)
+val FontStyleXLarge_Light = TextStyle(
+    fontSize = 64.sp,
+    fontWeight = FontWeight.Light,
+    color = TextColor
+)
 
 val FontStyleH2_Bold = TextStyle(
     fontSize = 24.sp,

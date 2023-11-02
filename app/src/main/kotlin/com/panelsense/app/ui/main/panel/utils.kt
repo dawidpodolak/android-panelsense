@@ -59,11 +59,19 @@ class OrientationHelper(private val remember: MutableState<IntSize>) {
     }
 }
 
-suspend fun EntityInteractor.getDrawable(mdiName: String?, enable: Boolean): Drawable? {
+suspend fun EntityInteractor.getDrawable(
+    mdiName: String?,
+    enable: Boolean,
+    enabledColor: androidx.compose.ui.graphics.Color? = null
+): Drawable? {
 
     val iconSpec = IconSpec(
         name = mdiName ?: return null,
-        color = (if (enable) StateEnabledColor else StateDisabledColor).toArgb()
+        color = when {
+            enable && enabledColor != null -> enabledColor.toArgb()
+            enable && enabledColor == null -> StateEnabledColor.toArgb()
+            else -> StateDisabledColor.toArgb()
+        }
     )
     return getIconProvider().getIcon(iconSpec)
 }

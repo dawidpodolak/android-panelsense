@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -139,8 +140,9 @@ private suspend fun LightEntityState.toState(
     panelItem: PanelItem,
     entityInteractor: EntityInteractor
 ): SimplePanelItemState {
+    val color = rgbColor?.run { Color(red, green, blue) }
     return SimplePanelItemState(
-        icon = entityInteractor.getDrawable(icon ?: MdiIcons.LIGHT_BULB, on),
+        icon = entityInteractor.getDrawable(icon ?: MdiIcons.LIGHT_BULB, on, color),
         title = panelItem.title ?: friendlyName ?: entityId,
         entityState = this
     )

@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.panelsense.app.ui.main.EntityInteractor
+import com.panelsense.app.ui.main.panel.item.ClockItemView
 import com.panelsense.app.ui.main.panel.item.PanelItemView
 import com.panelsense.domain.model.Panel
 import com.panelsense.domain.model.PanelItem
@@ -35,12 +36,21 @@ fun HomePanelView(
 
         val (bottomPanel, timePanel, weatherPanel) = createRefs()
 
+        ClockItemView(
+            modifier = Modifier
+                .constrainAs(timePanel) {
+                    top.linkTo(parent.top)
+                    end.linkTo(parent.end)
+                },
+            homePanel = homePanel
+        )
+
         if (homePanel.itemLeft != null || homePanel.itemRight != null) {
             ButtonsPanelView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.25f)
-                    .constrainAs(timePanel) {
+                    .constrainAs(bottomPanel) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         bottom.linkTo(parent.bottom)
