@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 package com.panelsense.domain.model.entity.command
 
 data class ToggleSwitchCommand(

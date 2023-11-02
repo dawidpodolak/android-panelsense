@@ -75,12 +75,9 @@ fun SimplePanelItemView(
 
     var state by remember { mutableStateOf(initState) }
     val orientationHelper = getOrientationHelper()
+
     Box(
         modifier = modifier
-            .background(
-                color = PanelItemBackgroundColor,
-                shape = ButtonShape
-            )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
@@ -88,40 +85,16 @@ fun SimplePanelItemView(
                     state.toggleCommand?.let(entityInteractor::sendCommand)
                 },
             )
+            .background(
+                color = PanelItemBackgroundColor,
+                shape = ButtonShape
+            )
             .padding(GridPadding)
             .onSizeChanged(orientationHelper::onSizeChanged)
     ) {
 
-        LaunchedEffect(key1 = panelItem) {
-            launch {
-                if (panelItem.entity.toDomain == EntityDomain.LIGHT) {
-                    entityInteractor.listenOnState(panelItem.entity, LightEntityState::class)
-                        .collect { entityState ->
-                            state = SimplePanelItemState(
-                                icon = entityInteractor.getDrawable(
-                                    entityState.icon ?: MdiIcons.LIGHT_BULB,
-                                    entityState.on
-                                ),
-                                title = panelItem.title ?: entityState.friendlyName
-                                ?: entityState.entityId,
-                                entityState = entityState
-                            )
-                        }
-                } else if (panelItem.entity.toDomain == EntityDomain.SWITCH) {
-                    entityInteractor.listenOnState(panelItem.entity, SwitchEntityState::class)
-                        .collect { entityState ->
-                            state = SimplePanelItemState(
-                                icon = entityInteractor.getDrawable(
-                                    entityState.icon,
-                                    entityState.on
-                                ),
-                                title = panelItem.title ?: entityState.friendlyName
-                                ?: entityState.entityId,
-                                entityState = entityState
-                            )
-                        }
-                }
-            }
+        StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
+            state = it
         }
 
         when (orientationHelper.orientation) {
@@ -131,6 +104,58 @@ fun SimplePanelItemView(
     }
 }
 
+@Composable
+private fun StateLaunchEffect(
+    panelItem: PanelItem,
+    entityInteractor: EntityInteractor,
+    callback: (SimplePanelItemState) -> Unit
+) =
+    LaunchedEffect(key1 = panelItem) {
+        launch {
+            if (panelItem.entity.toDomain == EntityDomain.LIGHT) {
+                updateState<LightEntityState>(panelItem, entityInteractor) {
+                    callback(it.toState(panelItem, entityInteractor))
+                }
+            } else if (panelItem.entity.toDomain == EntityDomain.SWITCH) {
+                updateState<SwitchEntityState>(panelItem, entityInteractor) {
+                    callback(it.toState(panelItem, entityInteractor))
+                }
+            }
+        }
+    }
+
+private suspend inline fun <reified ENTITY_STATE : EntityState> updateState(
+    panelItem: PanelItem,
+    entityInteractor: EntityInteractor,
+    noinline callback: suspend (ENTITY_STATE) -> Unit
+) {
+    entityInteractor.listenOnState(panelItem.entity, ENTITY_STATE::class)
+        .collect { entityState ->
+            callback(entityState)
+        }
+}
+
+private suspend fun LightEntityState.toState(
+    panelItem: PanelItem,
+    entityInteractor: EntityInteractor
+): SimplePanelItemState {
+    return SimplePanelItemState(
+        icon = entityInteractor.getDrawable(icon ?: MdiIcons.LIGHT_BULB, on),
+        title = panelItem.title ?: friendlyName ?: entityId,
+        entityState = this
+    )
+}
+
+private suspend fun SwitchEntityState.toState(
+    panelItem: PanelItem,
+    entityInteractor: EntityInteractor
+): SimplePanelItemState {
+    return SimplePanelItemState(
+        icon = entityInteractor.getDrawable(icon ?: MdiIcons.LIGHT_BULB, on),
+        title = panelItem.title ?: friendlyName ?: entityId,
+        entityState = this
+    )
+}
 
 @Composable
 fun VerticalSimplePanelItemView(
