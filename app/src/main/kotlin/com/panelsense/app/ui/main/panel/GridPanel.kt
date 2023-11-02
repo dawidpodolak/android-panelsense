@@ -27,6 +27,7 @@ val ButtonMiddleSpace = 20.dp
 @Composable
 @ExperimentalFoundationApi
 fun GridPanelView(
+    modifier: Modifier = Modifier,
     panelConfiguration: Panel.GridPanel,
     entityInteractor: EntityInteractor
 ) {
@@ -34,9 +35,8 @@ fun GridPanelView(
         200
     }
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .applyBackground(panelConfiguration.background)
     ) {
 
         Text(

@@ -23,6 +23,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.panelsense.app.R
 import kotlinx.coroutines.launch
 
+val NavigationBarHeight = 60.dp
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NavigationBar(
@@ -32,7 +34,7 @@ fun NavigationBar(
 ) {
     Box(
         modifier = modifier
-            .requiredHeight(60.dp)
+            .requiredHeight(NavigationBarHeight)
             .fillMaxWidth()
             .background(Color(0x80464646))
     ) {

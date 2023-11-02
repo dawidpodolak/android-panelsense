@@ -4,4 +4,9 @@ import com.panelsense.data.model.state.SwitchState
 import com.panelsense.domain.model.entity.state.SwitchEntityState
 
 fun SwitchState.toEntityState(): SwitchEntityState =
-    SwitchEntityState(entityId)
+    SwitchEntityState(
+        entityId = entityId,
+        on = on,
+        friendlyName = friendlyName,
+        icon = icon?.removePrefix("mdi:")
+    )

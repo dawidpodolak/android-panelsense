@@ -8,3 +8,9 @@ val Secondary = Color(0xFF4686ae)
 
 val BackgroundColor = Color(0xFF95ACBB)
 val TextColor = Color(0xFF162833)
+
+val PanelItemBackgroundColor = Color(0x57AAAAAA)
+val PanelItemTitleColor = Color(0xFFE1E1E1)
+
+val StateEnabledColor = Color(0xFFFFC00F)
+val StateDisabledColor = Color(0xFF585858)

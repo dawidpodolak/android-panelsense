@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -33,6 +34,7 @@ import com.panelsense.app.ui.login.LoginActivity
 import com.panelsense.app.ui.main.panel.GridPanelView
 import com.panelsense.app.ui.main.panel.HomePanelView
 import com.panelsense.app.ui.main.panel.NavigationBar
+import com.panelsense.app.ui.main.panel.NavigationBarHeight
 import com.panelsense.app.ui.main.panel.applyBackground
 import com.panelsense.app.ui.theme.FontStyleH3_Medium
 import com.panelsense.app.ui.theme.PanelSenseTheme
@@ -42,7 +44,6 @@ import com.panelsense.domain.model.Panel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @ExperimentalFoundationApi
@@ -138,17 +139,27 @@ fun PagerPanels(
     }
 
     val mainPanelId = configuration.getMainPanelPosition()
-    Timber.d("mainPanelId: $mainPanelId")
+
     LaunchedEffect(key1 = true) {
         delay(2000)
         pagerState.animateScrollToPage(mainPanelId)
     }
     Box(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(state = pagerState) { panelIndex ->
-            val panelConfig = configuration.panelList[panelIndex]
-            when (panelConfig) {
-                is Panel.HomePanel -> HomePanelView(panelConfig, entityInteractor)
-                is Panel.GridPanel -> GridPanelView(panelConfig, entityInteractor)
+            when (val panelConfig = configuration.panelList[panelIndex]) {
+                is Panel.HomePanel -> HomePanelView(
+                    modifier = Modifier
+                        .applyBackground(panelConfig.background)
+                        .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
+                    panelConfig, entityInteractor
+                )
+
+                is Panel.GridPanel -> GridPanelView(
+                    modifier = Modifier
+                        .applyBackground(panelConfig.background)
+                        .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
+                    panelConfig, entityInteractor
+                )
             }
         }
         if (configuration.system.showNavBar) {
@@ -158,6 +169,14 @@ fun PagerPanels(
                 mainPanelId
             )
         }
+    }
+}
+
+private fun Modifier.applyBottomPaddingIfNeeded(showNavBar: Boolean): Modifier {
+    return if (showNavBar) {
+        this.padding(bottom = NavigationBarHeight)
+    } else {
+        this
     }
 }
 
