@@ -8,13 +8,13 @@
       <entry key="NavigationPreview">
         <State />
       </entry>
-      <entry key="Preview">
-        <State />
-      </entry>
       <entry key="PreviewHome">
         <State />
       </entry>
       <entry key="SimplePanelItemPreview">
+        <State />
+      </entry>
+      <entry key="WeatherItemPreview">
         <State />
       </entry>
       <entry key="app">
@@ -24,13 +24,13 @@
               <type value="RUNNING_DEVICE_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="VIRTUAL_DEVICE_PATH" />
-                  <value value="$USER_HOME$/.android/avd/Nexus_7_API_30.avd" />
+                  <type value="SERIAL_NUMBER" />
+                  <value value="0876de25" />
                 </Key>
               </deviceKey>
             </Target>
           </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2023-11-02T12:22:48.622502Z" />
+          <timeTargetWasSelectedWithDropDown value="2023-11-03T16:06:43.907792Z" />
         </State>
       </entry>
     </value>

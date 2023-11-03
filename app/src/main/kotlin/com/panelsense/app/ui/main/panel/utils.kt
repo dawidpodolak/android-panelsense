@@ -2,12 +2,9 @@ package com.panelsense.app.ui.main.panel
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import android.media.AudioManager
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.unit.IntSize
 import androidx.core.content.ContextCompat
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
@@ -32,37 +29,10 @@ fun mockEntityInteractor(context: Context): EntityInteractor = object : EntityIn
             ContextCompat.getDrawable(context, R.drawable.ic_launcher_background)
     }
 }
-
-enum class PanelItemOrientation {
-    HORIZONTAL,
-    VERTICAL
-}
-
-@Composable
-fun getOrientationHelper(): OrientationHelper =
-    OrientationHelper(remember { mutableStateOf(IntSize.Zero) })
-
-class OrientationHelper(private val remember: MutableState<IntSize>) {
-    val orientation: PanelItemOrientation
-        get() = calculateOrientation()
-
-    fun onSizeChanged(size: IntSize) {
-        remember.value = size
-    }
-
-    private fun calculateOrientation(): PanelItemOrientation {
-        return if (remember.value.width > remember.value.height.times(2)) {
-            PanelItemOrientation.HORIZONTAL
-        } else {
-            PanelItemOrientation.VERTICAL
-        }
-    }
-}
-
 suspend fun EntityInteractor.getDrawable(
     mdiName: String?,
     enable: Boolean,
-    enabledColor: androidx.compose.ui.graphics.Color? = null
+    enabledColor: Color? = null
 ): Drawable? {
 
     val iconSpec = IconSpec(
@@ -74,4 +44,23 @@ suspend fun EntityInteractor.getDrawable(
         }
     )
     return getIconProvider().getIcon(iconSpec)
+}
+
+suspend fun EntityInteractor.getDrawable(
+    mdiName: String?,
+    color: Color,
+): Drawable? {
+
+    val iconSpec = IconSpec(
+        name = mdiName ?: return null,
+        color = color.toArgb()
+    )
+    return getIconProvider().getIcon(iconSpec)
+}
+
+fun withSound(context: Context) {
+    val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+    val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0)
+    audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK)
 }

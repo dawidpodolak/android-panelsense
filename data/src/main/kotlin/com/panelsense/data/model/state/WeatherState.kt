@@ -11,6 +11,7 @@ class WeatherState(
     val pressure: Float? = null,
     val pressureUnit: String? = null,
     val windBearing: Float? = null,
+    val windSpeed: Float? = null,
     val windSpeedUnit: String? = null,
     val visibilityUnit: String? = null,
     val precipitationUnit: String? = null,

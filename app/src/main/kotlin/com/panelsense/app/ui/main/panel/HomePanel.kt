@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -17,6 +19,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.item.ClockItemView
 import com.panelsense.app.ui.main.panel.item.PanelItemView
+import com.panelsense.app.ui.main.panel.item.WeatherItemView
 import com.panelsense.domain.model.Panel
 import com.panelsense.domain.model.PanelItem
 
@@ -38,6 +41,8 @@ fun HomePanelView(
 
         ClockItemView(
             modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight()
                 .constrainAs(timePanel) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
@@ -55,6 +60,20 @@ fun HomePanelView(
                         end.linkTo(parent.end)
                         bottom.linkTo(parent.bottom)
                     }, homePanel, entityInteractor
+            )
+        }
+
+        if (homePanel.weatherEntity != null) {
+            WeatherItemView(
+                modifier = Modifier
+                    .fillMaxWidth(0.5f)
+                    .wrapContentHeight()
+                    .constrainAs(weatherPanel) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                    },
+                homePanel = homePanel,
+                entityInteractor = entityInteractor
             )
         }
     }

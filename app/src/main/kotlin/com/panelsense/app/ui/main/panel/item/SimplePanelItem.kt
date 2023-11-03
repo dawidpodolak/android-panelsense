@@ -26,7 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,7 +36,7 @@ import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.GridPadding
-import com.panelsense.app.ui.main.panel.PanelItemOrientation
+import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getOrientationHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
@@ -84,14 +84,15 @@ fun SimplePanelItemView(
                 indication = rememberRipple(bounded = true),
                 onClick = {
                     state.toggleCommand?.let(entityInteractor::sendCommand)
-                },
+                }
             )
+
             .background(
                 color = PanelItemBackgroundColor,
                 shape = ButtonShape
             )
             .padding(GridPadding)
-            .onSizeChanged(orientationHelper::onSizeChanged)
+            .onGloballyPositioned(orientationHelper::onGlobalLayout)
     ) {
 
         StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
