@@ -2,6 +2,7 @@ package com.panelsense.data.mapper
 
 import com.panelsense.data.model.state.WeatherState
 import com.panelsense.domain.model.entity.state.WeatherEntityState
+import org.threeten.bp.ZonedDateTime
 
 fun WeatherState.toEntityState(): WeatherEntityState =
     WeatherEntityState(
@@ -25,12 +26,13 @@ fun WeatherState.toEntityState(): WeatherEntityState =
 private fun WeatherState.WeatherForecast.toEntityState(): WeatherEntityState.WeatherForecastEntity =
     WeatherEntityState.WeatherForecastEntity(
         condition = condition?.toWeatherState(),
-        datetime = datetime,
+        datetime = datetime?.let { ZonedDateTime.parse(it) },
         windBearing = windBearing,
         temperature = temperature,
         templow = templow,
         windSpeed = windSpeed,
-        humidity = humidity
+        humidity = humidity,
+        pressure = pressure
     )
 
 private fun String.toWeatherState(): WeatherEntityState.WeatherCondition =

@@ -1,5 +1,7 @@
 package com.panelsense.domain.model.entity.state
 
+import org.threeten.bp.ZonedDateTime
+
 class WeatherEntityState(
     override val entityId: String,
     val state: WeatherCondition? = null,
@@ -38,11 +40,12 @@ class WeatherEntityState(
 
     data class WeatherForecastEntity(
         val condition: WeatherCondition? = null,
-        val datetime: String? = null,
+        val datetime: ZonedDateTime? = null,
         val windBearing: Float? = null,
         val temperature: Float? = null,
         val templow: Float? = null,
         val windSpeed: Float? = null,
-        val humidity: Float? = null
+        val humidity: Float? = null,
+        val pressure: Float? = null
     )
 }

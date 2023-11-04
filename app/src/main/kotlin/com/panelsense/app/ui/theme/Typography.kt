@@ -119,22 +119,38 @@ val FontStyleH4 = TextStyle(
 )
 
 val FontStyleH5_Bold = TextStyle(
-    fontSize = 16.sp,
+    fontSize = 14.sp,
     fontWeight = FontWeight.Bold,
     color = TextColor
 )
 val FontStyleH5_SemiBold = TextStyle(
-    fontSize = 16.sp,
+    fontSize = 14.sp,
     fontWeight = FontWeight.SemiBold,
     color = TextColor
 )
 val FontStyleH5 = TextStyle(
-    fontSize = 16.sp,
+    fontSize = 14.sp,
+    fontWeight = FontWeight.Normal,
+    color = TextColor
+)
+
+val FontStyleH6_Bold = TextStyle(
+    fontSize = 12.sp,
+    fontWeight = FontWeight.Bold,
+    color = TextColor
+)
+val FontStyleH6_SemiBold = TextStyle(
+    fontSize = 12.sp,
+    fontWeight = FontWeight.SemiBold,
+    color = TextColor
+)
+val FontStyleH6 = TextStyle(
+    fontSize = 12.sp,
     fontWeight = FontWeight.Normal,
     color = TextColor
 )
 val FontStyleButton = TextStyle(
-    fontSize = 19.sp,
+    fontSize = 12.sp,
     fontWeight = FontWeight.Medium,
     color = Color.White
 )

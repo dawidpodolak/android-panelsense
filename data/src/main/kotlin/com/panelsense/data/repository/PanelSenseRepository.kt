@@ -145,7 +145,7 @@ class PanelSenseRepository @Inject constructor(
     }
 
     private companion object {
-        const val REQUEST_STATE_DELAY = 500L
+        const val REQUEST_STATE_DELAY = 1500L
         const val RELOGIN_DELAY = 1000L
     }
 }

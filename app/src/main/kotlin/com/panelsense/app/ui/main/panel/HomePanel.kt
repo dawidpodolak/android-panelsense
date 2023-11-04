@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.item.ClockItemView
 import com.panelsense.app.ui.main.panel.item.PanelItemView
@@ -46,6 +47,7 @@ fun HomePanelView(
                 .constrainAs(timePanel) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
+                    width = Dimension.wrapContent
                 },
             homePanel = homePanel
         )
@@ -66,11 +68,14 @@ fun HomePanelView(
         if (homePanel.weatherEntity != null) {
             WeatherItemView(
                 modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .wrapContentHeight()
                     .constrainAs(weatherPanel) {
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
+                        end.linkTo(timePanel.start, margin = 30.dp)
+                        bottom.linkTo(bottomPanel.top, margin = 30.dp)
+                        width = Dimension.fillToConstraints
+                        height = Dimension.fillToConstraints
+                        centerHorizontallyTo(parent, 0f)
                     },
                 homePanel = homePanel,
                 entityInteractor = entityInteractor

@@ -25,6 +25,7 @@ class WeatherState(
         val temperature: Float? = null,
         val templow: Float? = null,
         val windSpeed: Float? = null,
-        val humidity: Float? = null
+        val humidity: Float? = null,
+        val pressure: Float? = null
     )
 }
