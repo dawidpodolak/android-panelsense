@@ -7,5 +7,6 @@ data class CoverState(
     val tiltPosition: Int?,
     val icon: String?,
     val friendlyName: String?,
+    val deviceClass: String?,
     val supportedFeatures: Int?
 )
