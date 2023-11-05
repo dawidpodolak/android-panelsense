@@ -6,8 +6,6 @@ import com.google.gson.GsonBuilder
 import com.panelsense.data.icons.IconProvider
 import com.panelsense.data.icons.PictogramIconProvider
 import com.panelsense.data.model.MessageType
-import com.panelsense.data.mqtt.MqttController
-import com.panelsense.data.mqtt.MqttControllerImpl
 import com.panelsense.data.serializer.MessageTypeDeserializer
 import com.panelsense.data.serializer.MessageTypeSerializer
 import com.panelsense.data.serializer.PanelDeserializer
@@ -49,10 +47,6 @@ object DataModule {
 
     @Provides
     fun provideIconProviderImpl(iconProvider: PictogramIconProvider): IconProvider = iconProvider
-
-    @Provides
-    fun providerMqttControllerImpl(mqttController: MqttControllerImpl): MqttController =
-        mqttController
 
     @Provides
     fun provideGson(): Gson {
