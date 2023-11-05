@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,7 +41,6 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.getDrawable
-import com.panelsense.app.ui.main.panel.getOrientationHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH1_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3
@@ -55,7 +53,8 @@ import com.panelsense.domain.model.entity.state.WeatherEntityState.WeatherCondit
 import org.threeten.bp.format.DateTimeFormatter
 
 data class WeatherStateView(
-    val weatherState: WeatherEntityState? = null
+    val weatherState: WeatherEntityState? = null,
+    val temperatureDrawable: Drawable? = null
 )
 
 @Composable
@@ -76,7 +75,8 @@ fun WeatherItemView(
         TodayWeatherView(
             modifier = Modifier
                 .wrapContentHeight(),
-            weatherState = state.weatherState!!, entityInteractor
+            stateView = state,
+            entityInteractor
         )
 
         WeatherForecastView(
@@ -91,31 +91,24 @@ fun WeatherItemView(
 @Composable
 private fun TodayWeatherView(
     modifier: Modifier,
-    weatherState: WeatherEntityState,
+    stateView: WeatherStateView,
     entityInteractor: EntityInteractor
 ) {
-    val orientationHelper = getOrientationHelper()
+    val weatherState = stateView.weatherState ?: return
     ConstraintLayout(
         modifier
-            .onGloballyPositioned(orientationHelper::onGlobalLayout)
     ) {
         val state = weatherState.state ?: return@ConstraintLayout
         val (
             todayWeatherIcon,
             todayWeatherText,
             todayWeatherHumidity,
-            todayWeatherPressure,
-            todayWeatherWind,
             todayWeatherTemperature,
             todayWeatherTemperatureIcon,
         ) = createRefs()
 
         val temperature =
             weatherState.temperature?.run { "$this${weatherState.temperatureUnit ?: ""}" }
-        val bottomBarrier =
-            createBottomBarrier(todayWeatherHumidity, todayWeatherPressure, todayWeatherWind)
-        val rightBarrier =
-            createEndBarrier(todayWeatherHumidity, todayWeatherPressure, todayWeatherWind)
 
         Image(
             modifier = Modifier
@@ -141,10 +134,10 @@ private fun TodayWeatherView(
         )
 
         if (temperature != null) {
-            var iconState by remember { mutableStateOf<Drawable?>(null) }
-            LaunchedEffect(key1 = temperature) {
-                iconState = entityInteractor.getDrawable(MdiIcons.THERMOMETER, Color.White)
-            }
+//            var iconState by remember { mutableStateOf<Drawable?>(null) }
+//            LaunchedEffect(key1 = null) {
+//                iconState = entityInteractor.getDrawable(MdiIcons.THERMOMETER, Color.White)
+//            }
             Image(
                 modifier = Modifier
                     .constrainAs(todayWeatherTemperatureIcon) {
@@ -152,15 +145,15 @@ private fun TodayWeatherView(
                         bottom.linkTo(todayWeatherTemperature.bottom)
                         top.linkTo(todayWeatherTemperature.top)
                     },
-                painter = rememberDrawablePainter(drawable = iconState),
+                painter = rememberDrawablePainter(drawable = stateView.temperatureDrawable),
                 contentDescription = temperature
             )
 
             Text(
                 modifier = Modifier
                     .constrainAs(todayWeatherTemperature) {
-                        start.linkTo(rightBarrier, margin = 30.dp)
-                        bottom.linkTo(bottomBarrier)
+                        start.linkTo(todayWeatherHumidity.end, margin = 30.dp)
+                        bottom.linkTo(todayWeatherHumidity.bottom)
                     },
                 text = temperature,
                 style = FontStyleH1_SemiBold,
@@ -168,39 +161,37 @@ private fun TodayWeatherView(
             )
         }
 
-        WeatherAttributeView(
-            modifier = Modifier
-                .padding(top = 7.dp)
-                .constrainAs(todayWeatherHumidity) {
-                    top.linkTo(todayWeatherIcon.bottom)
-                    start.linkTo(parent.start)
-                },
-            attr = weatherState.humidity?.run { "$this %" },
-            mdiIconName = MdiIcons.HUMIDITY,
-            entityInteractor = entityInteractor
-        )
+        Column(modifier = Modifier
+            .constrainAs(todayWeatherHumidity) {
+                top.linkTo(todayWeatherIcon.bottom)
+                start.linkTo(parent.start)
+                width = Dimension.wrapContent
+            }
+        ) {
 
-        WeatherAttributeView(
-            modifier = Modifier
-                .constrainAs(todayWeatherPressure) {
-                    top.linkTo(todayWeatherHumidity.bottom)
-                    start.linkTo(parent.start)
-                },
-            attr = weatherState.pressure?.run { "$this ${weatherState.pressureUnit ?: ""} " },
-            mdiIconName = MdiIcons.GAUGE,
-            entityInteractor = entityInteractor
-        )
+            WeatherAttributeView(
+                modifier = Modifier
+                    .padding(top = 7.dp),
+                attr = weatherState.humidity?.run { "$this %" },
+                mdiIconName = MdiIcons.HUMIDITY,
+                entityInteractor = entityInteractor
+            )
 
-        WeatherAttributeView(
-            modifier = Modifier
-                .constrainAs(todayWeatherWind) {
-                    top.linkTo(todayWeatherPressure.bottom)
-                    start.linkTo(parent.start)
-                },
-            attr = weatherState.windSpeed?.run { "$this ${weatherState.windSpeedUnit ?: ""} " },
-            mdiIconName = MdiIcons.WIND,
-            entityInteractor = entityInteractor
-        )
+            WeatherAttributeView(
+                modifier = Modifier,
+                attr = weatherState.pressure?.run { "$this ${weatherState.pressureUnit ?: ""} " },
+                mdiIconName = MdiIcons.GAUGE,
+                entityInteractor = entityInteractor
+            )
+
+            WeatherAttributeView(
+                modifier = Modifier,
+                attr = weatherState.windSpeed?.run { "$this ${weatherState.windSpeedUnit ?: ""} " },
+                mdiIconName = MdiIcons.WIND,
+                entityInteractor = entityInteractor
+            )
+        }
+
     }
 }
 
@@ -247,7 +238,15 @@ fun WeatherItemLaunchEffect(
         WeatherEntityState::class
     )
     weatherState.collect {
-        callback(WeatherStateView(it))
+        callback(
+            WeatherStateView(
+                it,
+                temperatureDrawable = entityInteractor.getDrawable(
+                    MdiIcons.THERMOMETER,
+                    Color.White
+                )
+            )
+        )
     }
 }
 
