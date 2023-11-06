@@ -38,7 +38,7 @@ import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
 import com.panelsense.app.ui.main.panel.getDrawable
-import com.panelsense.app.ui.main.panel.getOrientationHelper
+import com.panelsense.app.ui.main.panel.getPanelSizeHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
@@ -75,7 +75,7 @@ fun SimplePanelItemView(
 ) {
 
     var state by remember { mutableStateOf(initState) }
-    val orientationHelper = getOrientationHelper()
+    val panelSizeHelper = getPanelSizeHelper()
 
     Box(
         modifier = modifier
@@ -92,14 +92,14 @@ fun SimplePanelItemView(
                 shape = ButtonShape
             )
             .padding(GridPadding)
-            .onGloballyPositioned(orientationHelper::onGlobalLayout)
+            .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
 
         StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
             state = it
         }
 
-        when (orientationHelper.orientation) {
+        when (panelSizeHelper.orientation) {
             PanelItemOrientation.HORIZONTAL -> HorizontalSimplePanelItemView(state = state)
             PanelItemOrientation.VERTICAL -> VerticalSimplePanelItemView(state = state)
         }

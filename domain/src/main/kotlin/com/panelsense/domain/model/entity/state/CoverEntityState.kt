@@ -31,6 +31,7 @@ class CoverEntityState(
         STOPPED,
     }
 
+    @Suppress("MagicNumber")
     enum class SupportedFeatures(val value: Int) {
         OPEN(1),
         CLOSE(2),
