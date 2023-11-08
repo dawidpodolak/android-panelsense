@@ -110,6 +110,7 @@ class WebsocketConnectionProvider @Inject constructor(
 
     fun sendCommand(command: EntityCommand) {
         val jsonMessage = gson.toJson(command.toWebsocketModel(gson))
+        Timber.d("Sending message: $jsonMessage")
         webSocket?.send(jsonMessage)
     }
 }

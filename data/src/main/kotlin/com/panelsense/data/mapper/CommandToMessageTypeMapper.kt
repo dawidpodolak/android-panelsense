@@ -18,5 +18,6 @@ fun EntityCommand.toWebsocketModel(gson: Gson): WebsocketModel? {
 fun EntityCommand.toMessageType(): MessageType? = when (this.entityId.toDomain) {
     EntityDomain.SWITCH -> MessageType.SWITCH
     EntityDomain.LIGHT -> MessageType.LIGHT
+    EntityDomain.COVER -> MessageType.COVER
     else -> null
 }

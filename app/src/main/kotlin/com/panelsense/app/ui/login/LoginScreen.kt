@@ -64,9 +64,9 @@ fun LoginScreen(
                 .verticalScroll(scrollState, enabled = true)
         ) {
 
-            var addressText by remember { mutableStateOf("192.168.1.32") }
+            var addressText by remember { mutableStateOf("127.0.0.1") }
             var portText by remember { mutableStateOf("8652") }
-            var panelSenseNameText by remember { mutableStateOf("NsPanel Salon") }
+            var panelSenseNameText by remember { mutableStateOf("Nexus Emu") }
             var userNameText by remember { mutableStateOf("admin") }
             var passwordText by remember { mutableStateOf("admin") }
             var passwordShow by remember { mutableStateOf(false) }

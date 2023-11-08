@@ -57,6 +57,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         disableSystemUI()
         setContent {
 
@@ -145,7 +146,10 @@ fun PagerPanels(
         pagerState.animateScrollToPage(mainPanelId)
     }
     Box(modifier = Modifier.fillMaxSize()) {
-        HorizontalPager(state = pagerState) { panelIndex ->
+        HorizontalPager(
+            state = pagerState,
+            beyondBoundsPageCount = configuration.panelList.size
+        ) { panelIndex ->
             when (val panelConfig = configuration.panelList[panelIndex]) {
                 is Panel.HomePanel -> HomePanelView(
                     modifier = Modifier

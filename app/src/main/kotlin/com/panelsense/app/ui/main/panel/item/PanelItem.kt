@@ -24,17 +24,25 @@ fun PanelItemView(
             entityInteractor = entityInteractor
         )
 
+        PanelItemViewType.COVER -> CoverItemView(
+            modifier,
+            panelItem = panelItem,
+            entityInteractor = entityInteractor
+        )
+
         PanelItemViewType.NONE -> Unit
     }
 }
 
 enum class PanelItemViewType {
+    COVER,
     SIMPLE,
     LIGHT,
     NONE
 }
 
 fun PanelItem.getItemViewType(): PanelItemViewType = when (this.entity.toDomain) {
+    EntityDomain.COVER -> PanelItemViewType.COVER
     EntityDomain.LIGHT -> PanelItemViewType.SIMPLE
     EntityDomain.SWITCH -> PanelItemViewType.SIMPLE
     else -> PanelItemViewType.NONE

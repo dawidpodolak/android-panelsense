@@ -14,3 +14,8 @@ val PanelItemTitleColor = Color(0xFFE1E1E1)
 
 val StateEnabledColor = Color(0xFFFFC00F)
 val StateDisabledColor = Color(0xFF585858)
+
+val DefaultItemColor = InversePrimary
+
+val CoverItemButtonActive = Color(0xFF9C9C9C)
+val CoverItemButtonInactive = Color(0x883f5b6f)

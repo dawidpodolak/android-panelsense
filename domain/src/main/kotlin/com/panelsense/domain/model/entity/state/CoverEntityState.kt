@@ -1,5 +1,8 @@
 package com.panelsense.domain.model.entity.state
 
+import com.panelsense.domain.model.entity.command.CoverEntityCommand
+import com.panelsense.domain.model.entity.command.EntityCommand
+
 class CoverEntityState(
     override val entityId: String,
     val state: State,
@@ -10,6 +13,25 @@ class CoverEntityState(
     val deviceClass: DeviceClass?,
     val supportedFeatures: Set<SupportedFeatures> = emptySet()
 ) : EntityState(entityId) {
+
+    fun getOpenCoverCommand(): EntityCommand =
+        CoverEntityCommand(
+            entityId = entityId,
+            state = "open"
+        )
+
+    fun getCloseCoverCommand(): EntityCommand =
+        CoverEntityCommand(
+            entityId = entityId,
+            state = "close"
+        )
+
+    fun getStopCoverCommand(): EntityCommand =
+        CoverEntityCommand(
+            entityId = entityId,
+            state = "stop"
+        )
+
     enum class DeviceClass {
         AWNING,
         BLIND,
