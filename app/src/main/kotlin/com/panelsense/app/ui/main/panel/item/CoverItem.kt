@@ -5,7 +5,6 @@ package com.panelsense.app.ui.main.panel.item
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -24,14 +23,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
+import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.theme.CoverItemButtonActive
+import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
@@ -49,11 +52,14 @@ import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.SHA
 import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.SHUTTER
 import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.WINDOW
 import com.panelsense.domain.model.entity.state.CoverEntityState.State.OPEN
+import com.panelsense.domain.model.entity.state.CoverEntityState.SupportedFeatures.SET_POSITION
+import com.panelsense.domain.model.entity.state.CoverEntityState.SupportedFeatures.SET_TILT_POSITION
 import timber.log.Timber
 
 data class CoverItemState(
     val icon: Drawable? = null,
     val title: String = "",
+    val position: String? = null,
     val entityState: CoverEntityState? = null
 )
 
@@ -89,7 +95,7 @@ fun HorizontalCoverItemView(
     ConstraintLayout(
         modifier.fillMaxSize()
     ) {
-        val (image, title, buttonsRow) = createRefs()
+        val (image, title, position) = createRefs()
         Timber.d("HorizontalCoverItemView: ${state.entityState}")
         state.entityState?.let {
             CoverControlButtons(
@@ -127,6 +133,24 @@ fun HorizontalCoverItemView(
             color = PanelItemTitleColor,
             style = FontStyleH3_SemiBold
         )
+
+        val supportedFeatures = state.entityState?.supportedFeatures ?: emptySet()
+        if (state.position != null && (SET_POSITION in supportedFeatures || SET_TILT_POSITION in supportedFeatures)) {
+            Text(
+                modifier = modifier
+                    .constrainAs(position) {
+                        start.linkTo(title.end, margin = 5.dp)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, margin = 5.dp)
+                        width = Dimension.wrapContent
+                        height = Dimension.wrapContent
+                    },
+                text = state.position,
+                color = PanelItemTitleColor,
+                style = FontStyleH3_Regular
+            )
+        }
     }
 }
 
@@ -190,7 +214,9 @@ fun CoverButton(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .clickable(
+            .effectClickable(
+                hapticFeedback = LocalHapticFeedback.current,
+                viewSoundEffect = LocalView.current,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
                 onClick = onClick
@@ -227,7 +253,8 @@ private fun StateLaunchEffect(
             CoverItemState(
                 icon = entityInteractor.getDrawable(it.getMdiIconName(), CoverItemButtonActive),
                 title = panelItem.title ?: it.friendlyName ?: it.entityId,
-                entityState = it
+                entityState = it,
+                position = it.position?.toString() ?: it.tiltPosition?.toString()
             )
         )
     }

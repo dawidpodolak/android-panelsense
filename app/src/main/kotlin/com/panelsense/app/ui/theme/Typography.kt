@@ -96,6 +96,11 @@ val FontStyleH3_Medium = TextStyle(
     fontWeight = FontWeight.Medium,
     color = TextColor
 )
+val FontStyleH3_Regular = TextStyle(
+    fontSize = 19.sp,
+    fontWeight = FontWeight.Normal,
+    color = TextColor
+)
 val FontStyleH3 = TextStyle(
     fontSize = 19.sp,
     fontWeight = FontWeight.Normal,

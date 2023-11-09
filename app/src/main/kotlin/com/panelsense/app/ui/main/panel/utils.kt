@@ -2,9 +2,17 @@ package com.panelsense.app.ui.main.panel
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.media.AudioManager
+import android.view.SoundEffectConstants
+import android.view.View
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.semantics.Role
 import androidx.core.content.ContextCompat
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
@@ -29,6 +37,7 @@ fun mockEntityInteractor(context: Context): EntityInteractor = object : EntityIn
             ContextCompat.getDrawable(context, R.drawable.ic_launcher_background)
     }
 }
+
 suspend fun EntityInteractor.getDrawable(
     mdiName: String?,
     enable: Boolean,
@@ -58,9 +67,24 @@ suspend fun EntityInteractor.getDrawable(
     return getIconProvider().getIcon(iconSpec)
 }
 
-fun withSound(context: Context) {
-    val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0)
-    audioManager.playSoundEffect(AudioManager.FX_KEY_CLICK)
-}
+fun Modifier.effectClickable(
+    hapticFeedback: HapticFeedback? = null,
+    viewSoundEffect: View? = null,
+    interactionSource: MutableInteractionSource,
+    indication: Indication?,
+    enabled: Boolean = true,
+    onClickLabel: String? = null,
+    role: Role? = null,
+    onClick: () -> Unit,
+) = clickable(
+    interactionSource = interactionSource,
+    indication = indication,
+    enabled = enabled,
+    onClickLabel = onClickLabel,
+    role = role,
+    onClick = {
+        onClick()
+        viewSoundEffect?.playSoundEffect(SoundEffectConstants.CLICK)
+        hapticFeedback?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+    },
+)

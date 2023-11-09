@@ -5,7 +5,6 @@ package com.panelsense.app.ui.main.panel.item
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -37,6 +38,7 @@ import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
+import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
@@ -79,14 +81,15 @@ fun SimplePanelItemView(
 
     Box(
         modifier = modifier
-            .clickable(
+            .effectClickable(
+                hapticFeedback = LocalHapticFeedback.current,
+                viewSoundEffect = LocalView.current,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
                 onClick = {
                     state.toggleCommand?.let(entityInteractor::sendCommand)
-                }
+                },
             )
-
             .background(
                 color = PanelItemBackgroundColor,
                 shape = ButtonShape

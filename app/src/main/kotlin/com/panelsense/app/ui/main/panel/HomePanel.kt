@@ -34,8 +34,8 @@ fun HomePanelView(
     ConstraintLayout(
         modifier = modifier
             .fillMaxSize()
-            .padding(30.dp)
             .applyBackground(homePanel.background)
+            .padding(30.dp)
     ) {
 
         val (bottomPanel, timePanel, weatherPanel) = createRefs()
