@@ -4,8 +4,9 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.SoundEffectConstants
 import android.view.View
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -67,6 +68,7 @@ suspend fun EntityInteractor.getDrawable(
     return getIconProvider().getIcon(iconSpec)
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 fun Modifier.effectClickable(
     hapticFeedback: HapticFeedback? = null,
     viewSoundEffect: View? = null,
@@ -75,13 +77,15 @@ fun Modifier.effectClickable(
     enabled: Boolean = true,
     onClickLabel: String? = null,
     role: Role? = null,
+    onLongClick: (() -> Unit)? = null,
     onClick: () -> Unit,
-) = clickable(
+) = combinedClickable(
     interactionSource = interactionSource,
     indication = indication,
     enabled = enabled,
     onClickLabel = onClickLabel,
     role = role,
+    onLongClick = onLongClick,
     onClick = {
         onClick()
         viewSoundEffect?.playSoundEffect(SoundEffectConstants.CLICK)

@@ -19,18 +19,19 @@
       </entry>
       <entry key="app">
         <State>
-          <runningDeviceTargetSelectedWithDropDown>
+          <targetSelectedWithDropDown>
             <Target>
-              <type value="RUNNING_DEVICE_TARGET" />
+              <type value="BOOT_WITH_SNAPSHOT_TARGET" />
               <deviceKey>
                 <Key>
-                  <type value="SERIAL_NUMBER" />
-                  <value value="192.168.1.88:47829" />
+                  <type value="VIRTUAL_DEVICE_PATH" />
+                  <value value="$USER_HOME$/.android/avd/Nexus_7_API_34.avd" />
                 </Key>
               </deviceKey>
+              <snapshotKey value="$USER_HOME$/.android/avd/Nexus_7_API_34.avd/snapshots/snap_2023-11-06_18-26-19" />
             </Target>
-          </runningDeviceTargetSelectedWithDropDown>
-          <timeTargetWasSelectedWithDropDown value="2023-11-09T17:33:56.836030Z" />
+          </targetSelectedWithDropDown>
+          <timeTargetWasSelectedWithDropDown value="2023-11-11T13:52:38.625203Z" />
         </State>
       </entry>
     </value>

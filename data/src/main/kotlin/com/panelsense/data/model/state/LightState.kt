@@ -6,10 +6,12 @@ data class LightState(
     val brightness: Int?,
     val colorMode: String?,
     val rgbColor: List<Int>?,
+    val rgbwwColor: List<Int>?,
     val colorTempKelvin: Int?,
     val maxColorTempKelvin: Int?,
     val minColorTempKelvin: Int?,
     val supportedColorModes: List<String>?,
     val friendlyName: String?,
-    val icon: String?
+    val icon: String?,
+    val supportedFeatures: Int?
 )

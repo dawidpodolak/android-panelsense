@@ -51,9 +51,9 @@ import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.GAT
 import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.SHADE
 import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.SHUTTER
 import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.WINDOW
+import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_POSITION
+import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_TILT_POSITION
 import com.panelsense.domain.model.entity.state.CoverEntityState.State.OPEN
-import com.panelsense.domain.model.entity.state.CoverEntityState.SupportedFeatures.SET_POSITION
-import com.panelsense.domain.model.entity.state.CoverEntityState.SupportedFeatures.SET_TILT_POSITION
 import timber.log.Timber
 
 data class CoverItemState(

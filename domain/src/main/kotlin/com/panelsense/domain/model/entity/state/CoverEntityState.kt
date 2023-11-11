@@ -1,5 +1,6 @@
 package com.panelsense.domain.model.entity.state
 
+import com.panelsense.domain.model.entity.EntityFeature
 import com.panelsense.domain.model.entity.command.CoverEntityCommand
 import com.panelsense.domain.model.entity.command.EntityCommand
 
@@ -11,7 +12,7 @@ class CoverEntityState(
     val icon: String?,
     val friendlyName: String?,
     val deviceClass: DeviceClass?,
-    val supportedFeatures: Set<SupportedFeatures> = emptySet()
+    val supportedFeatures: Set<Feature> = emptySet()
 ) : EntityState(entityId) {
 
     fun getOpenCoverCommand(): EntityCommand =
@@ -54,7 +55,7 @@ class CoverEntityState(
     }
 
     @Suppress("MagicNumber")
-    enum class SupportedFeatures(val value: Int) {
+    enum class Feature(override val value: Int) : EntityFeature {
         OPEN(1),
         CLOSE(2),
         SET_POSITION(4),

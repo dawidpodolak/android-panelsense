@@ -3,12 +3,14 @@ package com.panelsense.data.mapper
 import com.panelsense.data.model.state.LightState
 import com.panelsense.domain.model.entity.state.LightEntityState
 
+@Suppress("MagicNumber")
 fun LightState.toEntityState(): LightEntityState = LightEntityState(
     entityId = entityId,
     on = on,
     brightness = brightness,
     colorMode = colorMode.toColorMode(),
     rgbColor = rgbColor?.let { LightEntityState.Color(it[0], it[1], it[2]) },
+    rgbwwColor = rgbwwColor?.let { LightEntityState.ColorWW(it[0], it[1], it[2], it[3], it[4]) },
     colorTempKelvin = colorTempKelvin,
     colorTempKelvinRange = colorTempKelvin?.let {
         LightEntityState.ColorTempRange(
@@ -18,7 +20,8 @@ fun LightState.toEntityState(): LightEntityState = LightEntityState(
     },
     supportedColorModes = supportedColorModes?.mapNotNull { it.toColorMode() } ?: emptyList(),
     friendlyName = friendlyName,
-    icon = icon
+    icon = icon,
+    supportedFeatures = supportedFeatures.toSupportedFeature(LightEntityState.Feature.values()),
 )
 
 private fun String?.toColorMode(): LightEntityState.ColorMode? = when (this) {

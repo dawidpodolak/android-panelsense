@@ -3,7 +3,6 @@ package com.panelsense.data.mapper
 import com.panelsense.data.model.state.CoverState
 import com.panelsense.domain.model.entity.state.CoverEntityState
 import com.panelsense.domain.model.entity.state.CoverEntityState.State
-import com.panelsense.domain.model.entity.state.CoverEntityState.SupportedFeatures
 
 fun CoverState.toEntityState(): CoverEntityState =
     CoverEntityState(
@@ -14,7 +13,7 @@ fun CoverState.toEntityState(): CoverEntityState =
         icon = icon,
         friendlyName = friendlyName,
         deviceClass = deviceClass.toDeviceClass(),
-        supportedFeatures = supportedFeatures.toSupportedFeature(),
+        supportedFeatures = supportedFeatures.toSupportedFeature(CoverEntityState.Feature.values()),
     )
 
 private fun String?.toCoverState(): State =
@@ -41,14 +40,3 @@ private fun String?.toDeviceClass(): CoverEntityState.DeviceClass =
         "window" -> CoverEntityState.DeviceClass.WINDOW
         else -> CoverEntityState.DeviceClass.SHUTTER
     }
-
-private fun Int?.toSupportedFeature(): Set<SupportedFeatures> {
-    if (this == null) return emptySet()
-    val supportedFeatures = mutableSetOf<SupportedFeatures>()
-    SupportedFeatures.values().forEach {
-        if (this.and(it.value) == it.value) {
-            supportedFeatures.add(it)
-        }
-    }
-    return supportedFeatures
-}

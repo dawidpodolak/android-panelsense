@@ -9,6 +9,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -38,14 +40,17 @@ import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
+import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
+import com.panelsense.app.ui.theme.FontStyleH3
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
+import com.panelsense.app.ui.theme.PanelSenseBottomSheet
 import com.panelsense.domain.model.EntityDomain
 import com.panelsense.domain.model.PanelItem
 import com.panelsense.domain.model.entity.command.EntityCommand
@@ -78,6 +83,17 @@ fun SimplePanelItemView(
 
     var state by remember { mutableStateOf(initState) }
     val panelSizeHelper = getPanelSizeHelper()
+    val showBottomSheet = remember { mutableStateOf(false) }
+
+    if (state.entityState is LightEntityState && (state.entityState as LightEntityState).hasFeatures) {
+        PanelSenseBottomSheet(showBottomSheet, state.title) {
+            LightControlView(
+                Modifier.align(Alignment.CenterHorizontally),
+                lightEntityState = state.entityState as LightEntityState,
+                entityInteractor = entityInteractor
+            )
+        }
+    }
 
     Box(
         modifier = modifier
@@ -86,6 +102,9 @@ fun SimplePanelItemView(
                 viewSoundEffect = LocalView.current,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
+                onLongClick = {
+                    showBottomSheet.value = true
+                },
                 onClick = {
                     state.toggleCommand?.let(entityInteractor::sendCommand)
                 },
@@ -230,7 +249,90 @@ fun HorizontalSimplePanelItemView(
     }
 }
 
-@Preview(widthDp = 390, heightDp = 200)
+
+@Composable
+fun LightControlView(
+    modifier: Modifier = Modifier,
+    lightEntityState: LightEntityState,
+    entityInteractor: EntityInteractor
+) {
+    var entityState by remember { mutableStateOf(lightEntityState) }
+    var brightness by remember { mutableStateOf<Int?>(entityState.brightness ?: 0) }
+
+    LaunchedEffect(key1 = lightEntityState.entityId) {
+        entityInteractor.listenOnState(lightEntityState.entityId, LightEntityState::class)
+            .collect {
+                entityState = it
+                brightness = it.brightness
+            }
+    }
+
+    val brightnessText: String = when {
+        entityState.on && brightness != null -> brightness.getBrightnessPercent().toString()
+            .plus("%")
+
+        entityState.on && brightness == null -> ""
+        else -> stringResource(id = R.string.off)
+    }
+    Text(
+        modifier = modifier
+            .padding(top = 20.dp),
+        text = brightnessText,
+        color = Color.White,
+        style = FontStyleH3
+    )
+    Row(
+        modifier = modifier
+            .fillMaxSize(0.8f),
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        VerticalSlider(
+            Modifier.fillMaxHeight(0.7f),
+            initOn = lightEntityState.on,
+            initValue = entityState.brightness?.toFloat() ?: 0f,
+            maxValue = 255f,
+            initColor = entityState.rgbColor?.toColor() ?: Color.White,
+            onUpdateValue = {
+                brightness = it.toInt()
+                entityInteractor.sendCommand(entityState.getBrightnessCommand(it.toInt()))
+            }
+        )
+    }
+}
+
+fun Int?.getBrightnessPercent(): Int? =
+    this?.let { (it / 255f * 100f).toInt() }
+
+@Preview(widthDp = 1900, heightDp = 1200, showBackground = true)
+@Composable
+fun LightControlPreview() {
+    Box(
+
+    ) {
+        LightControlView(
+            Modifier.align(Alignment.Center),
+            lightEntityState = LightEntityState(
+                entityId = "someEntity",
+                brightness = 240,
+                on = true,
+                colorMode = null,
+                rgbColor = null,
+                rgbwwColor = null,
+                colorTempKelvin = null,
+                colorTempKelvinRange = null,
+                supportedColorModes = emptyList(),
+                friendlyName = "Lampa",
+                icon = "lamp",
+                supportedFeatures = emptySet()
+            ),
+            mockEntityInteractor(LocalContext.current)
+        )
+    }
+}
+
+private fun LightEntityState.Color.toColor(): Color =
+    Color(red, green, blue)
+
 @Composable
 fun SimplePanelItemPreview() {
 
