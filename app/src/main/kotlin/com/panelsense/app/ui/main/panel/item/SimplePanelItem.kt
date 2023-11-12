@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
@@ -46,6 +47,7 @@ import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH3
+import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
@@ -59,6 +61,7 @@ import com.panelsense.domain.model.entity.state.LightEntityState
 import com.panelsense.domain.model.entity.state.SwitchEntityState
 import com.panelsense.domain.toDomain
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 data class SimplePanelItemState(
     val icon: Drawable? = null,
@@ -219,8 +222,7 @@ fun HorizontalSimplePanelItemView(
             .fillMaxSize(),
     ) {
 
-
-        val (image, text) = createRefs()
+        val (image, text, brightness) = createRefs()
         Image(
             modifier = Modifier
                 .fillMaxHeight(0.5f)
@@ -246,6 +248,25 @@ fun HorizontalSimplePanelItemView(
             color = PanelItemTitleColor,
             style = FontStyleH3_SemiBold
         )
+
+        if (state.entityState is LightEntityState && state.entityState.brightness != null) {
+            Text(
+                modifier = Modifier
+                    .constrainAs(brightness) {
+                        start.linkTo(text.end, margin = 5.dp)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, margin = 5.dp)
+                        width = Dimension.wrapContent
+                        height = Dimension.wrapContent
+                    },
+                text = state.entityState.brightness?.getBrightnessPercent()
+                    .toString()
+                    .plus("%"),
+                color = PanelItemTitleColor,
+                style = FontStyleH3_Regular
+            )
+        }
     }
 }
 
@@ -294,6 +315,7 @@ fun LightControlView(
             initColor = entityState.rgbColor?.toColor() ?: Color.White,
             onUpdateValue = {
                 brightness = it.toInt()
+                Timber.d("Brightness: $it")
                 entityInteractor.sendCommand(entityState.getBrightnessCommand(it.toInt()))
             }
         )

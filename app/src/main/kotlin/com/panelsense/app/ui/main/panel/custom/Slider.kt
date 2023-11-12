@@ -1,11 +1,15 @@
 package com.panelsense.app.ui.main.panel.custom
 
+import android.view.MotionEvent
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitVerticalDragOrCancellation
+import androidx.compose.foundation.gestures.verticalDrag
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,15 +20,21 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VerticalSlider(
     modifier: Modifier = Modifier,
@@ -59,20 +69,29 @@ fun VerticalSlider(
         .run {
             if (upSideDown) rotate(180f) else this
         }
+        .pointerInteropFilter {
+            it.action == MotionEvent.ACTION_DOWN
+        }
         .pointerInput(Unit) {
-            detectVerticalDragGestures(
-                onDragStart = { isDragged = true },
-                onDragEnd = { isDragged = false }
-            ) { change, _ ->
-                if (!on) return@detectVerticalDragGestures
-                val minHeight = size.width * 0.6f
-                val position = change.position.y
-                val newP =
-                    maxValue - ((position.minus(minHeight.div(2)) * maxValue) / size.height.minus(
-                        minHeight
-                    ))
-                sliderValue = newP.coerceIn(0f, maxValue)
-                onUpdateValue(sliderValue)
+            awaitEachGesture {
+
+                val down = awaitFirstDown(requireUnconsumed = false).also { it.consume() }
+                val drag = awaitVerticalDragOrCancellation(down.id)?.also { it.consume() }
+
+                handleSliderUpdate(down.position, maxValue) {
+                    sliderValue = it
+                    onUpdateValue(it)
+                }
+
+                if (drag != null) {
+                    verticalDrag(drag.id) {
+                        it.consume()
+                        handleSliderUpdate(it.position, maxValue) {
+                            sliderValue = it
+                            onUpdateValue(it)
+                        }
+                    }
+                }
             }
         }
         .aspectRatio(0.3f)) {
@@ -81,7 +100,8 @@ fun VerticalSlider(
         ) {
             val cornerRadius = CornerRadius(size.width * 0.3f)
             val strokeWidth = cornerRadius.x * 0.1f
-            val minHeight = cornerRadius.x * 2
+            val minHeight = size.minHeight
+
             val maxHeight = size.height - strokeWidth - minHeight
             val requiredHeight = minHeight + (maxHeight * (animatedSlideValue / maxValue))
             val bottom = size.height - strokeWidth / 2
@@ -115,12 +135,33 @@ fun VerticalSlider(
     }
 }
 
+private fun PointerInputScope.handleSliderUpdate(
+    offset: Offset,
+    maxValue: Float,
+    onUpdateValue: (Float) -> Unit
+) {
+    val minHeight = size.minHeight
+    val position = offset.y
+    val newP =
+        maxValue - ((position.minus(minHeight.div(2)) * maxValue) / size.height.minus(
+            minHeight
+        ))
+    onUpdateValue(newP.coerceIn(0f, maxValue))
+}
+
+private val IntSize.minHeight
+    get() = width * MIN_HEIGHT_RATIO
+private val Size.minHeight
+    get() = width * MIN_HEIGHT_RATIO
+
 fun Color.getBackground(darkFactor: Float = 0.5f): Color = copy(
     alpha = alpha * darkFactor,
     red = red * darkFactor,
     green = green * darkFactor,
     blue = blue * darkFactor,
 )
+
+private const val MIN_HEIGHT_RATIO = 0.6f
 
 @Preview(widthDp = 40, heightDp = 200)
 @Composable()
