@@ -58,9 +58,7 @@ class PictogramIconProvider @Inject constructor(
                             iconSpec.color
                         )
                     )
-                ).also {
-                    Timber.d("SVG path: ${System.currentTimeMillis() - start}ms")
-                }
+                )
             }
                 .onFailure(Timber::e)
                 .getOrNull()

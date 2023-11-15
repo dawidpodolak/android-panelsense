@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +44,7 @@ import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
+import com.panelsense.app.ui.main.panel.custom.CircleColorPickerView
 import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
@@ -60,8 +64,9 @@ import com.panelsense.domain.model.entity.state.EntityState
 import com.panelsense.domain.model.entity.state.LightEntityState
 import com.panelsense.domain.model.entity.state.SwitchEntityState
 import com.panelsense.domain.toDomain
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 data class SimplePanelItemState(
     val icon: Drawable? = null,
@@ -270,7 +275,6 @@ fun HorizontalSimplePanelItemView(
     }
 }
 
-
 @Composable
 fun LightControlView(
     modifier: Modifier = Modifier,
@@ -279,12 +283,29 @@ fun LightControlView(
 ) {
     var entityState by remember { mutableStateOf(lightEntityState) }
     var brightness by remember { mutableStateOf<Int?>(entityState.brightness ?: 0) }
+    val coroutineScope = rememberCoroutineScope()
+
+    val colorFlow = remember { MutableSharedFlow<Color>() }
 
     LaunchedEffect(key1 = lightEntityState.entityId) {
         entityInteractor.listenOnState(lightEntityState.entityId, LightEntityState::class)
             .collect {
                 entityState = it
                 brightness = it.brightness
+                colorFlow.emit(it.rgbColor?.toColor() ?: Color.White)
+            }
+    }
+    LaunchedEffect(key1 = entityState.entityId) {
+        colorFlow
+            .sample(500)
+            .collect {
+                entityInteractor.sendCommand(
+                    entityState.getRGBCommand(
+                        (255 * it.red).toInt(),
+                        (255 * it.green).toInt(),
+                        (255 * it.blue).toInt()
+                    )
+                )
             }
     }
 
@@ -312,13 +333,19 @@ fun LightControlView(
             initOn = lightEntityState.on,
             initValue = entityState.brightness?.toFloat() ?: 0f,
             maxValue = 255f,
-            initColor = entityState.rgbColor?.toColor() ?: Color.White,
+            colorFlow = colorFlow,
             onUpdateValue = {
                 brightness = it.toInt()
-                Timber.d("Brightness: $it")
                 entityInteractor.sendCommand(entityState.getBrightnessCommand(it.toInt()))
             }
         )
+
+        Spacer(modifier = Modifier.width(20.dp))
+        CircleColorPickerView(Modifier.fillMaxHeight(0.7f), lightEntityState) {
+            coroutineScope.launch {
+                colorFlow.emit(it)
+            }
+        }
     }
 }
 
@@ -355,6 +382,7 @@ fun LightControlPreview() {
 private fun LightEntityState.Color.toColor(): Color =
     Color(red, green, blue)
 
+@Preview
 @Composable
 fun SimplePanelItemPreview() {
 

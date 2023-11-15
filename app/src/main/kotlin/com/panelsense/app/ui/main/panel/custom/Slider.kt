@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +34,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -42,12 +45,12 @@ fun VerticalSlider(
     upSideDown: Boolean = false,
     maxValue: Float = 100f,
     initValue: Float = 0f,
-    initColor: Color = Color(0xFF00BCD4),
+    colorFlow: Flow<Color> = flowOf(Color.White),
     onUpdateValue: (Float) -> Unit = {}
 ) {
     var isDragged by remember { mutableStateOf(false) }
     var on by remember { mutableStateOf(initOn) }
-    var color by remember { mutableStateOf(initColor) }
+    val color by colorFlow.collectAsState(initial = Color.White)
     var sliderValue by remember { mutableFloatStateOf(initValue.coerceIn(0f, maxValue)) }
 
     val animatedColor by animateColorAsState(targetValue = color, label = color.toString())
@@ -57,10 +60,9 @@ fun VerticalSlider(
         label = "initValue"
     )
 
-    LaunchedEffect(key1 = initValue * initColor.hashCode() * initOn.hashCode()) {
+    LaunchedEffect(key1 = initValue * initOn.hashCode()) {
         if (!isDragged) {
             sliderValue = initValue
-            color = initColor
             on = initOn
         }
     }
@@ -77,7 +79,7 @@ fun VerticalSlider(
 
                 val down = awaitFirstDown(requireUnconsumed = false).also { it.consume() }
                 val drag = awaitVerticalDragOrCancellation(down.id)?.also { it.consume() }
-
+                isDragged = true
                 handleSliderUpdate(down.position, maxValue) {
                     sliderValue = it
                     onUpdateValue(it)
@@ -92,6 +94,7 @@ fun VerticalSlider(
                         }
                     }
                 }
+                isDragged = false
             }
         }
         .aspectRatio(0.3f)) {

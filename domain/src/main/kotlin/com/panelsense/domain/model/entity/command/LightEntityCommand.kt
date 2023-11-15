@@ -12,3 +12,9 @@ data class BrightnessLightCommand(
     val on: Boolean = true,
     val brightness: Int
 ) : LightEntityCommand(entityId)
+
+data class RGBLightCommand(
+    override val entityId: String,
+    val on: Boolean = true,
+    val rgbColor: IntArray
+) : LightEntityCommand(entityId)

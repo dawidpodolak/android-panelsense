@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.dp
-import timber.log.Timber
 
 class PanelSizeHelper(private val remember: MutableState<LayoutCoordinates?>) {
     val orientation: PanelItemOrientation
@@ -16,7 +15,6 @@ class PanelSizeHelper(private val remember: MutableState<LayoutCoordinates?>) {
         get() = calculatePanelSize()
 
     fun onGlobalLayout(coordinates: LayoutCoordinates) {
-        Timber.d("onGlobalLayout: ${coordinates.size}")
         remember.value = coordinates
     }
 
@@ -30,7 +28,6 @@ class PanelSizeHelper(private val remember: MutableState<LayoutCoordinates?>) {
     }
 
     private fun calculateOrientation(): PanelItemOrientation {
-        Timber.d("calculateOrientation: ${remember.value?.size}")
         val intSize = remember.value?.size ?: return PanelItemOrientation.VERTICAL
         if (remember.value == null) return PanelItemOrientation.VERTICAL
         return if (intSize.width > intSize.height.times(2)) {
