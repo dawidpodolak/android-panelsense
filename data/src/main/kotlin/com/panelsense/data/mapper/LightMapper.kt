@@ -12,12 +12,12 @@ fun LightState.toEntityState(): LightEntityState = LightEntityState(
     rgbColor = rgbColor?.let { LightEntityState.Color(it[0], it[1], it[2]) },
     rgbwwColor = rgbwwColor?.let { LightEntityState.ColorWW(it[0], it[1], it[2], it[3], it[4]) },
     colorTempKelvin = colorTempKelvin,
-    colorTempKelvinRange = colorTempKelvin?.let {
+    colorTempKelvinRange = if (minColorTempKelvin != null && maxColorTempKelvin != null) {
         LightEntityState.ColorTempRange(
-            minColorTempKelvin!!,
-            maxColorTempKelvin!!
+            minColorTempKelvin,
+            maxColorTempKelvin
         )
-    },
+    } else null,
     supportedColorModes = supportedColorModes?.mapNotNull { it.toColorMode() } ?: emptyList(),
     friendlyName = friendlyName,
     icon = icon,

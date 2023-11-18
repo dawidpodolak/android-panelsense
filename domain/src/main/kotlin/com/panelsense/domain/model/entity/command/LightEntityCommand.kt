@@ -13,8 +13,17 @@ data class BrightnessLightCommand(
     val brightness: Int
 ) : LightEntityCommand(entityId)
 
+
+data class TemperatureLightCommand(
+    override val entityId: String,
+    val on: Boolean = true,
+    val colorMode: String = "color_temp",
+    val colorTempKelvin: Int
+) : LightEntityCommand(entityId)
+
 data class RGBLightCommand(
     override val entityId: String,
     val on: Boolean = true,
+    val colorMode: String = "hs",
     val rgbColor: IntArray
 ) : LightEntityCommand(entityId)

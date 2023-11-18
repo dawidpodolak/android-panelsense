@@ -45,12 +45,13 @@ import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
 import com.panelsense.app.ui.main.panel.custom.CircleColorPickerView
+import com.panelsense.app.ui.main.panel.custom.KelvinVerticalSlider
 import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
-import com.panelsense.app.ui.theme.FontStyleH3
+import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
@@ -67,6 +68,7 @@ import com.panelsense.domain.toDomain
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 data class SimplePanelItemState(
     val icon: Drawable? = null,
@@ -284,8 +286,7 @@ fun LightControlView(
     var entityState by remember { mutableStateOf(lightEntityState) }
     var brightness by remember { mutableStateOf<Int?>(entityState.brightness ?: 0) }
     val coroutineScope = rememberCoroutineScope()
-
-    val colorFlow = remember { MutableSharedFlow<Color>() }
+    val colorFlow = remember { MutableSharedFlow<Color>(replay = 1) }
 
     LaunchedEffect(key1 = lightEntityState.entityId) {
         entityInteractor.listenOnState(lightEntityState.entityId, LightEntityState::class)
@@ -299,6 +300,7 @@ fun LightControlView(
         colorFlow
             .sample(500)
             .collect {
+                if (it == entityState.rgbColor?.toColor()) return@collect
                 entityInteractor.sendCommand(
                     entityState.getRGBCommand(
                         (255 * it.red).toInt(),
@@ -318,10 +320,10 @@ fun LightControlView(
     }
     Text(
         modifier = modifier
-            .padding(top = 20.dp),
+            .padding(top = 20.dp, bottom = 10.dp),
         text = brightnessText,
         color = Color.White,
-        style = FontStyleH3
+        style = FontStyleH2_SemiBold
     )
     Row(
         modifier = modifier
@@ -340,10 +342,24 @@ fun LightControlView(
             }
         )
 
-        Spacer(modifier = Modifier.width(20.dp))
+        Spacer(modifier = Modifier.width(50.dp))
         CircleColorPickerView(Modifier.fillMaxHeight(0.7f), lightEntityState) {
             coroutineScope.launch {
                 colorFlow.emit(it)
+            }
+        }
+
+        Timber.d("colorTempKelvinRange ${entityState.colorTempKelvinRange}, ${entityState.supportedColorModes}")
+        if (entityState.colorTempKelvinRange != null) {
+
+            Spacer(modifier = Modifier.width(50.dp))
+            KelvinVerticalSlider(
+                Modifier.fillMaxHeight(0.7f),
+                maxValue = entityState.colorTempKelvinRange!!.max,
+                minValue = entityState.colorTempKelvinRange!!.min,
+                initValue = entityState.colorTempKelvin
+            ) {
+                entityInteractor.sendCommand(entityState.getTempCommand(it))
             }
         }
     }

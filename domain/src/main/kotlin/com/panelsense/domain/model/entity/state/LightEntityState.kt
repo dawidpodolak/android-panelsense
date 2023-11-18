@@ -4,6 +4,7 @@ import com.panelsense.domain.model.entity.EntityFeature
 import com.panelsense.domain.model.entity.command.BrightnessLightCommand
 import com.panelsense.domain.model.entity.command.LightEntityCommand
 import com.panelsense.domain.model.entity.command.RGBLightCommand
+import com.panelsense.domain.model.entity.command.TemperatureLightCommand
 import com.panelsense.domain.model.entity.command.ToggleLightCommand
 
 data class LightEntityState(
@@ -81,5 +82,11 @@ data class LightEntityState(
         entityId = entityId,
         on = true,
         rgbColor = arrayOf(red, green, blue).toIntArray()
+    )
+
+    fun getTempCommand(temp: Int): TemperatureLightCommand = TemperatureLightCommand(
+        entityId = entityId,
+        on = true,
+        colorTempKelvin = temp
     )
 }

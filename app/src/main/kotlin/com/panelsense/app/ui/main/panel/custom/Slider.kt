@@ -127,7 +127,7 @@ fun VerticalSlider(
                     cornerRadius = cornerRadius,
                 )
                 drawLine(
-                    color = Color.White,
+                    color = Color.Gray,
                     start = Offset(cornerRadius.x, offsetY + cornerRadius.y),
                     end = Offset(size.width - cornerRadius.x, offsetY + cornerRadius.y),
                     strokeWidth = strokeWidth * 1.5f,
