@@ -23,7 +23,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -34,6 +33,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
@@ -43,10 +43,11 @@ fun VerticalSlider(
     modifier: Modifier = Modifier,
     initOn: Boolean = true,
     upSideDown: Boolean = false,
+    aspectRatioOn: Boolean = true,
     maxValue: Float = 100f,
     initValue: Float = 0f,
     colorFlow: Flow<Color> = flowOf(Color.White),
-    onUpdateValue: (Float) -> Unit = {}
+    onUpdateValue: (Float, SliderMotion) -> Unit = { _, _ -> }
 ) {
     var isDragged by remember { mutableStateOf(false) }
     var on by remember { mutableStateOf(initOn) }
@@ -68,9 +69,6 @@ fun VerticalSlider(
     }
 
     Box(modifier = modifier
-        .run {
-            if (upSideDown) rotate(180f) else this
-        }
         .pointerInteropFilter {
             it.action == MotionEvent.ACTION_DOWN
         }
@@ -79,36 +77,53 @@ fun VerticalSlider(
 
                 val down = awaitFirstDown(requireUnconsumed = false).also { it.consume() }
                 val drag = awaitVerticalDragOrCancellation(down.id)?.also { it.consume() }
-                isDragged = true
-                handleSliderUpdate(down.position, maxValue) {
-                    sliderValue = it
-                    onUpdateValue(it)
-                }
 
+                isDragged = true
+                handleSliderUpdate(down.position, maxValue, upSideDown) {
+                    sliderValue = it
+                    onUpdateValue(it, SliderMotion.DOWN)
+                }
+                var lastDragPosition: Offset = down.position
                 if (drag != null) {
                     verticalDrag(drag.id) {
                         it.consume()
-                        handleSliderUpdate(it.position, maxValue) {
+                        lastDragPosition = it.position
+                        handleSliderUpdate(it.position, maxValue, upSideDown) {
                             sliderValue = it
-                            onUpdateValue(it)
+                            onUpdateValue(it, SliderMotion.DRAG)
                         }
                     }
                 }
                 isDragged = false
+                handleSliderUpdate(lastDragPosition, maxValue, upSideDown) {
+                    sliderValue = it
+                    onUpdateValue(it, SliderMotion.UP)
+                }
             }
         }
-        .aspectRatio(0.3f)) {
+        .run {
+            if (aspectRatioOn) aspectRatio(0.3f) else this
+        }) {
         Canvas(
             modifier = Modifier.fillMaxSize(),
         ) {
-            val cornerRadius = CornerRadius(size.width * 0.3f)
+            val cornerRadius = CornerRadius((size.width * 0.3f).coerceAtMost(15.dp.toPx()))
             val strokeWidth = cornerRadius.x * 0.1f
-            val minHeight = size.minHeight
+            val minHeight = 40.dp.toPx()
 
             val maxHeight = size.height - strokeWidth - minHeight
             val requiredHeight = minHeight + (maxHeight * (animatedSlideValue / maxValue))
             val bottom = size.height - strokeWidth / 2
-            val offsetY = strokeWidth / 2 + (bottom - requiredHeight)
+            val offsetY = if (upSideDown) {
+                0f
+            } else {
+                strokeWidth / 2 + (bottom - requiredHeight)
+            }
+            val stripY = if (upSideDown) {
+                requiredHeight - cornerRadius.x
+            } else {
+                offsetY + cornerRadius.y
+            }
 
             drawRoundRect(
                 color = animatedColor.getBackground(),
@@ -128,8 +143,8 @@ fun VerticalSlider(
                 )
                 drawLine(
                     color = Color.Gray,
-                    start = Offset(cornerRadius.x, offsetY + cornerRadius.y),
-                    end = Offset(size.width - cornerRadius.x, offsetY + cornerRadius.y),
+                    start = Offset(cornerRadius.x, stripY),
+                    end = Offset(size.width - cornerRadius.x, stripY),
                     strokeWidth = strokeWidth * 1.5f,
                     cap = StrokeCap.Round,
                 )
@@ -138,18 +153,33 @@ fun VerticalSlider(
     }
 }
 
+enum class SliderMotion {
+    DOWN, DRAG, UP
+}
+
 private fun PointerInputScope.handleSliderUpdate(
     offset: Offset,
     maxValue: Float,
+    upSideDown: Boolean,
     onUpdateValue: (Float) -> Unit
 ) {
-    val minHeight = size.minHeight
-    val position = offset.y
-    val newP =
-        maxValue - ((position.minus(minHeight.div(2)) * maxValue) / size.height.minus(
+    val minHeight = 40.dp.toPx()
+    val yPosition = offset.y
+    val calculatedPosition = if (upSideDown) {
+        maxValue - ((yPosition.minus(minHeight) * maxValue) / size.height.minus(
             minHeight
         ))
-    onUpdateValue(newP.coerceIn(0f, maxValue))
+    } else {
+        maxValue - ((yPosition.minus(minHeight.div(2)) * maxValue) / size.height.minus(
+            minHeight
+        ))
+    }
+    val finalPosition = if (upSideDown) {
+        maxValue - calculatedPosition.coerceIn(0f, maxValue)
+    } else {
+        calculatedPosition.coerceIn(0f, maxValue)
+    }
+    onUpdateValue(finalPosition)
 }
 
 private val IntSize.minHeight
@@ -166,13 +196,14 @@ fun Color.getBackground(darkFactor: Float = 0.5f): Color = copy(
 
 private const val MIN_HEIGHT_RATIO = 0.6f
 
-@Preview(widthDp = 40, heightDp = 200)
+@Preview(widthDp = 200, heightDp = 200)
 @Composable()
 fun Preview() {
     VerticalSlider(
-        initValue = 0f,
+        initValue = 50f,
         maxValue = 250f,
+        aspectRatioOn = false,
         initOn = true,
-        upSideDown = false
+        upSideDown = true
     )
 }

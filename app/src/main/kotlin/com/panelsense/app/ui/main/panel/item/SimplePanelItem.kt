@@ -46,6 +46,7 @@ import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
 import com.panelsense.app.ui.main.panel.custom.CircleColorPickerView
 import com.panelsense.app.ui.main.panel.custom.KelvinVerticalSlider
+import com.panelsense.app.ui.main.panel.custom.SliderMotion
 import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
@@ -68,7 +69,6 @@ import com.panelsense.domain.toDomain
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 data class SimplePanelItemState(
     val icon: Drawable? = null,
@@ -336,9 +336,11 @@ fun LightControlView(
             initValue = entityState.brightness?.toFloat() ?: 0f,
             maxValue = 255f,
             colorFlow = colorFlow,
-            onUpdateValue = {
-                brightness = it.toInt()
-                entityInteractor.sendCommand(entityState.getBrightnessCommand(it.toInt()))
+            onUpdateValue = { value, motion ->
+                brightness = value.toInt()
+                if (motion == SliderMotion.UP) {
+                    entityInteractor.sendCommand(entityState.getBrightnessCommand(value.toInt()))
+                }
             }
         )
 
@@ -349,7 +351,6 @@ fun LightControlView(
             }
         }
 
-        Timber.d("colorTempKelvinRange ${entityState.colorTempKelvinRange}, ${entityState.supportedColorModes}")
         if (entityState.colorTempKelvinRange != null) {
 
             Spacer(modifier = Modifier.width(50.dp))

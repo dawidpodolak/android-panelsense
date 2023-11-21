@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
@@ -31,14 +33,18 @@ import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
+import com.panelsense.app.ui.main.panel.custom.SliderMotion
+import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.theme.CoverItemButtonActive
+import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
+import com.panelsense.app.ui.theme.PanelSenseBottomSheet
 import com.panelsense.domain.model.PanelItem
 import com.panelsense.domain.model.entity.state.CoverEntityState
 import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.AWNING
@@ -54,6 +60,7 @@ import com.panelsense.domain.model.entity.state.CoverEntityState.DeviceClass.WIN
 import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_POSITION
 import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_TILT_POSITION
 import com.panelsense.domain.model.entity.state.CoverEntityState.State.OPEN
+import kotlinx.coroutines.flow.flowOf
 import timber.log.Timber
 
 data class CoverItemState(
@@ -96,13 +103,25 @@ fun HorizontalCoverItemView(
         modifier.fillMaxSize()
     ) {
         val (image, title, position) = createRefs()
-        Timber.d("HorizontalCoverItemView: ${state.entityState}")
+        val showBottomSheet = remember { mutableStateOf(false) }
+
         state.entityState?.let {
             CoverControlButtons(
                 modifier = Modifier
                     .fillMaxSize(),
-                state, entityInteractor, it
+                state, entityInteractor, it,
+                onLongClick = { showBottomSheet.value = true },
             )
+        }
+
+        if (state.entityState?.supportedFeatures?.contains(SET_POSITION) == true) {
+            PanelSenseBottomSheet(showBottomSheet, state.title) {
+                CoverControlView(
+                    Modifier.align(Alignment.CenterHorizontally),
+                    entityState = state.entityState!!,
+                    entityInteractor = entityInteractor
+                )
+            }
         }
 
         Image(
@@ -159,7 +178,8 @@ private fun CoverControlButtons(
     modifier: Modifier = Modifier,
     state: CoverItemState,
     entityInteractor: EntityInteractor,
-    coverEntityState: CoverEntityState
+    coverEntityState: CoverEntityState,
+    onLongClick: () -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -182,6 +202,7 @@ private fun CoverControlButtons(
                 .weight(0.3f),
             icon = openButton,
             useDivider = true,
+            onLongClick = { onLongClick() },
             onClick = { entityInteractor.sendCommand(coverEntityState.getOpenCoverCommand()) }
         )
 
@@ -191,6 +212,7 @@ private fun CoverControlButtons(
                 .weight(0.3f),
             icon = stopButton,
             useDivider = true,
+            onLongClick = { onLongClick() },
             onClick = { entityInteractor.sendCommand(coverEntityState.getStopCoverCommand()) }
         )
 
@@ -199,6 +221,7 @@ private fun CoverControlButtons(
                 .fillMaxHeight()
                 .weight(0.3f),
             icon = closeButton,
+            onLongClick = { onLongClick() },
             onClick = { entityInteractor.sendCommand(coverEntityState.getCloseCoverCommand()) }
         )
     }
@@ -209,6 +232,7 @@ fun CoverButton(
     modifier: Modifier = Modifier,
     icon: Drawable? = null,
     useDivider: Boolean = false,
+    onLongClick: () -> Unit,
     onClick: () -> Unit
 ) {
     Box(
@@ -219,6 +243,7 @@ fun CoverButton(
                 viewSoundEffect = LocalView.current,
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
+                onLongClick = onLongClick,
                 onClick = onClick
             )
     ) {
@@ -257,6 +282,44 @@ private fun StateLaunchEffect(
                 position = it.position?.toString() ?: it.tiltPosition?.toString()
             )
         )
+    }
+}
+
+@Composable
+private fun CoverControlView(
+    modifier: Modifier,
+    entityState: CoverEntityState,
+    entityInteractor: EntityInteractor
+) {
+
+    var positionText by remember { mutableStateOf((entityState.position?.toString() + "%") ?: "") }
+    LaunchedEffect(entityState.position) {
+        positionText = (entityState.position?.toString() + "%") ?: ""
+    }
+    Text(
+        modifier = modifier
+            .padding(top = 20.dp, bottom = 10.dp),
+        text = positionText,
+        color = Color.White,
+        style = FontStyleH2_SemiBold
+    )
+
+    VerticalSlider(
+        modifier
+            .fillMaxHeight(0.7f)
+            .requiredWidth(300.dp),
+        maxValue = 100f,
+        initValue = 100f - (entityState.position?.toFloat() ?: 0f),
+        aspectRatioOn = false,
+        upSideDown = true,
+        colorFlow = flowOf(CoverItemButtonActive)
+    ) { value, motion ->
+        positionText = "${100 - value.toInt()}%"
+        if (motion == SliderMotion.UP) {
+            entityInteractor.sendCommand(
+                entityState.getPositionCoverCommand(100 - value.toInt())
+            )
+        }
     }
 }
 

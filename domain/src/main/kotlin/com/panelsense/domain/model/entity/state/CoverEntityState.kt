@@ -2,6 +2,7 @@ package com.panelsense.domain.model.entity.state
 
 import com.panelsense.domain.model.entity.EntityFeature
 import com.panelsense.domain.model.entity.command.CoverEntityCommand
+import com.panelsense.domain.model.entity.command.CoverPositionEntityCommand
 import com.panelsense.domain.model.entity.command.EntityCommand
 
 class CoverEntityState(
@@ -25,6 +26,12 @@ class CoverEntityState(
         CoverEntityCommand(
             entityId = entityId,
             state = "close"
+        )
+
+    fun getPositionCoverCommand(position: Int): EntityCommand =
+        CoverPositionEntityCommand(
+            entityId = entityId,
+            position = position
         )
 
     fun getStopCoverCommand(): EntityCommand =
