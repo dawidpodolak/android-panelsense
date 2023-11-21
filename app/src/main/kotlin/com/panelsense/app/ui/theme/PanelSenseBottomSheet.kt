@@ -1,6 +1,8 @@
 package com.panelsense.app.ui.theme
 
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,6 +35,7 @@ fun PanelSenseBottomSheet(
                 bottomStart = 0.dp,
                 bottomEnd = 0.dp
             ),
+            windowInsets = WindowInsets.displayCutout,
             containerColor = Color(0xD2444444),
             tonalElevation = 30.dp,
             onDismissRequest = { showBottomSheet.value = false },
