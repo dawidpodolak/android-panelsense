@@ -18,13 +18,22 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
+private const val CLOSE_DELAY = 60000L
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,6 +52,14 @@ fun PanelSenseBottomSheet(
     }
 
     if (showBottomSheet.value) {
+        var timerJob by remember { mutableStateOf<Job?>(null) }
+        LaunchedEffect(key1 = null) {
+            timerJob = coroutineScope.launch {
+                delay(CLOSE_DELAY)
+                hideModalBottomSheet()
+            }
+        }
+
         ModalBottomSheet(
             modifier = Modifier
                 .fillMaxSize(0.95f),
@@ -55,7 +72,10 @@ fun PanelSenseBottomSheet(
             windowInsets = WindowInsets.displayCutout,
             containerColor = Color(0xD2444444),
             tonalElevation = 30.dp,
-            onDismissRequest = { showBottomSheet.value = false },
+            onDismissRequest = {
+                showBottomSheet.value = false
+                timerJob?.cancel()
+            },
             sheetState = bottomSheetState
         ) {
             Box(
