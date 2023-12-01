@@ -3,16 +3,15 @@ package com.panelsense.app.ui.main
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -24,63 +23,60 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
-import coil.compose.rememberAsyncImagePainter
 import com.panelsense.app.R
+import com.panelsense.app.disableSystemUI
 import com.panelsense.app.ui.login.LoginActivity
-import com.panelsense.app.ui.main.panel.GridPanel
-import com.panelsense.app.ui.main.panel.HomePanel
-import com.panelsense.app.ui.main.theme.FontStyleH3_Medium
-import com.panelsense.app.ui.main.theme.PanelSenseTheme
-import com.panelsense.core.model.mqqt.MqttMessage
-import com.panelsense.core.model.panelconfig.PanelConfiguration
-import com.panelsense.core.model.panelconfig.PanelConfiguration.GridPanel
-import com.panelsense.core.model.panelconfig.PanelConfiguration.HomePanel
+import com.panelsense.app.ui.main.panel.GridPanelView
+import com.panelsense.app.ui.main.panel.HomePanelView
+import com.panelsense.app.ui.main.panel.NavigationBar
+import com.panelsense.app.ui.main.panel.NavigationBarHeight
+import com.panelsense.app.ui.main.panel.applyBackground
+import com.panelsense.app.ui.theme.FontStyleH3_Medium
+import com.panelsense.app.ui.theme.PanelSenseTheme
 import com.panelsense.data.icons.IconProvider
+import com.panelsense.domain.model.Configuration
+import com.panelsense.domain.model.Panel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @ExperimentalFoundationApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    val viewModel: MainViewModel by viewModels<MainViewModel>()
+
     @Inject
     lateinit var iconProvider: IconProvider
 
-    val viewModel: MainViewModel by viewModels<MainViewModel>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("MainActivity", "onCreate")
-        Timber.d("onCreate")
 
+        disableSystemUI()
         setContent {
 
             PanelSenseTheme {
                 val uiState = viewModel.stateFlow.collectAsState()
 
-                val senseConfig = uiState.value?.senseConfiguration ?: return@PanelSenseTheme
-                Background(senseConfig.systemConfiguration?.backgroundImageUrl)
+                val senseConfig = uiState.value.panelConfiguration ?: return@PanelSenseTheme
 
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(
+                    modifier = Modifier
+                        .applyBackground(senseConfig.system.background)
+                        .fillMaxSize()
+                ) {
                     if (senseConfig.panelList.isEmpty()) {
                         NoPanels()
                     } else {
                         PagerPanels(
-                            panels = senseConfig.panelList,
-                            iconProvider = iconProvider,
-                            stateFlow = viewModel.messageFlow,
-                            onClick = viewModel::onItemClick
+                            configuration = senseConfig,
+                            entityInteractor = viewModel
                         )
 
                     }
@@ -134,43 +130,74 @@ fun NoPanels() {
 @Composable
 @ExperimentalFoundationApi
 fun PagerPanels(
-    panels: List<PanelConfiguration>,
-    iconProvider: IconProvider,
-    stateFlow: Flow<MqttMessage>,
-    onClick: (PanelConfiguration.PanelItem.ButtonItem) -> Unit
+    configuration: Configuration,
+    entityInteractor: EntityInteractor
 ) {
 
     val pagerState = object : PagerState() {
         override val pageCount: Int
-            get() = panels.size
+            get() = configuration.panelList.size
     }
+
+    val mainPanelId = configuration.getMainPanelPosition()
 
     LaunchedEffect(key1 = true) {
         delay(2000)
-        pagerState.animateScrollToPage(1)
+        pagerState.animateScrollToPage(mainPanelId)
     }
-    HorizontalPager(state = pagerState) { panelIndex ->
-        when (val panelConfig = panels[panelIndex]) {
-            is HomePanel -> HomePanel(panelConfig, iconProvider)
-            is GridPanel -> GridPanel(panelConfig, iconProvider, stateFlow, onClick)
+    Box(modifier = Modifier.fillMaxSize()) {
+        HorizontalPager(
+            state = pagerState,
+            beyondBoundsPageCount = configuration.panelList.size
+        ) { panelIndex ->
+            when (val panelConfig = configuration.panelList[panelIndex]) {
+                is Panel.HomePanel -> HomePanelView(
+                    modifier = Modifier
+                        .applyBackground(panelConfig.background)
+                        .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
+                    panelConfig, entityInteractor
+                )
+
+                is Panel.GridPanel -> GridPanelView(
+                    modifier = Modifier
+                        .applyBackground(panelConfig.background)
+                        .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
+                    panelConfig, entityInteractor
+                )
+            }
+        }
+        if (configuration.system.showNavBar) {
+            NavigationBar(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                pagerState,
+                mainPanelId
+            )
         }
     }
 }
 
-@Composable
-fun Background(imageUrl: String?) {
-    val painter = if (imageUrl != null) {
-        rememberAsyncImagePainter(model = imageUrl)
+private fun Modifier.applyBottomPaddingIfNeeded(showNavBar: Boolean): Modifier {
+    return if (showNavBar) {
+        this.padding(bottom = NavigationBarHeight)
     } else {
-        painterResource(id = R.drawable.background)
+        this
     }
-    Image(
-        painter = painter,
-        contentDescription = "Background",
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop
-    )
 }
+
+private fun Configuration.getMainPanelPosition(): Int {
+    val mainPanelId = system.mainPanelId
+    return if (mainPanelId != null) {
+        panelList.indexOfFirst { it.panelId == system.mainPanelId }
+    } else {
+        0
+    }
+}
+
+val Panel.panelId: String?
+    get() = when (this) {
+        is Panel.HomePanel -> this.id
+        is Panel.GridPanel -> this.id
+    }
 
 @Composable
 fun CameraPanel() {

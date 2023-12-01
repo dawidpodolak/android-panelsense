@@ -1,4 +1,4 @@
-package com.panelsense.app.ui.main.theme
+package com.panelsense.app.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.graphics.Color
@@ -54,6 +54,16 @@ val FontStyleH1 = TextStyle(
     fontWeight = FontWeight.Normal,
     color = TextColor
 )
+val FontStyleLarge_Light = TextStyle(
+    fontSize = 48.sp,
+    fontWeight = FontWeight.Light,
+    color = TextColor
+)
+val FontStyleXLarge_Light = TextStyle(
+    fontSize = 64.sp,
+    fontWeight = FontWeight.Light,
+    color = TextColor
+)
 
 val FontStyleH2_Bold = TextStyle(
     fontSize = 24.sp,
@@ -86,6 +96,11 @@ val FontStyleH3_Medium = TextStyle(
     fontWeight = FontWeight.Medium,
     color = TextColor
 )
+val FontStyleH3_Regular = TextStyle(
+    fontSize = 19.sp,
+    fontWeight = FontWeight.Normal,
+    color = TextColor
+)
 val FontStyleH3 = TextStyle(
     fontSize = 19.sp,
     fontWeight = FontWeight.Normal,
@@ -109,22 +124,38 @@ val FontStyleH4 = TextStyle(
 )
 
 val FontStyleH5_Bold = TextStyle(
-    fontSize = 16.sp,
+    fontSize = 14.sp,
     fontWeight = FontWeight.Bold,
     color = TextColor
 )
 val FontStyleH5_SemiBold = TextStyle(
-    fontSize = 16.sp,
+    fontSize = 14.sp,
     fontWeight = FontWeight.SemiBold,
     color = TextColor
 )
 val FontStyleH5 = TextStyle(
-    fontSize = 16.sp,
+    fontSize = 14.sp,
+    fontWeight = FontWeight.Normal,
+    color = TextColor
+)
+
+val FontStyleH6_Bold = TextStyle(
+    fontSize = 12.sp,
+    fontWeight = FontWeight.Bold,
+    color = TextColor
+)
+val FontStyleH6_SemiBold = TextStyle(
+    fontSize = 12.sp,
+    fontWeight = FontWeight.SemiBold,
+    color = TextColor
+)
+val FontStyleH6 = TextStyle(
+    fontSize = 12.sp,
     fontWeight = FontWeight.Normal,
     color = TextColor
 )
 val FontStyleButton = TextStyle(
-    fontSize = 19.sp,
+    fontSize = 12.sp,
     fontWeight = FontWeight.Medium,
     color = Color.White
 )

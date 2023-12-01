@@ -73,8 +73,10 @@ dependencies {
     implementation(libs.compose.grid)
     implementation(libs.kt.coil)
     implementation(libs.compose.image.drawable)
+    implementation(libs.compose.constraintLayout)
     implementation(libs.hilt.android)
     implementation(libs.gson)
+    implementation(libs.threetenabp)
 
     implementation(libs.kotlin.coroutines.android)
     implementation(libs.kotlin.coroutines.core)

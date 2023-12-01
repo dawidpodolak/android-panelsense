@@ -11,7 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.lifecycleScope
 import com.panelsense.app.disableSystemUI
 import com.panelsense.app.ui.main.MainActivity
-import com.panelsense.app.ui.main.theme.PanelSenseTheme
+import com.panelsense.app.ui.theme.PanelSenseTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
