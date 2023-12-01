@@ -6,16 +6,19 @@ import com.google.gson.GsonBuilder
 import com.panelsense.data.icons.IconProvider
 import com.panelsense.data.icons.PictogramIconProvider
 import com.panelsense.data.model.MessageType
-import com.panelsense.data.mqtt.MqttController
-import com.panelsense.data.mqtt.MqttControllerImpl
 import com.panelsense.data.serializer.MessageTypeDeserializer
 import com.panelsense.data.serializer.MessageTypeSerializer
+import com.panelsense.data.serializer.PanelDeserializer
+import com.panelsense.data.serializer.PanelTypeDeserializer
+import com.panelsense.domain.model.Panel
+import com.panelsense.domain.model.PanelType
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.aaronhe.threetengson.ThreeTenGsonAdapter
 import org.yaml.snakeyaml.Yaml
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -46,14 +49,15 @@ object DataModule {
     fun provideIconProviderImpl(iconProvider: PictogramIconProvider): IconProvider = iconProvider
 
     @Provides
-    fun providerMqttControllerImpl(mqttController: MqttControllerImpl): MqttController =
-        mqttController
+    fun provideGson(): Gson {
+        val builder = GsonBuilder()
+            .disableHtmlEscaping()
+            .registerTypeAdapter(MessageType::class.java, MessageTypeSerializer())
+            .registerTypeAdapter(MessageType::class.java, MessageTypeDeserializer())
+            .registerTypeAdapter(Panel::class.java, PanelDeserializer())
+            .registerTypeAdapter(PanelType::class.java, PanelTypeDeserializer())
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
 
-    @Provides
-    fun provideGson(): Gson = GsonBuilder()
-        .disableHtmlEscaping()
-        .registerTypeAdapter(MessageType::class.java, MessageTypeSerializer())
-        .registerTypeAdapter(MessageType::class.java, MessageTypeDeserializer())
-        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-        .create()
+        return ThreeTenGsonAdapter.registerZonedDateTime(builder).create()
+    }
 }

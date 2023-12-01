@@ -48,6 +48,10 @@ dependencies {
     implementation(libs.okhttp.logging)
     implementation(libs.kotlin.coroutines.android)
     implementation(libs.kotlin.coroutines.core)
+    implementation(libs.threetenabp)
+    implementation(libs.threetenadapter) {
+        isTransitive = false
+    }
 
     kapt(libs.hilt.compiler)
 }

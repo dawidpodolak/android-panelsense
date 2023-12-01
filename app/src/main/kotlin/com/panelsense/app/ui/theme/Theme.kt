@@ -1,4 +1,4 @@
-package com.panelsense.app.ui.main.theme
+package com.panelsense.app.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme

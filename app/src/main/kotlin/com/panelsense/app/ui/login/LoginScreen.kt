@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,11 +40,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.panelsense.app.R
-import com.panelsense.app.ui.main.theme.BackgroundColor
-import com.panelsense.app.ui.main.theme.FontStyleButton
-import com.panelsense.app.ui.main.theme.FontStyleH3
-import com.panelsense.app.ui.main.theme.FontStyleH4
-import com.panelsense.app.ui.main.theme.FontStyleH4_SemiBold
+import com.panelsense.app.ui.theme.BackgroundColor
+import com.panelsense.app.ui.theme.FontStyleButton
+import com.panelsense.app.ui.theme.FontStyleH3
+import com.panelsense.app.ui.theme.FontStyleH4
+import com.panelsense.app.ui.theme.FontStyleH4_SemiBold
 import com.panelsense.app.ui.util.ErrorScreen
 import com.panelsense.domain.model.ServerConnectionData
 
@@ -61,14 +60,13 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .aspectRatio(1f)
                 .padding(10.dp)
                 .verticalScroll(scrollState, enabled = true)
         ) {
 
-            var addressText by remember { mutableStateOf("192.168.1.32") }
+            var addressText by remember { mutableStateOf("127.0.0.1") }
             var portText by remember { mutableStateOf("8652") }
-            var panelSenseNameText by remember { mutableStateOf("NsPanel Salon") }
+            var panelSenseNameText by remember { mutableStateOf("Nexus Emu") }
             var userNameText by remember { mutableStateOf("admin") }
             var passwordText by remember { mutableStateOf("admin") }
             var passwordShow by remember { mutableStateOf(false) }

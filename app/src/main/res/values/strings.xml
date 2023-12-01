@@ -16,4 +16,22 @@
     <!--  General  -->
     <string name="errorTitle">Error</string>
     <string name="serverDisconnected">Server disconnected!</string>
+
+    <!-- Weather -->
+    <string name="weatherClearNight">Pogodnie</string>
+    <string name="weatherCloudy">Pochmurno</string>
+    <string name="weatherExceptional"></string>
+    <string name="weatherFog">Mgła</string>
+    <string name="weatherHail">Graf</string>
+    <string name="weatherLightning">Burza</string>
+    <string name="weatherLightningRainy">Burza z deszczem</string>
+    <string name="weatherPartlyCloudy">Częściowo pochmurnie</string>
+    <string name="weatherPouring">Deszcz</string>
+    <string name="weatherRainy">Mrzawka</string>
+    <string name="weatherSnowy">Śnieg</string>
+    <string name="weatherSnowyRainy">Śnieg z deszczem</string>
+    <string name="weatherSunny">Słonecznie</string>
+    <string name="weatherWindy">Wietrznie</string>
+    <string name="weatherWindyVariant">Pochmurno</string>
+    <string name="off">Wyłączony</string>
 </resources>

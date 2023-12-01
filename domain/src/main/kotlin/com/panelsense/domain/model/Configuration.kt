@@ -6,16 +6,33 @@ data class Configuration(
 )
 
 data class ConfigurationSystem(
-    val mainPanelId: String? = null
+    val mainPanelId: String? = null,
+    val showNavBar: Boolean = false,
+    val background: String? = null
 )
 
-data class Panel(
-    val id: String? = null,
-    val type: PanelType,
-    val columnCount: Int = 0,
-    val name: String? = null,
-    val itemList: List<PanelItem> = emptyList()
-)
+
+sealed class Panel {
+
+    data class HomePanel(
+        val id: String? = null,
+        val type: PanelType = PanelType.HOME,
+        val name: String? = null,
+        val weatherEntity: String? = null,
+        val time24h: Boolean = false,
+        val itemList: List<PanelItem> = emptyList(),
+        val background: String? = null
+    ) : Panel()
+
+    data class GridPanel(
+        val id: String? = null,
+        val type: PanelType = PanelType.GRID,
+        val name: String? = null,
+        val columnCount: Int = 0,
+        val itemList: List<PanelItem> = emptyList(),
+        val background: String? = null
+    ) : Panel()
+}
 
 enum class PanelType(val type: String) {
     HOME("home"),
