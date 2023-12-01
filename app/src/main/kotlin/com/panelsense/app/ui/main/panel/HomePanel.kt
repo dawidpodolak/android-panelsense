@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstrainedLayoutReference
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.panelsense.app.ui.main.EntityInteractor
@@ -38,8 +39,8 @@ fun HomePanelView(
             .padding(30.dp)
     ) {
 
-        val (bottomPanel, timePanel, weatherPanel) = createRefs()
-
+        var bottomPanel: ConstrainedLayoutReference? = null
+        val (timePanel, weatherPanel) = createRefs()
         ClockItemView(
             modifier = Modifier
                 .wrapContentWidth()
@@ -53,6 +54,7 @@ fun HomePanelView(
         )
 
         if (homePanel.itemLeft != null || homePanel.itemRight != null) {
+            bottomPanel = createRef()
             ButtonsPanelView(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -72,7 +74,11 @@ fun HomePanelView(
                         top.linkTo(parent.top)
                         start.linkTo(parent.start)
                         end.linkTo(timePanel.start, margin = 30.dp)
-                        bottom.linkTo(bottomPanel.top, margin = 30.dp)
+                        if (bottomPanel != null) {
+                            bottom.linkTo(bottomPanel.top, margin = 30.dp)
+                        } else {
+                            bottom.linkTo(parent.bottom, margin = 30.dp)
+                        }
                         width = Dimension.fillToConstraints
                         height = Dimension.fillToConstraints
                         centerHorizontallyTo(parent, 0f)
