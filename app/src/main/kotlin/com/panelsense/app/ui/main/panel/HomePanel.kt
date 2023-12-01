@@ -53,7 +53,7 @@ fun HomePanelView(
             homePanel = homePanel
         )
 
-        if (homePanel.itemLeft != null || homePanel.itemRight != null) {
+        if (homePanel.itemList.isNotEmpty()) {
             bottomPanel = createRef()
             ButtonsPanelView(
                 modifier = Modifier
@@ -99,24 +99,17 @@ private fun ButtonsPanelView(
     Row(
         modifier = modifier,
     ) {
-        if (homePanel.itemLeft != null) {
+        val weight = 1 / homePanel.itemList.size.toFloat()
+        homePanel.itemList.forEachIndexed { index, item ->
             PanelItemView(
                 modifier = Modifier
-                    .weight(0.3f),
-                panelItem = homePanel.itemLeft!!, entityInteractor = entityInteractor
+                    .weight(weight),
+                panelItem = item, entityInteractor = entityInteractor
             )
-        }
 
-        if (homePanel.itemLeft != null && homePanel.itemRight != null) {
-            Spacer(modifier = Modifier.requiredWidth(30.dp))
-        }
-
-        if (homePanel.itemRight != null) {
-            PanelItemView(
-                modifier = Modifier
-                    .weight(0.3f),
-                panelItem = homePanel.itemRight!!, entityInteractor = entityInteractor
-            )
+            if ((index >= 0 && homePanel.itemList.size > 1) && index < homePanel.itemList.size - 1) {
+                Spacer(modifier = Modifier.requiredWidth(30.dp))
+            }
         }
     }
 }

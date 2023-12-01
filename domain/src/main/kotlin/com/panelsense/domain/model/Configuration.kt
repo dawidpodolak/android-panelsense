@@ -20,8 +20,7 @@ sealed class Panel {
         val name: String? = null,
         val weatherEntity: String? = null,
         val time24h: Boolean = false,
-        val itemLeft: PanelItem? = null,
-        val itemRight: PanelItem? = null,
+        val itemList: List<PanelItem> = emptyList(),
         val background: String? = null
     ) : Panel()
 
