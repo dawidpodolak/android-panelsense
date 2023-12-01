@@ -113,7 +113,9 @@ fun SimplePanelItemView(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(bounded = true),
                 onLongClick = {
-                    showBottomSheet.value = true
+                    if (state.entityState is LightEntityState && (state.entityState as LightEntityState).on) {
+                        showBottomSheet.value = true
+                    }
                 },
                 onClick = {
                     state.toggleCommand?.let(entityInteractor::sendCommand)

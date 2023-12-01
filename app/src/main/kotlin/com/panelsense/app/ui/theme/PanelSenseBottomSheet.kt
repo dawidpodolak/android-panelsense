@@ -1,20 +1,30 @@
 package com.panelsense.app.ui.theme
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +34,13 @@ fun PanelSenseBottomSheet(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val coroutineScope = rememberCoroutineScope()
+    val hideModalBottomSheet: () -> Unit = {
+        coroutineScope.launch {
+            bottomSheetState.hide()
+            showBottomSheet.value = false
+        }
+    }
 
     if (showBottomSheet.value) {
         ModalBottomSheet(
@@ -41,13 +58,32 @@ fun PanelSenseBottomSheet(
             onDismissRequest = { showBottomSheet.value = false },
             sheetState = bottomSheetState
         ) {
-            Text(
+            Box(
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
-                text = title,
-                color = Color.White,
-                style = FontStyleH2_SemiBold
-            )
+                    .fillMaxWidth(0.95f)
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.Center),
+                    text = title,
+                    color = Color.White,
+                    style = FontStyleH2_SemiBold
+                )
+
+                Icon(
+                    modifier = Modifier
+                        .requiredWidth(32.dp)
+                        .requiredHeight(32.dp)
+                        .align(Alignment.CenterEnd)
+                        .clickable {
+                            hideModalBottomSheet()
+                        },
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = null,
+                    tint = Color.White
+                )
+            }
             content()
         }
     }
