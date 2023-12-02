@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.com.android.application)
     alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.dev.detekt)
+    alias(libs.plugins.sentry)
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
 }
@@ -13,6 +14,8 @@ plugins {
 android {
     namespace = "com.panelsense.app"
     compileSdk = 34
+    val keysProperties = Properties()
+    keysProperties.load(FileInputStream(rootProject.file("keys.properties")))
 
     defaultConfig {
         applicationId = "com.panel.sense"
@@ -22,6 +25,8 @@ android {
         versionCode = getVersionCode(properties = properties)
         versionName = "1.0"
 
+        buildConfigField("String", "SENTRY_DSN", keysProperties.getProperty("sentryDSN"))
+        manifestPlaceholders["SENTRY_DSN"] = keysProperties.getProperty("sentryDSN")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
