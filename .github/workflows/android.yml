@@ -84,6 +84,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: PanelSense_*.apk
+          asset_path: PanelSense_${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}.apk
           asset_name: PanelSense-${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}.apk
           asset_content_type: application/vnd.android.package-archive
