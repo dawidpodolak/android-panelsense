@@ -73,8 +73,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 'v${{ PANEL_SENSE_APP_VERSION_NAME }}'
-          release_name: 'Release ${{ PANEL_SENSE_APP_VERSION_NAME }}'
+          tag_name: 'v${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
+          release_name: 'Release ${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
           draft: true
           prerelease: false
           body: "Description of the release"
