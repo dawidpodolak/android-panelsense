@@ -25,7 +25,7 @@ jobs:
           gpg -d --passphrase "${{ secrets.KEYS_PROPERTIES_PASSPHRASE }}" --batch keys.properties.asc > keys.properties
       - name: Detekt
         run: ./gradlew detekt
-      - name: Build with Gradle
+      - name: Build debug app
         run: ./gradlew :app:assembleDebug
 
   release:
