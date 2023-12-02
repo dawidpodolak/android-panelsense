@@ -19,7 +19,7 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 34
-        versionCode = 1
+        versionCode = getVersionCode(properties = properties)
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -112,3 +112,6 @@ dependencies {
 
     kapt(libs.hilt.compiler)
 }
+
+fun getVersionCode(properties: MutableMap<String, *>): Int =
+    if (properties.containsKey("android.injected.invoked.from.ide")) 100 else (System.currentTimeMillis() / 1000 / 60).toInt()

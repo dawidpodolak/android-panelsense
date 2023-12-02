@@ -1,0 +1,87 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop", "master" ]
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Detekt
+        run: ./gradlew detekt
+      - name: Build with Gradle
+        run: ./gradlew :app:assembleDebug
+
+  release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.base_ref == 'master'
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'build-tools;34.0.0'
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Detekt
+        run: ./gradlew detekt
+      - name: Get release keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE }}" >> release.keystore.asc
+          echo "${{ secrets.KEYSTORE_PROPERTIES }}" >> keystore-properties.txt.asc
+          gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch release.keystore.asc > keystore.jks
+          gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch keystore-properties.txt.asc > keystore-properties.txt
+      - name: Build with Gradle
+        run: ./gradlew :app:assembleRelease
+      - name: Prepare Artifacts
+        run: |
+          export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools/34.0.0
+          PANEL_SENSE_APP_VERSION_CODE=$(aapt dump badging app/build/outputs/apk/release/app-release.apk | grep versionCode | awk -F " " '{print $3}' | awk -F "'" '{print $2}')
+          PANEL_SENSE_APP_VERSION_NAME=$(aapt dump badging app/build/outputs/apk/release/app-release.apk | grep versionName | awk -F " " '{print $4}' | awk -F "'" '{print $2}')
+          echo "PANEL_SENSE_APP_VERSION_CODE=$PANEL_SENSE_APP_VERSION_CODE" >> $GITHUB_ENV
+          echo "PANEL_SENSE_APP_VERSION_NAME=$PANEL_SENSE_APP_VERSION_NAME" >> $GITHUB_ENV
+          ./scripts/prepareRelease.sh
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: panel-sense-apk-${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}
+          path: |
+            PanelSense_*.apk
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: 'v${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
+          release_name: 'Release ${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
+          draft: false
+          prerelease: true
+          body: "Release ${{ env.PANEL_SENSE_APP_VERSION_NAME }}"
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: PanelSense_${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}.apk
+          asset_name: PanelSense_${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}.apk
+          asset_content_type: application/vnd.android.package-archive
