@@ -33,4 +33,7 @@ jobs:
         ls -la
         
     - name: Build with Gradle
-      run: ./gradlew :app:assembleRelease
+      run: |
+        ./gradlew :app:assembleRelease
+        ls -la
+
