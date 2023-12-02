@@ -1,6 +1,7 @@
 [versions]
 agp = "8.2.0-alpha15"
 detekt = "1.23.1"
+sentry = "4.0.0"
 org-jetbrains-kotlin-android = "1.8.10"
 core-ktx = "1.10.1"
 junit = "4.13.2"
@@ -76,6 +77,7 @@ threetenadapter = { group = "org.aaronhe", name = "threetenbp-gson-adapter", ver
 com-android-application = { id = "com.android.application", version.ref = "agp" }
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
 dev-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+sentry = { id = "io.sentry.android.gradle", version.ref = "sentry" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 hiltLibrary = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
