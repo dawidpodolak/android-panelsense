@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.com.android.application)
@@ -25,10 +28,29 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            val keystorePath = file("../keystore-properties.txt")
+            val prop = Properties()
+            if (keystorePath.canRead()) {
+                prop.load(FileInputStream(keystorePath))
+                keyAlias = prop.getProperty("keyAlias")
+                keyPassword = prop.getProperty("keyPassword")
+                storeFile = file("../keystore.jks")
+                storePassword = prop.getProperty("storePassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            isMinifyEnabled = true
+            isDebuggable = false
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
     compileOptions {
