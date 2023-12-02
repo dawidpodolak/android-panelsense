@@ -30,11 +30,15 @@ jobs:
         echo "${{ secrets.KEYSTORE_PROPERTIES }}" >> keystore-properties.txt.asc
         gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch release.keystore.asc > keystore.jks
         gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch keystore-properties.txt.asc > keystore-properties.txt
-        ls -la
-        
     - name: Build with Gradle
+      run: ./gradlew :app:assembleRelease
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v3
       run: |
-        ./gradlew :app:assembleRelease
         ./scripts/prepareRelease.sh
         ls -la
+      with:
+        name: panel-sense-apk
+        path: |
+          PanelSense_*.apk
 
