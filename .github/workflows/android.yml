@@ -58,8 +58,10 @@ jobs:
           export PATH=$PATH:$ANDROID_SDK_ROOT/build-tools/34.0.0
           PANEL_SENSE_APP_VERSION_CODE=$(aapt dump badging app/build/outputs/apk/release/app-release.apk | grep versionCode | awk -F " " '{print $3}' | awk -F "'" '{print $2}')
           PANEL_SENSE_APP_VERSION_NAME=$(aapt dump badging app/build/outputs/apk/release/app-release.apk | grep versionName | awk -F " " '{print $4}' | awk -F "'" '{print $2}')
-          echo "PANEL_SENSE_APP_VERSION_CODE=PANEL_SENSE_APP_VERSION_CODE" >> $GITHUB_ENV
-          echo "PANEL_SENSE_APP_VERSION_NAME=PANEL_SENSE_APP_VERSION_NAME" >> $GITHUB_ENV
+          echo "PANEL_SENSE_APP_VERSION_CODE=$PANEL_SENSE_APP_VERSION_CODE"
+          echo "PANEL_SENSE_APP_VERSION_NAME=$PANEL_SENSE_APP_VERSION_NAME"
+          echo "PANEL_SENSE_APP_VERSION_CODE=$PANEL_SENSE_APP_VERSION_CODE" >> $GITHUB_ENV
+          echo "PANEL_SENSE_APP_VERSION_NAME=$PANEL_SENSE_APP_VERSION_NAME" >> $GITHUB_ENV
           ./scripts/prepareRelease.sh
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
