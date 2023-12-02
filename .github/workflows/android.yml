@@ -23,7 +23,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Detekt
-      run: ./gradlew detect
+      run: ./gradlew detekt
     - name: Get release keystore
       run: |
         echo "${{ secrets.RELEASE_KEYSTORE }}" >> release.keystore.asc
