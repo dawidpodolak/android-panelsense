@@ -14,6 +14,28 @@ class LoginViewModel @Inject constructor(
 ) : NavViewModel<LoginNavCommand, LoginViewState>() {
 
     override fun defaultState(): LoginViewState = LoginViewState()
+
+    init {
+        checkIfUserIsLoggedIn()
+    }
+
+    private fun checkIfUserIsLoggedIn() {
+        viewModelScope.launch {
+            val serverConnectionData = loginInteractor.getServerConnectionData()
+            if (serverConnectionData != null) {
+                modify {
+                    copy(
+                        addressText = serverConnectionData.serverIPAddress,
+                        portText = serverConnectionData.serverPort,
+                        panelSenseNameText = serverConnectionData.panelSenseName,
+                        userNameText = serverConnectionData.userName,
+                        passwordText = serverConnectionData.password
+                    )
+                }
+            }
+        }
+    }
+
     fun login(serverConnectionData: ServerConnectionData) {
         viewModelScope.launch {
             modify { copy(isConnecting = true) }

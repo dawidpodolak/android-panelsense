@@ -64,11 +64,15 @@ fun LoginScreen(
                 .verticalScroll(scrollState, enabled = true)
         ) {
 
-            var addressText by remember { mutableStateOf("127.0.0.1") }
-            var portText by remember { mutableStateOf("8652") }
-            var panelSenseNameText by remember { mutableStateOf("Nexus Emu") }
-            var userNameText by remember { mutableStateOf("admin") }
-            var passwordText by remember { mutableStateOf("admin") }
+            var addressText by remember { mutableStateOf(state.value.addressText ?: "") }
+            var portText by remember { mutableStateOf(state.value.portText ?: "") }
+            var panelSenseNameText by remember {
+                mutableStateOf(
+                    state.value.panelSenseNameText ?: ""
+                )
+            }
+            var userNameText by remember { mutableStateOf(state.value.userNameText ?: "") }
+            var passwordText by remember { mutableStateOf(state.value.passwordText ?: "") }
             var passwordShow by remember { mutableStateOf(false) }
 
             Image(

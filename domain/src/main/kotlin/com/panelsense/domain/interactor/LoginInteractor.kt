@@ -12,6 +12,10 @@ class LoginInteractor @Inject constructor(
 ) {
     suspend fun isUserLoggedIn(): Boolean = userDataRepository.getServerConnectionData() != null
 
+    suspend fun getServerConnectionData(): ServerConnectionData? =
+        userDataRepository.getServerConnectionData()
+
+
     suspend fun login(serverConnectionData: ServerConnectionData): Result<LoginSuccess> {
         val result = serverRepository.login(serverConnectionData)
         if (result.isSuccess) {
