@@ -120,19 +120,20 @@ fun PreviewHome() {
     HomePanelView(
         homePanel = Panel.HomePanel(
             background = "#ffffff",
-            itemLeft = PanelItem(
-                id = "1",
-                title = "Light",
-                icon = "lightbulb",
-                entity = "light.biuri",
-            ),
-
-            itemRight = PanelItem(
-                id = "1",
-                title = "Light",
-                icon = "lightbulb",
-                entity = "light.biuro",
-            ),
+            itemList = listOf(
+                PanelItem(
+                    id = "1",
+                    title = "Light",
+                    icon = "lightbulb",
+                    entity = "light.biuri",
+                ),
+                PanelItem(
+                    id = "1",
+                    title = "Light",
+                    icon = "lightbulb",
+                    entity = "light.biuro",
+                )
+            )
         ),
         entityInteractor = mockEntityInteractor(LocalContext.current)
     )
