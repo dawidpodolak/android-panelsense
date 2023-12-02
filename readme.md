@@ -1,21 +1,27 @@
-# NSPanel Sense
+# Panel Sense - Android client
 
-This in an android application that can be launched on Sonoff NSPanel Pro. It allows you to configure many panels
-that are swiped horizontally. Whole configuration will be made through HomeAssistant add on (TBD). For now, configuration
-is done by a local project file senseConfig.yml.
+[![MIT License](https://img.shields.io/badge/License-APACHE_2.0-green.svg)](LICENSE)
+[![Version](https://img.shields.io/github/v/release/dawidpodolak/android-panelsense)](releases)
 
-## Configuration
-Edit a senseConfig.yml at data/src/main/assets/senseConfig.yml
+<img src="logo.png?raw=true"  width="500" />
 
-### Panels
-- Home Panel
-- Button panel
-- Media panel
-- HVAC panel
-- LED panel
-- Lightness panel
-- Cover panel
-- Weather forecast
+PanelSense is a project that helps to manage Home Assistant with an Android app that can be
+installed locally on any Android device like a tablet or devices such as Sonoff NSPanel. Is fully
+customizable with this addon installed in HomeAssistant. Android application provides you the
+ability to set up many screens with various options like home panel or grid panel, where you can put
+buttons to control light, cover, and other HomeAssistant entities.
 
-### Icons
-All icons are taken from https://pictogrammers.com/library/mdi/. In order to use icon at senseConfig.yml, just declare name of the icon.
+## Screnshots
+<img  src="screenshots/screenshot_panel_home.png?raw=true"  width="350" /><img  src="screenshots/screenshot_panel_grid.png?raw=true"  width="350" /><img  src="screenshots/screenshot_details_light.png?raw=true"  width="350" /><img  src="screenshots/screenshot_details_cover.png?raw=true"  width="350" />
+
+## Installation
+
+1. Download the latest version of the app
+   from https://github.com/dawidpodolak/android-panelsense/releases
+2. Connect your device with adb. e.g. `adb connect 192.168.1.1:2342`
+3. Install app with command `adb install path-to-apk`
+4. Connect app to PanelSense addon
+
+## Licence
+
+[APACHE 2.0](LICENSE)
