@@ -35,5 +35,6 @@ jobs:
     - name: Build with Gradle
       run: |
         ./gradlew :app:assembleRelease
+        ./scripts/prepareRelease.sh
         ls -la
 
