@@ -3,25 +3,55 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".PanelSenseApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.NSPanelSense"
         tools:targetApi="31">
+
         <activity
-            android:name=".MainActivity"
+            android:name="com.panelsense.app.ui.main.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:screenOrientation="landscape"
             android:theme="@style/Theme.NSPanelSense">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.HOME" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-    </application>
 
+        <activity
+            android:name="com.panelsense.app.ui.login.LoginActivity"
+            android:screenOrientation="landscape"
+            android:theme="@style/Theme.NSPanelSense" />
+
+        <!-- sentry -->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="" />
+        <meta-data
+            android:name="io.sentry.traces.user-interaction.enable"
+            android:value="true" />
+        <meta-data
+            android:name="io.sentry.attach-screenshot"
+            android:value="true" />
+        <meta-data
+            android:name="io.sentry.attach-view-hierarchy"
+            android:value="true" />
+        <meta-data
+            android:name="io.sentry.traces.sample-rate"
+            android:value="1.0" />
+        <meta-data
+            android:name="io.sentry.traces.profiling.sample-rate"
+            android:value="1.0" />
+    </application>
 </manifest>

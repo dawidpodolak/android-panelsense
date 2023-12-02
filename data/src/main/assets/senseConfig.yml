@@ -1,0 +1,148 @@
+systemConfiguration:
+  mainPanelId: "button_panel"
+  mqtt:
+    address: "tcp://192.168.1.32:1883"
+    port: 1883
+    user: "mqqtha"
+    password: "mqqthapsw"
+    clientName: "SalonNSPanel"
+panelList:
+  - id: home_panel
+    type: "home"
+    weather:
+    items:
+      - id: button_left
+        type: "button"
+        text: "Kuchnia"
+        icon: "ceiling-light-multiple"
+        background: "#cecece"
+        topic: "test"
+      - id: button_right
+        type: "button"
+        text: "Jadalnia"
+        icon: "ceiling-light-multiple"
+        background: "#ffffff"
+        topic: "test"
+
+  - id: button_panel
+    type: grid
+    columnCount: 3
+    name: "Panel przycisków"
+    items:
+      - id: "button_1"
+        type: "button"
+        text: "Kuchnia ledy"
+        textColor: "#ffffff"
+        icon: "led-strip-variant"
+        background: "#88cecece"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_4_kuchnia_led/set"
+          receiverTopic: "boneio1/relay/OUT_4_kuchnia_led"
+      - id: "button_2"
+        type: "button"
+        text: "Wyspa"
+        icon: "ceiling-light-multiple"
+        textColor: "#ffffff"
+        background: "#88cecece"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_31_kuchnia_wyspa/set"
+          receiverTopic: "boneio1/relay/OUT_31_kuchnia_wyspa"
+        topic: "test"
+      - id: "button_3"
+        type: "button"
+        text: "Jadalnia"
+        icon: "ceiling-light-multiple-outline"
+        background: "#88cecece"
+        textColor: "#ffffff"
+        topic: "boneio1/relay/OUT_5_jadalnia"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_5_jadalnia/set"
+          receiverTopic: "boneio1/relay/OUT_5_jadalnia"
+      - id: "button_4"
+        type: "button"
+        text: "Salon"
+        icon: "chandelier"
+        textColor: "#ffffff"
+        background: "#88aeaeae"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_7_salon/set"
+          receiverTopic: "boneio1/relay/OUT_7_salon"
+      - id: "button_5"
+        type: "button"
+        text: "Halogeny"
+        icon: "floor-lamp-torchiere-variant-outline"
+        textColor: "#ffffff"
+        background: "#88aeaeae"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_25_kuchnia_halogeny/set"
+          receiverTopic: "boneio1/relay/OUT_25_kuchnia_halogeny"
+      - id: "button_6"
+        type: "button"
+        text: "Lampka\nTV"
+        icon: "lamp"
+        textColor: "#ffffff"
+        background: "#88aeaeae"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_25_kuchnia_halogeny/set"
+          receiverTopic: "boneio1/relay/OUT_25_kuchnia_halogeny"
+  - id: button_panel
+    type: grid
+    columnCount: 3
+    name: "Panel przycisków"
+    items:
+      - id: "button_1"
+        type: "button"
+        text: "Kuchnia ledy"
+        textColor: "#ffffff"
+        icon: "led-strip-variant"
+        background: "#88cecece"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_4_kuchnia_led/set"
+          receiverTopic: "boneio1/relay/OUT_4_kuchnia_led"
+      - id: "button_2"
+        type: "button"
+        text: "Wyspa"
+        icon: "ceiling-light-multiple"
+        textColor: "#ffffff"
+        background: "#88cecece"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_31_kuchnia_wyspa/set"
+          receiverTopic: "boneio1/relay/OUT_31_kuchnia_wyspa"
+        topic: "test"
+      - id: "button_3"
+        type: "button"
+        text: "Jadalnia"
+        icon: "ceiling-light-multiple-outline"
+        background: "#88cecece"
+        textColor: "#ffffff"
+        topic: "boneio1/relay/OUT_5_jadalnia"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_5_jadalnia/set"
+          receiverTopic: "boneio1/relay/OUT_5_jadalnia"
+      - id: "button_4"
+        type: "button"
+        text: "Salon"
+        icon: "chandelier"
+        textColor: "#ffffff"
+        background: "#88aeaeae"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_7_salon/set"
+          receiverTopic: "boneio1/relay/OUT_7_salon"
+      - id: "button_5"
+        type: "button"
+        text: "Halogeny"
+        icon: "floor-lamp-torchiere-variant-outline"
+        textColor: "#ffffff"
+        background: "#88aeaeae"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_25_kuchnia_halogeny/set"
+          receiverTopic: "boneio1/relay/OUT_25_kuchnia_halogeny"
+      - id: "button_6"
+        type: "button"
+        text: "Lampka\nTV"
+        icon: "lamp"
+        textColor: "#ffffff"
+        background: "#88aeaeae"
+        mqtt:
+          publishTopic: "boneio1/cmd/relay/OUT_25_kuchnia_halogeny/set"
+          receiverTopic: "boneio1/relay/OUT_25_kuchnia_halogeny"
