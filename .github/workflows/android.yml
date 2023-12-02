@@ -75,6 +75,15 @@ jobs:
         with:
           tag_name: 'v${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
           release_name: 'Release ${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
-          draft: true
+          draft: false
           prerelease: true
           body: "Description of the release"
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: PanelSense_*.apk
+          asset_name: PanelSense-${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}.apk
+          asset_content_type: application/vnd.android.package-archive
