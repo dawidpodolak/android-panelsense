@@ -33,5 +33,25 @@
             android:name="com.panelsense.app.ui.login.LoginActivity"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.NSPanelSense" />
+
+        <!-- sentry -->
+        <meta-data
+            android:name="io.sentry.dsn"
+            android:value="" />
+        <meta-data
+            android:name="io.sentry.traces.user-interaction.enable"
+            android:value="true" />
+        <meta-data
+            android:name="io.sentry.attach-screenshot"
+            android:value="true" />
+        <meta-data
+            android:name="io.sentry.attach-view-hierarchy"
+            android:value="true" />
+        <meta-data
+            android:name="io.sentry.traces.sample-rate"
+            android:value="1.0" />
+        <meta-data
+            android:name="io.sentry.traces.profiling.sample-rate"
+            android:value="1.0" />
     </application>
 </manifest>
