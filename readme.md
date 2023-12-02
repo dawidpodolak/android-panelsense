@@ -3,8 +3,7 @@
 [![MIT License](https://img.shields.io/badge/License-APACHE_2.0-green.svg)](LICENSE)
 [![Version](https://img.shields.io/github/v/release/dawidpodolak/android-panelsense)](releases)
 
-<img  src="panelsense/logo.png?raw=true"  width="500" />
-
+<img src="logo.png?raw=true"  width="500" />
 
 PanelSense is a project that helps to manage Home Assistant with an Android app that can be
 installed locally on any Android device like a tablet or devices such as Sonoff NSPanel. Is fully
@@ -13,7 +12,6 @@ ability to set up many screens with various options like home panel or grid pane
 buttons to control light, cover, and other HomeAssistant entities.
 
 ## Screnshots
-
 <img  src="screenshots/screenshot_panel_home.png?raw=true"  width="350" /><img  src="screenshots/screenshot_panel_grid.png?raw=true"  width="350" /><img  src="screenshots/screenshot_details_light.png?raw=true"  width="350" /><img  src="screenshots/screenshot_details_cover.png?raw=true"  width="350" />
 
 ## Installation
