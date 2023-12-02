@@ -76,5 +76,5 @@ jobs:
           tag_name: 'v${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
           release_name: 'Release ${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
           draft: true
-          prerelease: false
+          prerelease: true
           body: "Description of the release"
