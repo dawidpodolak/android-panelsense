@@ -19,12 +19,12 @@ jobs:
           cache: gradle
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Detekt
-        run: ./gradlew detekt
       - name: Get keys properties
         run: |
           echo "${{ secrets.KEYS_PROPERTIES }}" >> keys.properties.asc
           gpg -d --passphrase "${{ secrets.KEYS_PROPERTIES_PASSPHRASE }}" --batch keys.properties.asc > keys.properties
+      - name: Detekt
+        run: ./gradlew detekt
       - name: Build with Gradle
         run: ./gradlew :app:assembleDebug
 
