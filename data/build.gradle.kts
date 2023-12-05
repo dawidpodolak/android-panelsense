@@ -2,7 +2,7 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidLibrary)
-    alias(libs.plugins.org.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.dev.detekt)
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.panelsense.data"
-    compileSdk = 34
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         minSdk = 26

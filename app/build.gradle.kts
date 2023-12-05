@@ -3,17 +3,17 @@ import java.util.Properties
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-    alias(libs.plugins.com.android.application)
-    alias(libs.plugins.org.jetbrains.kotlin.android)
+    alias(libs.plugins.application)
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.dev.detekt)
     alias(libs.plugins.sentry)
     kotlin("kapt")
-    id("com.google.dagger.hilt.android")
+    alias(libs.plugins.hiltLibrary)
 }
 
 android {
     namespace = "com.panelsense.app"
-    compileSdk = 34
+    compileSdk = libs.versions.compileSdk.get().toInt()
     val keysProperties = Properties()
     keysProperties.load(FileInputStream(rootProject.file("keys.properties")))
 
@@ -69,7 +69,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.3"
+        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
     packaging {
         resources {
