@@ -1,37 +1,13 @@
-name: Android CI
+name: Release PanelSense CI
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "develop", "master" ]
+    tags:
+      - 'v*'
 
 jobs:
-  pull-request:
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == false
-    steps:
-      - uses: actions/checkout@v3
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'zulu'
-          cache: gradle
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Get keys properties
-        run: |
-          echo "${{ secrets.KEYS_PROPERTIES }}" >> keys.properties.asc
-          gpg -d --passphrase "${{ secrets.KEYS_PROPERTIES_PASSPHRASE }}" --batch keys.properties.asc > keys.properties
-      - name: Detekt
-        run: ./gradlew detekt
-      - name: Build debug app
-        run: ./gradlew :app:assembleDebug
-
   release:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true && github.base_ref == 'master'
     steps:
       - uses: actions/checkout@v3
       - name: set up JDK 17
@@ -46,8 +22,6 @@ jobs:
           packages: 'build-tools;34.0.0'
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Detekt
-        run: ./gradlew detekt
       - name: Get release keystore and keys properties
         run: |
           echo "${{ secrets.RELEASE_KEYSTORE }}" >> release.keystore.asc
@@ -57,6 +31,8 @@ jobs:
           gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch release.keystore.asc > keystore.jks
           gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch keystore-properties.txt.asc > keystore-properties.txt
           gpg -d --passphrase "${{ secrets.KEYS_PROPERTIES_PASSPHRASE }}" --batch keys.properties.asc > keys.properties
+      - name: Detekt
+        run: ./gradlew detekt
       - name: Build with Gradle
         run: ./gradlew :app:assembleRelease
       - name: Prepare Artifacts
@@ -67,17 +43,11 @@ jobs:
           echo "PANEL_SENSE_APP_VERSION_CODE=$PANEL_SENSE_APP_VERSION_CODE" >> $GITHUB_ENV
           echo "PANEL_SENSE_APP_VERSION_NAME=$PANEL_SENSE_APP_VERSION_NAME" >> $GITHUB_ENV
           ./scripts/prepareRelease.sh
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: panel-sense-apk-${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}
-          path: |
-            PanelSense_*.apk
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CREARE_RELEASE_PAT }}
         with:
           tag_name: 'v${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
           release_name: 'Release ${{ env.PANEL_SENSE_APP_VERSION_NAME }}'
@@ -87,7 +57,7 @@ jobs:
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.CREARE_RELEASE_PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: PanelSense_${{ env.PANEL_SENSE_APP_VERSION_NAME }}_${{ env.PANEL_SENSE_APP_VERSION_CODE }}.apk

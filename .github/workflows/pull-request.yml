@@ -1,0 +1,28 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches: [ "develop", "master" ]
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == false
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Get keys properties
+        run: |
+          echo "${{ secrets.KEYS_PROPERTIES }}" >> keys.properties.asc
+          gpg -d --passphrase "${{ secrets.KEYS_PROPERTIES_PASSPHRASE }}" --batch keys.properties.asc > keys.properties
+      - name: Detekt
+        run: ./gradlew detekt
+      - name: Build debug app
+        run: ./gradlew :app:assembleDebug
