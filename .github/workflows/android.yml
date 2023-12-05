@@ -53,6 +53,7 @@ jobs:
           echo "${{ secrets.RELEASE_KEYSTORE }}" >> release.keystore.asc
           echo "${{ secrets.KEYSTORE_PROPERTIES }}" >> keystore-properties.txt.asc
           echo "${{ secrets.KEYS_PROPERTIES }}" >> keys.properties.asc
+          echo "auth.token=${{ secrets.SENTRY_AUTH_TOKEN }}" >> sentry.properties
           gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch release.keystore.asc > keystore.jks
           gpg -d --passphrase "${{ secrets.RELEASE_KEYSTORE_PASSPHRASE }}" --batch keystore-properties.txt.asc > keystore-properties.txt
           gpg -d --passphrase "${{ secrets.KEYS_PROPERTIES_PASSPHRASE }}" --batch keys.properties.asc > keys.properties

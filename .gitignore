@@ -17,3 +17,4 @@ local.properties
 keystore.jks
 keystore-properties.txt
 keys.properties
+sentry.properties
