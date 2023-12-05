@@ -1,35 +1,39 @@
 [versions]
-agp = "8.2.0-alpha15"
+agp = "8.1.4"
 detekt = "1.23.1"
 sentry = "4.0.0"
-org-jetbrains-kotlin-android = "1.8.10"
+kotlin = "1.9.20"
 core-ktx = "1.10.1"
 junit = "4.13.2"
 androidx-test-ext-junit = "1.1.5"
 espresso-core = "3.5.1"
 lifecycle-runtime-ktx = "2.6.1"
-activity-compose = "1.7.2"
-compose-bom = "2023.08.00"
-compose-grid = "1.5.0"
-compose-image-drawable = "0.33.0-alpha"
+activity-compose = "1.8.1"
+compose-bom = "2023.10.01"
+compose-grid = "1.5.4"
+compose-image-drawable = "0.32.0"
 compose-constraint-layout = "1.0.1"
 compose-coil = "0.18.0"
-kt-coil = "2.4.0"
+kt-coil = "2.5.0"
 timber = "5.0.1"
 appcompat = "1.6.1"
-material = "1.9.0"
+material = "1.10.0"
 retrofit = "2.9.0"
-okhttp = "4.10.0"
+okhttp = "4.12.0"
 okhttp-logging = "4.11.0"
-hilt = "2.44"
-kotlin-coroutines = "1.7.1"
+hilt = "2.49"
+kotlin-coroutines = "1.7.3"
 gson = "2.10.1"
 jsoup = "1.16.1"
-datastore = "1.0.0-beta01"
+datastore = "1.0.0"
 yml = "2.1"
 mqtt = "1.2.5"
 threetenabp = "1.4.6"
 threetenadapter = "1.0.2"
+
+targetSdk = "34"
+compileSdk = "34"
+compose-compiler = "1.5.4"
 
 [libraries]
 core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "core-ktx" }
@@ -74,8 +78,8 @@ threetenabp = { group = "com.jakewharton.threetenabp", name = "threetenabp", ver
 threetenadapter = { group = "org.aaronhe", name = "threetenbp-gson-adapter", version.ref = "threetenadapter" }
 
 [plugins]
-com-android-application = { id = "com.android.application", version.ref = "agp" }
-org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "org-jetbrains-kotlin-android" }
+application = { id = "com.android.application", version.ref = "agp" }
+kotlin = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 dev-detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 sentry = { id = "io.sentry.android.gradle", version.ref = "sentry" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
