@@ -23,7 +23,7 @@ android {
         //noinspection EditedTargetSdkVersion
         targetSdk = 34
         versionCode = getVersionCode(properties = properties)
-        versionName = "1.0"
+        versionName = "1.0-beta1"
 
         buildConfigField("String", "SENTRY_DSN", keysProperties.getProperty("sentryDSN"))
         manifestPlaceholders["SENTRY_DSN"] = keysProperties.getProperty("sentryDSN")
