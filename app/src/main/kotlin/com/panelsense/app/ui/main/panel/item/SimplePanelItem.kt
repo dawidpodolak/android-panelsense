@@ -177,7 +177,11 @@ private suspend fun LightEntityState.toState(
 ): SimplePanelItemState {
     val color = rgbColor?.run { Color(red, green, blue) }
     return SimplePanelItemState(
-        icon = entityInteractor.getDrawable(icon ?: MdiIcons.LIGHT_BULB, on, color),
+        icon = entityInteractor.getDrawable(
+            panelItem.icon ?: icon ?: MdiIcons.LIGHT_BULB,
+            on,
+            color
+        ),
         title = panelItem.title ?: friendlyName ?: entityId,
         entityState = this
     )
@@ -188,7 +192,7 @@ private suspend fun SwitchEntityState.toState(
     entityInteractor: EntityInteractor
 ): SimplePanelItemState {
     return SimplePanelItemState(
-        icon = entityInteractor.getDrawable(icon ?: MdiIcons.LIGHT_BULB, on),
+        icon = entityInteractor.getDrawable(panelItem.icon ?: icon ?: MdiIcons.LIGHT_BULB, on),
         title = panelItem.title ?: friendlyName ?: entityId,
         entityState = this
     )
