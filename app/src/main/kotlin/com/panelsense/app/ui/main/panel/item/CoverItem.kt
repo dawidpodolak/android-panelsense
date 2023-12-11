@@ -276,7 +276,10 @@ private fun StateLaunchEffect(
     entityInteractor.listenOnState(panelItem.entity, CoverEntityState::class).collect {
         callback.invoke(
             CoverItemState(
-                icon = entityInteractor.getDrawable(it.getMdiIconName(), CoverItemButtonActive),
+                icon = entityInteractor.getDrawable(
+                    panelItem.icon ?: it.getMdiIconName(),
+                    CoverItemButtonActive
+                ),
                 title = panelItem.title ?: it.friendlyName ?: it.entityId,
                 entityState = it,
                 position = it.position?.toString() ?: it.tiltPosition?.toString()
