@@ -34,4 +34,7 @@
     <string name="weatherWindy">Wietrznie</string>
     <string name="weatherWindyVariant">Pochmurno</string>
     <string name="off">Wyłączony</string>
+
+    <!-- PanelItem  -->
+    <string name="unknownPanel">Not supported entity or type:\n%s</string>
 </resources>
