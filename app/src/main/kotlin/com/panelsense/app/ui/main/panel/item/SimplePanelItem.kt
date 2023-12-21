@@ -44,7 +44,6 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
-import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
 import com.panelsense.app.ui.main.panel.custom.CircleColorPickerView
 import com.panelsense.app.ui.main.panel.custom.KelvinVerticalSlider
@@ -127,7 +126,6 @@ fun SimplePanelItemView(
                 color = PanelItemBackgroundColor,
                 shape = ButtonShape
             )
-            .padding(GridPadding)
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
 
