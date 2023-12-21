@@ -75,7 +75,7 @@ fun HomePanelView(
                         start.linkTo(parent.start)
                         end.linkTo(timePanel.start, margin = 30.dp)
                         if (bottomPanel != null) {
-                            bottom.linkTo(bottomPanel.top, margin = 30.dp)
+                            bottom.linkTo(bottomPanel.top)
                         } else {
                             bottom.linkTo(parent.bottom, margin = 30.dp)
                         }
