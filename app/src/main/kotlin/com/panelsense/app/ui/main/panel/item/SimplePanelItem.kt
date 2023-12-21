@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
@@ -54,6 +55,7 @@ import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
+import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
@@ -228,6 +230,18 @@ fun VerticalSimplePanelItemView(
             color = PanelItemTitleColor,
             style = FontStyleH3_SemiBold,
         )
+
+        if (state.entityState is LightEntityState && state.entityState.brightness != null) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                text = state.entityState.brightness?.getBrightnessPercent()
+                    .toString()
+                    .plus("%"),
+                color = PanelItemTitleColor,
+                style = FontStyleH3_Regular
+            )
+        }
     }
 }
 
@@ -267,6 +281,25 @@ fun HorizontalSimplePanelItemView(
             color = PanelItemTitleColor,
             style = FontStyleH3_SemiBold,
         )
+
+        if (state.entityState is LightEntityState && state.entityState.brightness != null) {
+            Text(
+                modifier = Modifier
+                    .constrainAs(brightness) {
+                        start.linkTo(text.end, margin = 5.dp)
+                        top.linkTo(parent.top)
+                        bottom.linkTo(parent.bottom)
+                        end.linkTo(parent.end, margin = 5.dp)
+                        width = Dimension.wrapContent
+                        height = Dimension.wrapContent
+                    },
+                text = state.entityState.brightness?.getBrightnessPercent()
+                    .toString()
+                    .plus("%"),
+                color = PanelItemTitleColor,
+                style = FontStyleH3_Regular
+            )
+        }
     }
 }
 
