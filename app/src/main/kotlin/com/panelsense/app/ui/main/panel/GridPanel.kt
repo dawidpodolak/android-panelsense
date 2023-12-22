@@ -18,7 +18,7 @@ import com.panelsense.domain.model.Panel
 
 @Suppress("TopLevelPropertyNaming")
 const val DefaultButtonBackground = "#88cecece"
-val GridPadding = 15.dp
+val GridPadding = 5.dp
 val ButtonShape = RoundedCornerShape(15.dp)
 
 @Composable

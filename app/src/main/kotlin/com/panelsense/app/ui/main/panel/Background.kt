@@ -1,5 +1,6 @@
 package com.panelsense.app.ui.main.panel
 
+import android.graphics.Color.parseColor
 import android.util.Patterns
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
@@ -14,8 +15,7 @@ fun Modifier.applyBackground(background: String?): Modifier =
     when (val backgroundType = background.getBackgroundType()) {
         is BackgroundType.BackgroundColor -> this.background(backgroundType.color)
         is BackgroundType.BackgroundURL -> this.paint(
-            rememberAsyncImagePainter(model = backgroundType.url),
-            contentScale = ContentScale.Crop
+            rememberAsyncImagePainter(model = backgroundType.url), contentScale = ContentScale.Crop
         )
 
         else -> this
@@ -32,13 +32,9 @@ private fun String?.getBackgroundType(): BackgroundType {
 
     return when {
         this == null -> BackgroundType.BackgroundNone
-        HEX_REGEX.matches(this) -> BackgroundType.BackgroundColor(
-            Color(
-                android.graphics.Color.parseColor(
-                    this
-                )
-            )
-        )
+        HEX_REGEX.matches(this) -> kotlin.runCatching {
+            BackgroundType.BackgroundColor(Color(parseColor(this)))
+        }.getOrElse { BackgroundType.BackgroundNone }
 
         Regex(Patterns.WEB_URL.pattern()).matches(this) -> BackgroundType.BackgroundURL(this)
         else -> BackgroundType.BackgroundNone
