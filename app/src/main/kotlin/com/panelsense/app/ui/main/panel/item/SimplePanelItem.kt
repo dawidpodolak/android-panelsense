@@ -34,6 +34,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -42,7 +44,6 @@ import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
-import com.panelsense.app.ui.main.panel.GridPadding
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
 import com.panelsense.app.ui.main.panel.custom.CircleColorPickerView
 import com.panelsense.app.ui.main.panel.custom.KelvinVerticalSlider
@@ -125,7 +126,6 @@ fun SimplePanelItemView(
                 color = PanelItemBackgroundColor,
                 shape = ButtonShape
             )
-            .padding(GridPadding)
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
 
@@ -215,14 +215,31 @@ fun VerticalSimplePanelItemView(
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
         )
+
         Text(
             modifier = Modifier
                 .padding(8.dp)
+                .fillMaxWidth()
                 .align(Alignment.CenterHorizontally),
             text = state.title,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.Center,
             color = PanelItemTitleColor,
-            style = FontStyleH3_SemiBold
+            style = FontStyleH3_SemiBold,
         )
+
+        if (state.entityState is LightEntityState && state.entityState.brightness != null) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                text = state.entityState.brightness?.getBrightnessPercent()
+                    .toString()
+                    .plus("%"),
+                color = PanelItemTitleColor,
+                style = FontStyleH3_Regular
+            )
+        }
     }
 }
 
@@ -249,6 +266,7 @@ fun HorizontalSimplePanelItemView(
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
         )
+
         Text(
             modifier = Modifier
                 .constrainAs(text) {
@@ -259,7 +277,7 @@ fun HorizontalSimplePanelItemView(
                 },
             text = state.title,
             color = PanelItemTitleColor,
-            style = FontStyleH3_SemiBold
+            style = FontStyleH3_SemiBold,
         )
 
         if (state.entityState is LightEntityState && state.entityState.brightness != null) {

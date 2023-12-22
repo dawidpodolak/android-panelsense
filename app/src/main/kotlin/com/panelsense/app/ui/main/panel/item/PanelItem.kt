@@ -30,7 +30,10 @@ fun PanelItemView(
             entityInteractor = entityInteractor
         )
 
-        PanelItemViewType.NONE -> Unit
+        PanelItemViewType.NONE -> UnknownPanelItem(
+            modifier,
+            panelItem = panelItem
+        )
     }
 }
 
