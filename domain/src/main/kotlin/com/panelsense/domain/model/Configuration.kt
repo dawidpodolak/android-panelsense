@@ -32,11 +32,26 @@ sealed class Panel {
         val itemList: List<PanelItem> = emptyList(),
         val background: String? = null
     ) : Panel()
+
+    data class FlexPanel(
+        val id: String? = null,
+        val type: PanelType = PanelType.FLEX,
+        val name: String? = null,
+        val columns: List<List<PanelItem>> = emptyList(),
+        val rows: List<List<PanelItem>> = emptyList(),
+        val background: String? = null
+    ) : Panel()
+
+    data class UnknownPanel(
+        val type: PanelType = PanelType.UNKNOWN,
+    ) : Panel()
 }
 
 enum class PanelType(val type: String) {
     HOME("home"),
     GRID("grid"),
+    FLEX("flex"),
+    UNKNOWN("unknown"),
 }
 
 data class PanelItem(

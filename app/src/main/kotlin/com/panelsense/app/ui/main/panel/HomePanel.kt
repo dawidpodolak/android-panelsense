@@ -25,7 +25,6 @@ import com.panelsense.app.ui.main.panel.item.WeatherItemView
 import com.panelsense.domain.model.Panel
 import com.panelsense.domain.model.PanelItem
 
-@Suppress("EmptyFunctionBlock")
 @Composable
 fun HomePanelView(
     modifier: Modifier = Modifier,
