@@ -1,9 +1,13 @@
 package com.panelsense.app.ui.main.panel.item
 
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.domain.model.EntityDomain
@@ -14,20 +18,23 @@ import com.panelsense.domain.toDomain
 fun PanelItemView(
     modifier: Modifier = Modifier,
     panelItem: PanelItem,
-    entityInteractor: EntityInteractor
+    entityInteractor: EntityInteractor,
+    layoutRequest: PanelItemLayoutRequest = PanelItemLayoutRequest.Standard
 ) {
     when (panelItem.getItemViewType()) {
         PanelItemViewType.LIGHT,
         PanelItemViewType.SIMPLE -> SimplePanelItemView(
             modifier,
             panelItem = panelItem,
-            entityInteractor = entityInteractor
+            entityInteractor = entityInteractor,
+            layoutRequest = layoutRequest
         )
 
         PanelItemViewType.COVER -> CoverItemView(
             modifier,
             panelItem = panelItem,
-            entityInteractor = entityInteractor
+            entityInteractor = entityInteractor,
+            layoutRequest = layoutRequest
         )
 
         PanelItemViewType.NONE -> UnknownPanelItem(
@@ -59,4 +66,23 @@ fun PanelItemPreview() {
         panelItem = PanelItem(entity = "light.test"),
         mockEntityInteractor(LocalContext.current)
     )
+}
+
+interface PanelItemLayoutRequest {
+    object Standard : PanelItemLayoutRequest
+    object Flex : PanelItemLayoutRequest {
+        val SimplePanelHeight = 100.dp
+        val CoverPanelHeight = 100.dp
+    }
+
+    companion object {
+        fun Modifier.applySizeIfFlex(layoutRequest: PanelItemLayoutRequest, height: Dp): Modifier =
+            when (layoutRequest) {
+                is Flex -> this
+                    .fillMaxWidth()
+                    .requiredHeight(height)
+
+                else -> this
+            }
+    }
 }

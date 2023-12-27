@@ -46,6 +46,8 @@ import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex
 import com.panelsense.app.ui.theme.CoverItemButtonActive
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
@@ -84,7 +86,8 @@ fun CoverItemView(
     modifier: Modifier = Modifier,
     panelItem: PanelItem,
     entityInteractor: EntityInteractor,
-    initState: CoverItemState = CoverItemState()
+    initState: CoverItemState = CoverItemState(),
+    layoutRequest: PanelItemLayoutRequest
 ) {
     var state by remember { mutableStateOf(initState) }
     val panelSizeHelper = getPanelSizeHelper()
@@ -92,23 +95,25 @@ fun CoverItemView(
     StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
         state = it
     }
-    Timber.d("CoverItemView: state: $state")
     Box(
         modifier = modifier
-            .fillMaxSize()
+            .applySizeIfFlex(layoutRequest, Flex.CoverPanelHeight)
             .background(
                 color = PanelItemBackgroundColor,
                 shape = ButtonShape
             )
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
-        when (panelSizeHelper.orientation) {
-            HORIZONTAL -> HorizontalCoverItemView(
+        when {
+            panelSizeHelper.orientation == HORIZONTAL || layoutRequest is Flex -> HorizontalCoverItemView(
                 entityInteractor = entityInteractor,
                 state = state
             )
 
-            VERTICAL -> VerticalCoverItemView(entityInteractor = entityInteractor, state = state)
+            panelSizeHelper.orientation == VERTICAL -> VerticalCoverItemView(
+                entityInteractor = entityInteractor,
+                state = state
+            )
         }
     }
 }
@@ -159,10 +164,10 @@ fun HorizontalCoverItemView(
         Text(
             modifier = modifier
                 .constrainAs(title) {
-                    start.linkTo(parent.start)
+                    start.linkTo(parent.start, margin = 70.dp)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
+                    end.linkTo(parent.end, margin = 70.dp)
                     width = Dimension.wrapContent
                     height = Dimension.wrapContent
                 },

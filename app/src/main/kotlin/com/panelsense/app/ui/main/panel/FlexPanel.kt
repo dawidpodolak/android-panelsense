@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
@@ -35,6 +34,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.panelsense.app.pxToDp
 import com.panelsense.app.ui.main.EntityInteractor
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest
 import com.panelsense.app.ui.main.panel.item.PanelItemView
 import com.panelsense.domain.model.Panel
 import kotlinx.coroutines.FlowPreview
@@ -169,9 +169,9 @@ fun FlexColumnsView(
             ) {
                 itemsIndexed(column) { columnIndex, item ->
                     PanelItemView(
-                        modifier = Modifier
-                            .heightIn(ROW_ITEM_HEIGHT, ROW_ITEM_HEIGHT * 2.5f),
-                        panelItem = item, entityInteractor = entityInteractor
+                        modifier = Modifier,
+                        panelItem = item, entityInteractor = entityInteractor,
+                        layoutRequest = PanelItemLayoutRequest.Flex
                     )
 
                     Spacer(modifier = Modifier.requiredHeight(30.dp))

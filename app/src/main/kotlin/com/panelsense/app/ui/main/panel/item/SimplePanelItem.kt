@@ -52,6 +52,8 @@ import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex.SimplePanelHeight
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
@@ -89,7 +91,8 @@ fun SimplePanelItemView(
     modifier: Modifier = Modifier,
     panelItem: PanelItem,
     entityInteractor: EntityInteractor,
-    initState: SimplePanelItemState = SimplePanelItemState()
+    initState: SimplePanelItemState = SimplePanelItemState(),
+    layoutRequest: PanelItemLayoutRequest
 ) {
 
     var state by remember { mutableStateOf(initState) }
@@ -127,15 +130,22 @@ fun SimplePanelItemView(
                 shape = ButtonShape
             )
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
+            .applySizeIfFlex(layoutRequest, SimplePanelHeight)
     ) {
 
         StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
             state = it
         }
 
-        when (panelSizeHelper.orientation) {
-            PanelItemOrientation.HORIZONTAL -> HorizontalSimplePanelItemView(state = state)
-            PanelItemOrientation.VERTICAL -> VerticalSimplePanelItemView(state = state)
+        when {
+            panelSizeHelper.orientation == PanelItemOrientation.HORIZONTAL || layoutRequest is PanelItemLayoutRequest.Flex ->
+                HorizontalSimplePanelItemView(
+                    state = state
+                )
+
+            panelSizeHelper.orientation == PanelItemOrientation.VERTICAL -> VerticalSimplePanelItemView(
+                state = state
+            )
         }
     }
 }
@@ -272,10 +282,13 @@ fun HorizontalSimplePanelItemView(
                 .constrainAs(text) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start)
+                    end.linkTo(parent.end, margin = 70.dp)
+                    start.linkTo(parent.start, margin = 70.dp)
+                    width = Dimension.fillToConstraints
                 },
+            maxLines = 1,
             text = state.title,
+            overflow = TextOverflow.Ellipsis,
             color = PanelItemTitleColor,
             style = FontStyleH3_SemiBold,
         )
@@ -434,6 +447,7 @@ fun SimplePanelItemPreview() {
         initState = SimplePanelItemState(
             icon = LocalContext.current.getDrawable(R.drawable.ic_launcher_background),
             title = "Test"
-        )
+        ),
+        layoutRequest = PanelItemLayoutRequest.Standard
     )
 }
