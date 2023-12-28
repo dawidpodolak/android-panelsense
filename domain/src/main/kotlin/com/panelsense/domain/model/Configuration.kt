@@ -56,7 +56,9 @@ enum class PanelType(val type: String) {
 
 data class PanelItem(
     val id: String? = null,
-    val entity: String,
+    val entity: String? = null,
+    val type: String? = null,
     val title: String? = null,
-    val icon: String? = null
+    val icon: String? = null,
+    val time24h: Boolean? = null // Only for ItemPanelType.CLOCK
 )

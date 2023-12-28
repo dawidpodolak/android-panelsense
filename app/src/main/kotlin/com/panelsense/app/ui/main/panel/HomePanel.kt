@@ -49,7 +49,7 @@ fun HomePanelView(
                     end.linkTo(parent.end)
                     width = Dimension.wrapContent
                 },
-            homePanel = homePanel
+            time24h = homePanel.time24h,
         )
 
         if (homePanel.itemList.isNotEmpty()) {
@@ -82,7 +82,7 @@ fun HomePanelView(
                         height = Dimension.fillToConstraints
                         centerHorizontallyTo(parent, 0f)
                     },
-                homePanel = homePanel,
+                weatherEntity = homePanel.weatherEntity,
                 entityInteractor = entityInteractor
             )
         }

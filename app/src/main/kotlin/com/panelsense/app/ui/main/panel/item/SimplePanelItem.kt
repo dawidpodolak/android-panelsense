@@ -62,16 +62,17 @@ import com.panelsense.app.ui.theme.MdiIcons
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.app.ui.theme.PanelSenseBottomSheet
+import com.panelsense.domain.entityToDomain
 import com.panelsense.domain.model.EntityDomain
 import com.panelsense.domain.model.PanelItem
 import com.panelsense.domain.model.entity.command.EntityCommand
 import com.panelsense.domain.model.entity.state.EntityState
 import com.panelsense.domain.model.entity.state.LightEntityState
 import com.panelsense.domain.model.entity.state.SwitchEntityState
-import com.panelsense.domain.toDomain
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 data class SimplePanelItemState(
     val icon: Drawable? = null,
@@ -158,11 +159,11 @@ private fun StateLaunchEffect(
 ) =
     LaunchedEffect(key1 = panelItem) {
         launch {
-            if (panelItem.entity.toDomain == EntityDomain.LIGHT) {
+            if (panelItem.entity!!.entityToDomain == EntityDomain.LIGHT) {
                 updateState<LightEntityState>(panelItem, entityInteractor) {
                     callback(it.toState(panelItem, entityInteractor))
                 }
-            } else if (panelItem.entity.toDomain == EntityDomain.SWITCH) {
+            } else if (panelItem.entity!!.entityToDomain == EntityDomain.SWITCH) {
                 updateState<SwitchEntityState>(panelItem, entityInteractor) {
                     callback(it.toState(panelItem, entityInteractor))
                 }
@@ -175,7 +176,8 @@ private suspend inline fun <reified ENTITY_STATE : EntityState> updateState(
     entityInteractor: EntityInteractor,
     noinline callback: suspend (ENTITY_STATE) -> Unit
 ) {
-    entityInteractor.listenOnState(panelItem.entity, ENTITY_STATE::class)
+    Timber.d("StateLaunchEffect: listenOnState: ${panelItem.entity}")
+    entityInteractor.listenOnState(panelItem.entity!!, ENTITY_STATE::class)
         .collect { entityState ->
             callback(entityState)
         }

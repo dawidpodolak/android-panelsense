@@ -10,9 +10,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
+import com.panelsense.domain.entityToDomain
 import com.panelsense.domain.model.EntityDomain
+import com.panelsense.domain.model.ItemTypeDomain
 import com.panelsense.domain.model.PanelItem
-import com.panelsense.domain.toDomain
+import com.panelsense.domain.typeToDomain
 
 @Composable
 fun PanelItemView(
@@ -37,6 +39,19 @@ fun PanelItemView(
             layoutRequest = layoutRequest
         )
 
+        PanelItemViewType.WEATHER -> WeatherItemView(
+            modifier,
+            weatherEntity = panelItem.entity!!,
+            entityInteractor = entityInteractor,
+            layoutRequest = layoutRequest
+        )
+
+        PanelItemViewType.CLOCK -> ClockItemView(
+            modifier,
+            layoutRequest = layoutRequest,
+            time24h = panelItem.time24h ?: false
+        )
+
         PanelItemViewType.NONE -> UnknownPanelItem(
             modifier,
             panelItem = panelItem
@@ -48,14 +63,26 @@ enum class PanelItemViewType {
     COVER,
     SIMPLE,
     LIGHT,
+    WEATHER,
+    CLOCK,
     NONE
 }
 
-fun PanelItem.getItemViewType(): PanelItemViewType = when (this.entity.toDomain) {
-    EntityDomain.COVER -> PanelItemViewType.COVER
-    EntityDomain.LIGHT -> PanelItemViewType.SIMPLE
-    EntityDomain.SWITCH -> PanelItemViewType.SIMPLE
-    else -> PanelItemViewType.NONE
+fun PanelItem.getItemViewType(): PanelItemViewType {
+    val itemTypeFromType = when (this.type?.typeToDomain) {
+        ItemTypeDomain.CLOCK -> PanelItemViewType.CLOCK
+        else -> null
+    }
+
+    val itemTypeFromEntity = when (this.entity?.entityToDomain) {
+        EntityDomain.COVER -> PanelItemViewType.COVER
+        EntityDomain.LIGHT -> PanelItemViewType.SIMPLE
+        EntityDomain.SWITCH -> PanelItemViewType.SIMPLE
+        EntityDomain.WEATHER -> PanelItemViewType.WEATHER
+        else -> null
+    }
+
+    return itemTypeFromType ?: itemTypeFromEntity ?: PanelItemViewType.NONE
 }
 
 @Preview
@@ -76,11 +103,14 @@ interface PanelItemLayoutRequest {
     }
 
     companion object {
-        fun Modifier.applySizeIfFlex(layoutRequest: PanelItemLayoutRequest, height: Dp): Modifier =
+        fun Modifier.applySizeIfFlex(
+            layoutRequest: PanelItemLayoutRequest,
+            height: Dp? = null
+        ): Modifier =
             when (layoutRequest) {
                 is Flex -> this
                     .fillMaxWidth()
-                    .requiredHeight(height)
+                    .run { if (height != null) requiredHeight(height) else this }
 
                 else -> this
             }

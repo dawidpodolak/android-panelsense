@@ -167,10 +167,11 @@ fun FlexColumnsView(
                     .nestedScroll(columnScrollConnection),
                 state = columnState
             ) {
-                itemsIndexed(column) { columnIndex, item ->
+                itemsIndexed(column) { _, item ->
                     PanelItemView(
                         modifier = Modifier,
-                        panelItem = item, entityInteractor = entityInteractor,
+                        panelItem = item,
+                        entityInteractor = entityInteractor,
                         layoutRequest = PanelItemLayoutRequest.Flex
                     )
 
