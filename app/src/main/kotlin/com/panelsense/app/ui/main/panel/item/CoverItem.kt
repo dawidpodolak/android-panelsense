@@ -168,9 +168,10 @@ fun HorizontalCoverItemView(
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
                     end.linkTo(parent.end, margin = 70.dp)
-                    width = Dimension.wrapContent
+                    width = Dimension.fillToConstraints
                     height = Dimension.wrapContent
                 },
+            textAlign = TextAlign.Center,
             text = state.title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
