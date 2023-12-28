@@ -128,6 +128,9 @@ fun HorizontalCoverItemView(
         val (image, title, position) = createRefs()
         val showBottomSheet = remember { mutableStateOf(false) }
 
+        val startGuide = createGuidelineFromStart(START_GUIDE)
+        val endGuide = createGuidelineFromStart(END_GUIDE)
+
         state.entityState?.let {
             CoverControlButtons(
                 modifier = Modifier
@@ -154,8 +157,8 @@ fun HorizontalCoverItemView(
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(title.start)
-                    start.linkTo(parent.start)
+                    end.linkTo(startGuide)
+                    start.linkTo(startGuide)
                 },
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
@@ -164,10 +167,10 @@ fun HorizontalCoverItemView(
         Text(
             modifier = modifier
                 .constrainAs(title) {
-                    start.linkTo(parent.start, margin = 70.dp)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end, margin = 70.dp)
+                    start.linkTo(startGuide, margin = 15.dp)
+                    end.linkTo(endGuide, margin = 15.dp)
                     width = Dimension.fillToConstraints
                     height = Dimension.wrapContent
                 },
@@ -184,10 +187,10 @@ fun HorizontalCoverItemView(
             Text(
                 modifier = modifier
                     .constrainAs(position) {
-                        start.linkTo(title.end, margin = 5.dp)
+                        start.linkTo(endGuide)
+                        end.linkTo(endGuide)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 5.dp)
                         width = Dimension.wrapContent
                         height = Dimension.wrapContent
                     },

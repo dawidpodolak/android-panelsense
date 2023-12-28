@@ -74,6 +74,9 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+const val START_GUIDE = 0.16f
+const val END_GUIDE = 1f - START_GUIDE
+
 data class SimplePanelItemState(
     val icon: Drawable? = null,
     val title: String = "",
@@ -265,6 +268,9 @@ fun HorizontalSimplePanelItemView(
     ) {
 
         val (image, text, brightness) = createRefs()
+        val startGuide = createGuidelineFromStart(START_GUIDE)
+        val endGuide = createGuidelineFromStart(END_GUIDE)
+
         Image(
             modifier = Modifier
                 .fillMaxHeight(0.5f)
@@ -272,8 +278,8 @@ fun HorizontalSimplePanelItemView(
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(text.start)
-                    start.linkTo(parent.start)
+                    end.linkTo(startGuide)
+                    start.linkTo(startGuide)
                 },
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
@@ -284,12 +290,13 @@ fun HorizontalSimplePanelItemView(
                 .constrainAs(text) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end, margin = 70.dp)
-                    start.linkTo(parent.start, margin = 70.dp)
+                    end.linkTo(endGuide, margin = 15.dp)
+                    start.linkTo(startGuide, margin = 15.dp)
                     width = Dimension.fillToConstraints
                 },
             maxLines = 1,
             text = state.title,
+            textAlign = TextAlign.Center,
             overflow = TextOverflow.Ellipsis,
             color = PanelItemTitleColor,
             style = FontStyleH3_SemiBold,
@@ -299,10 +306,10 @@ fun HorizontalSimplePanelItemView(
             Text(
                 modifier = Modifier
                     .constrainAs(brightness) {
-                        start.linkTo(text.end, margin = 5.dp)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 5.dp)
+                        start.linkTo(endGuide)
+                        end.linkTo(endGuide)
                         width = Dimension.wrapContent
                         height = Dimension.wrapContent
                     },
