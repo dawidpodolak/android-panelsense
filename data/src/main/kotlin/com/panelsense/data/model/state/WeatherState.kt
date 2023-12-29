@@ -1,6 +1,9 @@
 package com.panelsense.data.model.state
 
-class WeatherState(
+import com.panelsense.data.mapper.toEntityState
+import com.panelsense.domain.model.entity.state.EntityState
+
+data class WeatherState(
     val entityId: String,
     val state: String? = null,
     val temperature: Float? = null,
@@ -16,7 +19,9 @@ class WeatherState(
     val visibilityUnit: String? = null,
     val precipitationUnit: String? = null,
     val forecast: List<WeatherForecast>? = null,
-) {
+) : DataState {
+
+    override fun toDomainState(): EntityState = toEntityState()
 
     data class WeatherForecast(
         val condition: String? = null,

@@ -19,11 +19,11 @@ android {
 
     defaultConfig {
         applicationId = "com.panel.sense"
-        minSdk = 26
+        minSdk = libs.versions.minSdk.get().toInt()
         //noinspection EditedTargetSdkVersion
-        targetSdk = 34
+        targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = getVersionCode(properties = properties)
-        versionName = "1.0-beta2"
+        versionName = "1.0-beta3"
 
         buildConfigField("String", "SENTRY_DSN", keysProperties.getProperty("sentryDSN"))
         manifestPlaceholders["SENTRY_DSN"] = keysProperties.getProperty("sentryDSN")
