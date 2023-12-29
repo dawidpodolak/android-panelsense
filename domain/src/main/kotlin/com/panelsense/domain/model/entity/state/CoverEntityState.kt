@@ -5,7 +5,7 @@ import com.panelsense.domain.model.entity.command.CoverEntityCommand
 import com.panelsense.domain.model.entity.command.CoverPositionEntityCommand
 import com.panelsense.domain.model.entity.command.EntityCommand
 
-class CoverEntityState(
+data class CoverEntityState(
     override val entityId: String,
     val state: State,
     val position: Int?,
