@@ -446,7 +446,7 @@ private fun StateLaunchEffect(
     entityInteractor: EntityInteractor,
     callback: (CoverItemState) -> Unit
 ) = LaunchedEffect(key1 = panelItem) {
-    entityInteractor.listenOnState(panelItem.entity, CoverEntityState::class).collect {
+    entityInteractor.listenOnState(panelItem.entity!!, CoverEntityState::class).collect {
         callback.invoke(
             CoverItemState(
                 icon = entityInteractor.getDrawable(

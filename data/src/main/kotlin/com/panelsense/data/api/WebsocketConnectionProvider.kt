@@ -2,8 +2,8 @@ package com.panelsense.data.api
 
 import com.google.gson.Gson
 import com.panelsense.data.mapper.toWebsocketModel
-import com.panelsense.data.model.MessageType
 import com.panelsense.data.model.WebsocketModel
+import com.panelsense.data.repository.IncomingMessageProcessor
 import com.panelsense.domain.model.ConnectionState
 import com.panelsense.domain.model.entity.command.EntityCommand
 import kotlinx.coroutines.CoroutineScope
@@ -12,9 +12,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
@@ -29,13 +27,13 @@ import javax.inject.Inject
 class WebsocketConnectionProvider @Inject constructor(
     private val reconnectHelper: ReconnectHelper,
     private val okHttpClient: OkHttpClient,
+    private val incomingMessageProcessor: IncomingMessageProcessor,
     private val gson: Gson
 ) {
 
 
     private var webSocket: WebSocket? = null
     private val websocketScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val messageFlow: MutableStateFlow<WebsocketModel?> = MutableStateFlow(null)
     private val _connectionStateFlow: MutableStateFlow<ConnectionState> =
         MutableStateFlow(ConnectionState.DISCONNECTED)
     val connectionStateFlow: Flow<ConnectionState> = _connectionStateFlow
@@ -57,7 +55,12 @@ class WebsocketConnectionProvider @Inject constructor(
         override fun onMessage(webSocket: WebSocket, text: String) {
             Timber.d("onMessage: $text")
             runCatching {
-                messageFlow.value = gson.fromJson(text, WebsocketModel::class.java)
+                incomingMessageProcessor.processMessage(
+                    gson.fromJson(
+                        text,
+                        WebsocketModel::class.java
+                    )
+                )
             }.onFailure(Timber::e)
         }
 
@@ -88,19 +91,11 @@ class WebsocketConnectionProvider @Inject constructor(
         val request: Request = Request.Builder()
             .url("ws://$serverIp:$port")
             .build()
-        connectionFlow = MutableStateFlow<Result<ConnectionOpen>?>(null)
+        connectionFlow = MutableStateFlow(null)
         webSocket = okHttpClient.newWebSocket(request, webSocketListener)
         reconnectHelper.initialize(request, webSocketListener) { webSocket = it }
         return connectionFlow!!.mapNotNull { it }.first()
     }
-
-    fun <DATA_TYPE> listenForMessages(messageType: MessageType): Flow<DATA_TYPE> = messageFlow
-        .shareIn(websocketScope, SharingStarted.Eagerly, 1)
-        .mapNotNull { it }
-        .filter { it.type == messageType }
-        .map {
-            gson.fromJson(it.data, messageType.dataClass) as DATA_TYPE
-        }
 
     fun sendMessage(message: Any) = websocketScope.launch {
         val jsonMessage = gson.toJson(message)

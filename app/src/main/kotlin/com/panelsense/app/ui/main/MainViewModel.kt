@@ -2,7 +2,6 @@ package com.panelsense.app.ui.main
 
 import androidx.lifecycle.viewModelScope
 import com.panelsense.core.base.NavViewModel
-import com.panelsense.core.model.panelconfig.SenseConfiguration
 import com.panelsense.data.icons.IconProvider
 import com.panelsense.domain.interactor.LoginInteractor
 import com.panelsense.domain.interactor.PanelSenseInteractor
@@ -75,8 +74,6 @@ class MainViewModel @Inject constructor(
     override fun getIconProvider(): IconProvider = iconProvider
 
     data class MainViewState(
-        @Deprecated("Use panelConfiguration")
-        val senseConfiguration: SenseConfiguration? = null,
         val panelConfiguration: Configuration? = null,
         val serverConnected: Boolean = true
     )
