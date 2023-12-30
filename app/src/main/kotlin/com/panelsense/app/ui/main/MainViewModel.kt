@@ -3,6 +3,7 @@ package com.panelsense.app.ui.main
 import androidx.lifecycle.viewModelScope
 import com.panelsense.core.base.NavViewModel
 import com.panelsense.data.icons.IconProvider
+import com.panelsense.domain.interactor.AppInteractor
 import com.panelsense.domain.interactor.LoginInteractor
 import com.panelsense.domain.interactor.PanelSenseInteractor
 import com.panelsense.domain.model.Configuration
@@ -20,6 +21,7 @@ import kotlin.reflect.KClass
 class MainViewModel @Inject constructor(
     private val loginInteractor: LoginInteractor,
     private val panelSenseInteractor: PanelSenseInteractor,
+    private val appInteractor: AppInteractor,
     private var iconProvider: IconProvider
 ) : NavViewModel<MainNavCommand, MainViewModel.MainViewState>(), EntityInteractor {
 
@@ -36,6 +38,10 @@ class MainViewModel @Inject constructor(
             if (!loginInteractor.isUserLoggedIn()) {
                 navigateTo(MainNavCommand.NavigateToLogin)
                 return@launch
+            }
+
+            appInteractor.getDeviceName()?.let { deviceName ->
+                modify { copy(deviceName = deviceName) }
             }
 
             val result = loginInteractor.relogin()
@@ -74,6 +80,7 @@ class MainViewModel @Inject constructor(
     override fun getIconProvider(): IconProvider = iconProvider
 
     data class MainViewState(
+        val deviceName: String = "",
         val panelConfiguration: Configuration? = null,
         val serverConnected: Boolean = true
     )

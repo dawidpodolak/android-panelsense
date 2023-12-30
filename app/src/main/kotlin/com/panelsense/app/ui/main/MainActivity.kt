@@ -7,8 +7,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -23,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +41,7 @@ import com.panelsense.app.ui.main.panel.NavigationBar
 import com.panelsense.app.ui.main.panel.NavigationBarHeight
 import com.panelsense.app.ui.main.panel.applyBackground
 import com.panelsense.app.ui.theme.FontStyleH3_Medium
+import com.panelsense.app.ui.theme.FontStyleLarge_SemiBold
 import com.panelsense.app.ui.theme.PanelSenseTheme
 import com.panelsense.data.icons.IconProvider
 import com.panelsense.domain.model.Configuration
@@ -69,10 +74,11 @@ class MainActivity : ComponentActivity() {
                 Box(
                     modifier = Modifier
                         .applyBackground(senseConfig.system.background)
-                        .fillMaxSize()
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
                     if (senseConfig.panelList.isEmpty()) {
-                        NoPanels()
+                        NoPanels(uiState.value.deviceName)
                     } else {
                         PagerPanels(
                             configuration = senseConfig,
@@ -123,8 +129,24 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 @Suppress("EmptyFunctionBlock")
-fun NoPanels() {
-
+fun NoPanels(deviceName: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(
+            modifier = Modifier.requiredHeight(120.dp),
+            painter = painterResource(id = R.drawable.logo),
+            contentDescription = "Logo"
+        )
+        Spacer(modifier = Modifier.requiredHeight(60.dp))
+        Text(
+            text = stringResource(id = R.string.emptyPanelConnect),
+            style = FontStyleLarge_SemiBold,
+        )
+        Spacer(modifier = Modifier.requiredHeight(20.dp))
+        Text(
+            text = stringResource(id = R.string.emptyPanelDescription, deviceName),
+            style = FontStyleH3_Medium,
+        )
+    }
 }
 
 @Composable

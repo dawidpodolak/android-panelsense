@@ -12,6 +12,7 @@ class PanelSenseInteractor @Inject constructor(
     fun connectionState() = serverRepository.connectionState()
 
     fun configuration() = serverRepository.configuration()
+
     fun observeEntityState(entityId: String): Flow<EntityState> {
         return serverRepository.observerEntitiesState(entityId)
     }

@@ -27,7 +27,7 @@
     <string name="weatherLightningRainy">Burza z deszczem</string>
     <string name="weatherPartlyCloudy">Częściowo pochmurnie</string>
     <string name="weatherPouring">Deszcz</string>
-    <string name="weatherRainy">Mrzawka</string>
+    <string name="weatherRainy">Mżawka</string>
     <string name="weatherSnowy">Śnieg</string>
     <string name="weatherSnowyRainy">Śnieg z deszczem</string>
     <string name="weatherSunny">Słonecznie</string>
@@ -37,4 +37,6 @@
 
     <!-- PanelItem  -->
     <string name="unknownPanel">Not supported entity or type:\n%s</string>
+    <string name="emptyPanelConnect">App is connected to HomeAssistant addon</string>
+    <string name="emptyPanelDescription">Please visit PanelSense addon, find this device %s and start configuration</string>
 </resources>
