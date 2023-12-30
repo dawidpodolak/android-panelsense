@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -58,7 +57,6 @@ fun FlexPanelView(
         modifier = modifier
             .fillMaxSize()
             .applyBackground(flexPanel.background)
-            .padding(30.dp)
     ) {
 
         val (rows, columns) = createRefs()
@@ -66,9 +64,9 @@ fun FlexPanelView(
         FlexRowView(
             modifier = Modifier
                 .constrainAs(rows) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start, margin = 30.dp)
+                    end.linkTo(parent.end, margin = 30.dp)
+                    bottom.linkTo(parent.bottom, margin = 30.dp)
                     width = Dimension.fillToConstraints
                     height = Dimension.wrapContent
                 },
@@ -155,11 +153,15 @@ fun FlexColumnsView(
             flexPanel.columns
         ) { rowIndex, column ->
             if (maxWidth == null) return@itemsIndexed
-            val maxWidthToCalculate = maxWidth!!.pxToDp() - 30.dp.times(columnCount - 1)
+            val maxWidthToCalculate =
+                maxWidth!!.pxToDp() - (30.dp.times(columnCount - 1).plus(60.dp))
             val columnWidth = (maxWidthToCalculate.div(columnCount)).coerceAtLeast(MIN_COLUMN_WIDTH)
             val columnState = rememberLazyListState()
             val columnScrollConnection = scrollReset(columnState)
 
+            if (rowIndex == 0) {
+                Spacer(modifier = Modifier.requiredWidth(30.dp))
+            }
             LazyColumn(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -167,7 +169,10 @@ fun FlexColumnsView(
                     .nestedScroll(columnScrollConnection),
                 state = columnState
             ) {
-                itemsIndexed(column) { _, item ->
+                itemsIndexed(column) { columnIndex, item ->
+                    if (columnIndex == 0) {
+                        Spacer(modifier = Modifier.requiredHeight(30.dp))
+                    }
                     PanelItemView(
                         modifier = Modifier,
                         panelItem = item,
@@ -182,9 +187,9 @@ fun FlexColumnsView(
 
             val isNotLast = rowIndex < flexPanel.columns.size - 1
 
-            if (isNotLast) {
+//            if (isNotLast) {
                 Spacer(modifier = Modifier.requiredWidth(30.dp))
-            }
+//            }
         }
     }
 }

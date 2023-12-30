@@ -72,7 +72,6 @@ import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_POS
 import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_TILT_POSITION
 import com.panelsense.domain.model.entity.state.CoverEntityState.State.OPEN
 import kotlinx.coroutines.flow.flowOf
-import timber.log.Timber
 
 data class CoverItemState(
     val icon: Drawable? = null,
