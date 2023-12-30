@@ -25,7 +25,6 @@ import com.panelsense.app.ui.main.panel.item.WeatherItemView
 import com.panelsense.domain.model.Panel
 import com.panelsense.domain.model.PanelItem
 
-@Suppress("EmptyFunctionBlock")
 @Composable
 fun HomePanelView(
     modifier: Modifier = Modifier,
@@ -50,7 +49,7 @@ fun HomePanelView(
                     end.linkTo(parent.end)
                     width = Dimension.wrapContent
                 },
-            homePanel = homePanel
+            time24h = homePanel.time24h,
         )
 
         if (homePanel.itemList.isNotEmpty()) {
@@ -83,7 +82,7 @@ fun HomePanelView(
                         height = Dimension.fillToConstraints
                         centerHorizontallyTo(parent, 0f)
                     },
-                homePanel = homePanel,
+                weatherEntity = homePanel.weatherEntity,
                 entityInteractor = entityInteractor
             )
         }

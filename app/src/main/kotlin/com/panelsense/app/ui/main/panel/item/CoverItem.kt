@@ -46,6 +46,8 @@ import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex
 import com.panelsense.app.ui.theme.CoverItemButtonActive
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
@@ -70,7 +72,6 @@ import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_POS
 import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_TILT_POSITION
 import com.panelsense.domain.model.entity.state.CoverEntityState.State.OPEN
 import kotlinx.coroutines.flow.flowOf
-import timber.log.Timber
 
 data class CoverItemState(
     val icon: Drawable? = null,
@@ -84,7 +85,8 @@ fun CoverItemView(
     modifier: Modifier = Modifier,
     panelItem: PanelItem,
     entityInteractor: EntityInteractor,
-    initState: CoverItemState = CoverItemState()
+    initState: CoverItemState = CoverItemState(),
+    layoutRequest: PanelItemLayoutRequest
 ) {
     var state by remember { mutableStateOf(initState) }
     val panelSizeHelper = getPanelSizeHelper()
@@ -92,23 +94,25 @@ fun CoverItemView(
     StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
         state = it
     }
-    Timber.d("CoverItemView: state: $state")
     Box(
         modifier = modifier
-            .fillMaxSize()
+            .applySizeIfFlex(layoutRequest, Flex.CoverPanelHeight)
             .background(
                 color = PanelItemBackgroundColor,
                 shape = ButtonShape
             )
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
-        when (panelSizeHelper.orientation) {
-            HORIZONTAL -> HorizontalCoverItemView(
+        when {
+            panelSizeHelper.orientation == HORIZONTAL || layoutRequest is Flex -> HorizontalCoverItemView(
                 entityInteractor = entityInteractor,
                 state = state
             )
 
-            VERTICAL -> VerticalCoverItemView(entityInteractor = entityInteractor, state = state)
+            panelSizeHelper.orientation == VERTICAL -> VerticalCoverItemView(
+                entityInteractor = entityInteractor,
+                state = state
+            )
         }
     }
 }
@@ -122,6 +126,9 @@ fun HorizontalCoverItemView(
     ) {
         val (image, title, position) = createRefs()
         val showBottomSheet = remember { mutableStateOf(false) }
+
+        val startGuide = createGuidelineFromStart(START_GUIDE)
+        val endGuide = createGuidelineFromStart(END_GUIDE)
 
         state.entityState?.let {
             CoverControlButtons(
@@ -149,8 +156,8 @@ fun HorizontalCoverItemView(
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(title.start)
-                    start.linkTo(parent.start)
+                    end.linkTo(startGuide)
+                    start.linkTo(startGuide)
                 },
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
@@ -159,13 +166,14 @@ fun HorizontalCoverItemView(
         Text(
             modifier = modifier
                 .constrainAs(title) {
-                    start.linkTo(parent.start)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                    width = Dimension.wrapContent
+                    start.linkTo(startGuide, margin = 15.dp)
+                    end.linkTo(endGuide, margin = 15.dp)
+                    width = Dimension.fillToConstraints
                     height = Dimension.wrapContent
                 },
+            textAlign = TextAlign.Center,
             text = state.title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -178,10 +186,10 @@ fun HorizontalCoverItemView(
             Text(
                 modifier = modifier
                     .constrainAs(position) {
-                        start.linkTo(title.end, margin = 5.dp)
+                        start.linkTo(endGuide)
+                        end.linkTo(endGuide)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 5.dp)
                         width = Dimension.wrapContent
                         height = Dimension.wrapContent
                     },

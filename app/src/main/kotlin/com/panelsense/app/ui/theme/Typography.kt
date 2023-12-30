@@ -59,8 +59,20 @@ val FontStyleLarge_Light = TextStyle(
     fontWeight = FontWeight.Light,
     color = TextColor
 )
+val FontStyleLarge_SemiBold = TextStyle(
+    fontSize = 48.sp,
+    fontWeight = FontWeight.SemiBold,
+    color = TextColor
+)
+
 val FontStyleXLarge_Light = TextStyle(
     fontSize = 64.sp,
+    fontWeight = FontWeight.Light,
+    color = TextColor
+)
+
+val FontStyleXXLarge_Light = TextStyle(
+    fontSize = 96.sp,
     fontWeight = FontWeight.Light,
     color = TextColor
 )

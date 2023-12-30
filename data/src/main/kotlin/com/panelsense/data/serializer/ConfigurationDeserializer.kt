@@ -37,7 +37,12 @@ class PanelDeserializer : JsonDeserializer<Panel> {
                 Panel.GridPanel::class.java
             )
 
-            else -> throw IllegalArgumentException("Unknown panel type: $jsonPanelType")
+            PanelType.FLEX -> context.deserialize<Panel.FlexPanel>(
+                json,
+                Panel.FlexPanel::class.java
+            )
+
+            else -> Panel.UnknownPanel()
         }
     }
 }
