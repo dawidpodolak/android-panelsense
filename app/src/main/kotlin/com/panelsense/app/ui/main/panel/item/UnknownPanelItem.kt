@@ -30,7 +30,8 @@ fun UnknownPanelItem(modifier: Modifier, panelItem: PanelItem) {
             .fillMaxHeight(),
         contentAlignment = androidx.compose.ui.Alignment.Center
     ) {
-        val title = stringResource(id = R.string.unknownPanel, panelItem.entity)
+        val title =
+            stringResource(id = R.string.unknownPanel, panelItem.entity ?: panelItem.type ?: "")
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = title,

@@ -4,5 +4,6 @@ enum class EntityDomain {
     COVER,
     LIGHT,
     SWITCH,
+    WEATHER,
     UNKNOWN
 }

@@ -35,6 +35,7 @@ import androidx.lifecycle.lifecycleScope
 import com.panelsense.app.R
 import com.panelsense.app.disableSystemUI
 import com.panelsense.app.ui.login.LoginActivity
+import com.panelsense.app.ui.main.panel.FlexPanelView
 import com.panelsense.app.ui.main.panel.GridPanelView
 import com.panelsense.app.ui.main.panel.HomePanelView
 import com.panelsense.app.ui.main.panel.NavigationBar
@@ -186,6 +187,15 @@ fun PagerPanels(
                         .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
                     panelConfig, entityInteractor
                 )
+
+                is Panel.FlexPanel -> FlexPanelView(
+                    modifier = Modifier
+                        .applyBackground(panelConfig.background)
+                        .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
+                    panelConfig, entityInteractor
+                )
+
+                is Panel.UnknownPanel -> {}
             }
         }
         if (configuration.system.showNavBar) {
@@ -219,6 +229,8 @@ val Panel.panelId: String?
     get() = when (this) {
         is Panel.HomePanel -> this.id
         is Panel.GridPanel -> this.id
+        is Panel.FlexPanel -> this.id
+        is Panel.UnknownPanel -> this.panelId
     }
 
 @Composable
