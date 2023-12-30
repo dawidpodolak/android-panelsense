@@ -185,11 +185,7 @@ fun FlexColumnsView(
 
             }
 
-            val isNotLast = rowIndex < flexPanel.columns.size - 1
-
-//            if (isNotLast) {
-                Spacer(modifier = Modifier.requiredWidth(30.dp))
-//            }
+            Spacer(modifier = Modifier.requiredWidth(30.dp))
         }
     }
 }
