@@ -52,6 +52,13 @@ fun PanelItemView(
             time24h = panelItem.time24h ?: false
         )
 
+        PanelItemViewType.SENSOR -> SensorItemView(
+            modifier,
+            panelItem = panelItem,
+            entityInteractor = entityInteractor,
+            layoutRequest = layoutRequest
+        )
+
         PanelItemViewType.NONE -> UnknownPanelItem(
             modifier,
             panelItem = panelItem
@@ -65,7 +72,8 @@ enum class PanelItemViewType {
     LIGHT,
     WEATHER,
     CLOCK,
-    NONE
+    NONE,
+    SENSOR
 }
 
 fun PanelItem.getItemViewType(): PanelItemViewType {
@@ -79,6 +87,7 @@ fun PanelItem.getItemViewType(): PanelItemViewType {
         EntityDomain.LIGHT -> PanelItemViewType.SIMPLE
         EntityDomain.SWITCH -> PanelItemViewType.SIMPLE
         EntityDomain.WEATHER -> PanelItemViewType.WEATHER
+        EntityDomain.SENSOR -> PanelItemViewType.SENSOR
         else -> null
     }
 
