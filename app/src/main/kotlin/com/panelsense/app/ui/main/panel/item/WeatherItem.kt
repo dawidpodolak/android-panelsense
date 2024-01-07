@@ -66,8 +66,8 @@ data class WeatherStateView(
 @Composable
 fun WeatherItemView(
     modifier: Modifier = Modifier,
-    panelItem: PanelItem = PanelItem(),
     weatherEntity: String?,
+    panelItem: PanelItem = PanelItem(entity = weatherEntity),
     entityInteractor: EntityInteractor,
     layoutRequest: PanelItemLayoutRequest = PanelItemLayoutRequest.Standard,
     initState: WeatherStateView = WeatherStateView()

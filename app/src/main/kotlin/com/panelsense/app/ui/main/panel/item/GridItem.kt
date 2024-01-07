@@ -10,15 +10,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.applyBackgroundForItem
+import com.panelsense.app.ui.main.panel.scrollReset
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.domain.model.PanelItem
@@ -79,19 +83,22 @@ private fun FixedGridItemView(
 }
 
 @Composable
-@OptIn(ExperimentalLayoutApi::class)
 private fun DynamicGridItemView(
     modifier: Modifier,
     panelItem: PanelItem,
     layoutRequest: PanelItemLayoutRequest,
     entityInteractor: EntityInteractor
 ) {
+    val state: LazyGridState = rememberLazyGridState()
+    val rowScrollConnection = scrollReset(state)
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(PanelItemLayoutRequest.Grid.ItemWidth),
+        state = state,
         modifier = modifier
             .fillMaxWidth()
-            .applyBackgroundForItem(panelItem, layoutRequest),
+            .applyBackgroundForItem(panelItem, layoutRequest)
+            .nestedScroll(rowScrollConnection),
         contentPadding = PaddingValues(8.dp)
     ) {
         items(panelItem.itemList ?: emptyList()) { panelItem ->

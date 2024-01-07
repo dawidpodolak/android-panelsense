@@ -42,7 +42,7 @@ const val DATE_FORMAT = "EEEE, dd MMMM"
 @Composable
 fun ClockItemView(
     modifier: Modifier,
-    panelItem: PanelItem = PanelItem(),
+    panelItem: PanelItem = PanelItem(type = "clock"),
     layoutRequest: PanelItemLayoutRequest = PanelItemLayoutRequest.Standard,
     initState: ClockItemState = ClockItemState()
 ) {
