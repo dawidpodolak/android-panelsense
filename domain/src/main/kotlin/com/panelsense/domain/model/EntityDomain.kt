@@ -6,5 +6,6 @@ enum class EntityDomain {
     SWITCH,
     WEATHER,
     SENSOR,
+    BINARY_SENSOR,
     UNKNOWN
 }

@@ -59,6 +59,13 @@ fun PanelItemView(
             layoutRequest = layoutRequest
         )
 
+        PanelItemViewType.BINARY_SENSOR -> BinarySensorItemView(
+            modifier,
+            panelItem = panelItem,
+            entityInteractor = entityInteractor,
+            layoutRequest = layoutRequest
+        )
+
         PanelItemViewType.NONE -> UnknownPanelItem(
             modifier,
             panelItem = panelItem
@@ -73,7 +80,8 @@ enum class PanelItemViewType {
     WEATHER,
     CLOCK,
     NONE,
-    SENSOR
+    SENSOR,
+    BINARY_SENSOR
 }
 
 fun PanelItem.getItemViewType(): PanelItemViewType {
@@ -88,6 +96,7 @@ fun PanelItem.getItemViewType(): PanelItemViewType {
         EntityDomain.SWITCH -> PanelItemViewType.SIMPLE
         EntityDomain.WEATHER -> PanelItemViewType.WEATHER
         EntityDomain.SENSOR -> PanelItemViewType.SENSOR
+        EntityDomain.BINARY_SENSOR -> PanelItemViewType.BINARY_SENSOR
         else -> null
     }
 

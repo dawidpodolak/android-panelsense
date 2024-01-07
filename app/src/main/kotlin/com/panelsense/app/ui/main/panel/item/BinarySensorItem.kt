@@ -15,12 +15,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
+import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
 import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation.HORIZONTAL
@@ -35,32 +37,35 @@ import com.panelsense.app.ui.theme.FontStyleH4
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.domain.model.PanelItem
-import com.panelsense.domain.model.entity.state.SensorEntityState
+import com.panelsense.domain.model.entity.state.BinarySensorEntityState
 
-data class SensorItemState(
+data class BinarySensorItemState(
     val icon: Drawable? = null,
     val title: String = "",
     val entityValue: String? = null,
-    val entityState: SensorEntityState? = null
+    val entityState: BinarySensorEntityState? = null
 )
 
 @Composable
-fun SensorItemView(
+fun BinarySensorItemView(
     modifier: Modifier,
     panelItem: PanelItem,
     entityInteractor: EntityInteractor,
-    initState: SensorItemState = SensorItemState(),
+    initState: BinarySensorItemState = BinarySensorItemState(),
     layoutRequest: PanelItemLayoutRequest
 ) {
     var state by remember { mutableStateOf(initState) }
     val panelSizeHelper = getPanelSizeHelper()
 
-    StateLaunchEffect<SensorEntityState, SensorItemState>(
+    val onText = stringResource(id = R.string.on_short)
+    val offText = stringResource(id = R.string.off_short)
+
+    StateLaunchEffect<BinarySensorEntityState, BinarySensorItemState>(
         panelItem = panelItem,
         entityInteractor = entityInteractor,
-        mapper = ::entityToItemState
+        mapper = ::entityToBinarySensorItemState
     ) {
-        state = it
+        state = it.copy(entityValue = if (it.entityState?.state == true) onText else offText)
     }
 
     Box(
@@ -73,12 +78,12 @@ fun SensorItemView(
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
         when {
-            panelSizeHelper.orientation == HORIZONTAL || layoutRequest is Flex -> HorizontalSensorItemView(
+            panelSizeHelper.orientation == HORIZONTAL || layoutRequest is Flex -> HorizontalBinarySensorItemView(
                 modifier = Modifier.fillMaxSize(),
                 state = state
             )
 
-            panelSizeHelper.orientation == VERTICAL -> VerticalSensorItemView(
+            panelSizeHelper.orientation == VERTICAL -> VerticalBinarySensorItemView(
                 modifier = Modifier.fillMaxSize(),
                 state = state
             )
@@ -87,9 +92,9 @@ fun SensorItemView(
 }
 
 @Composable
-fun HorizontalSensorItemView(
+fun HorizontalBinarySensorItemView(
     modifier: Modifier,
-    state: SensorItemState
+    state: BinarySensorItemState
 ) {
     ConstraintLayout(modifier = modifier) {
         val (title, icon, valueText) = createRefs()
@@ -104,7 +109,6 @@ fun HorizontalSensorItemView(
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
         )
-
         if (state.entityValue != null) {
             Text(
                 modifier = Modifier.constrainAs(valueText) {
@@ -137,9 +141,9 @@ fun HorizontalSensorItemView(
 }
 
 @Composable
-fun VerticalSensorItemView(
+fun VerticalBinarySensorItemView(
     modifier: Modifier,
-    state: SensorItemState
+    state: BinarySensorItemState
 ) {
     ConstraintLayout(modifier = modifier) {
         val (title, icon, valueText) = createRefs()
@@ -183,17 +187,15 @@ fun VerticalSensorItemView(
     }
 }
 
-private suspend fun entityToItemState(
-    entityState: SensorEntityState,
+private suspend fun entityToBinarySensorItemState(
+    entityState: BinarySensorEntityState,
     panelItem: PanelItem,
     entityInteractor: EntityInteractor
-): SensorItemState = SensorItemState(
+): BinarySensorItemState = BinarySensorItemState(
     icon = entityInteractor.getDrawable(
         mdiName = panelItem.icon ?: entityState.icon ?: entityState.mdiIcon,
-        enabledColor = PanelItemTitleColor,
-        enable = true,
+        enable = entityState.state,
     ),
     title = panelItem.title ?: entityState.friendlyName ?: "",
     entityState = entityState,
-    entityValue = entityState.run { state + unitOfMeasurement }
 )
