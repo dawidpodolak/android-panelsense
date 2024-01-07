@@ -8,7 +8,8 @@ data class Configuration(
 data class ConfigurationSystem(
     val mainPanelId: String? = null,
     val showNavBar: Boolean = false,
-    val background: String? = null
+    val background: String? = null,
+    val foreground: String? = null
 )
 
 
@@ -21,7 +22,8 @@ sealed class Panel {
         val weatherEntity: String? = null,
         val time24h: Boolean = false,
         val itemList: List<PanelItem> = emptyList(),
-        val background: String? = null
+        val background: String? = null,
+        val foreground: String? = null
     ) : Panel()
 
     data class GridPanel(
@@ -30,7 +32,8 @@ sealed class Panel {
         val name: String? = null,
         val columnCount: Int = 0,
         val itemList: List<PanelItem> = emptyList(),
-        val background: String? = null
+        val background: String? = null,
+        val foreground: String? = null
     ) : Panel()
 
     data class FlexPanel(
@@ -39,7 +42,8 @@ sealed class Panel {
         val name: String? = null,
         val columns: List<List<PanelItem>> = emptyList(),
         val rows: List<List<PanelItem>> = emptyList(),
-        val background: String? = null
+        val background: String? = null,
+        val foreground: String? = null
     ) : Panel()
 
     data class UnknownPanel(

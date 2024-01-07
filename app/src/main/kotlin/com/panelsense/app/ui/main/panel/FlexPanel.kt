@@ -48,8 +48,7 @@ val ROW_ITEM_HEIGHT = 120.dp
 const val ROW_COUNT = 3
 val MIN_COLUMN_WIDTH = 250.dp
 
-//const val SCROLL_RESET_DELAY = 60_000L // 1 minute
-const val SCROLL_RESET_DELAY = 5_000L // 1 minute
+const val SCROLL_RESET_DELAY = 60_000L // 1 minute
 
 @Composable
 fun FlexPanelView(

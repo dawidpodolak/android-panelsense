@@ -3,26 +3,63 @@ package com.panelsense.app.ui.main.panel
 import android.graphics.Color.parseColor
 import android.util.Patterns
 import androidx.compose.foundation.background
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ScaleFactor
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import coil.compose.rememberAsyncImagePainter
 import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest
 import com.panelsense.app.ui.main.panel.item.PanelItemViewType
 import com.panelsense.app.ui.main.panel.item.getItemViewType
 import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.domain.model.PanelItem
+import kotlin.math.max
 
-fun Modifier.applyBackground(background: String?): Modifier =
+fun Modifier.applyBackground(background: String?, foreground: String? = null): Modifier =
     composed {
         when (val backgroundType = background.getBackgroundType()) {
             is BackgroundType.BackgroundColor -> this.background(backgroundType.color)
-            is BackgroundType.BackgroundURL -> this.paint(
-                rememberAsyncImagePainter(model = backgroundType.url),
-                contentScale = ContentScale.Crop
-            )
+            is BackgroundType.BackgroundURL -> this
+                .paint(
+                    rememberAsyncImagePainter(model = backgroundType.url),
+                    contentScale = ContentScale.Crop
+                )
+                .applyForeground(foreground)
+
+            else -> this
+        }
+    }
+
+fun Modifier.applyFinalBackgroundForItem(
+    background: String?,
+    foreground: String? = null
+): Modifier =
+    composed {
+        when (val backgroundType = background.getBackgroundType()) {
+            is BackgroundType.BackgroundColor -> this.background(backgroundType.color, ButtonShape)
+            is BackgroundType.BackgroundURL -> {
+                var intSize by remember { mutableStateOf(IntSize.Zero) }
+                this
+                    .onSizeChanged { intSize = it }
+                    .paint(
+                        painter = rememberAsyncImagePainter(model = backgroundType.url),
+                        contentScale = BgCrop(intSize.height)
+                    )
+                    .applyForeground(foreground)
+            }
 
             else -> this
         }
@@ -34,6 +71,12 @@ fun Modifier.applyBackgroundForItem(
 ): Modifier {
     return when {
         layoutRequest is PanelItemLayoutRequest.Grid -> this
+        panelItem.background != null -> this
+            .clip(ButtonShape)
+            .applyFinalBackgroundForItem(
+                panelItem.background, panelItem.foreground
+            )
+
         panelItem.getItemViewType() in listOf(
             PanelItemViewType.WEATHER,
             PanelItemViewType.CLOCK
@@ -43,7 +86,36 @@ fun Modifier.applyBackgroundForItem(
             color = PanelItemBackgroundColor,
             shape = ButtonShape
         )
+    }.run { this.clip(ButtonShape) }
+}
+
+fun Modifier.applyForeground(foreground: String?): Modifier = this.drawBehind {
+    foreground?.let {
+        val foregroundType = it.getBackgroundType()
+        if (foregroundType is BackgroundType.BackgroundColor) {
+            this.drawRect(
+                foregroundType.color,
+                Offset.Zero,
+                this.size,
+                1f,
+                Fill,
+                null
+            )
+        }
     }
+}
+
+fun BgCrop(maxHeight: Int) = object : ContentScale {
+    override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
+        if (srcSize.height > srcSize.width) {
+            val widthScale = dstSize.width / srcSize.width
+            val heightScale = dstSize.height / srcSize.height
+            max(widthScale, heightScale)
+        } else {
+            maxHeight.toFloat() / srcSize.height
+        }.run {
+            ScaleFactor(this, this)
+        }
 }
 
 sealed class BackgroundType {

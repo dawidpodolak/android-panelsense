@@ -80,11 +80,13 @@ fun WeatherItemView(
     Column(
         modifier
             .applyBackgroundForItem(panelItem, layoutRequest)
+            .applySizeForRequestLayout(layoutRequest)
+
     ) {
         TodayWeatherView(
             modifier = Modifier
-                .applySizeForRequestLayout(layoutRequest)
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .padding(top = 8.dp, start = 8.dp, end = 8.dp),
             stateView = state,
             layoutRequest = layoutRequest,
             entityInteractor = entityInteractor
@@ -92,7 +94,7 @@ fun WeatherItemView(
 
         WeatherForecastView(
             modifier = Modifier
-                .padding(top = 15.dp),
+                .padding(top = 15.dp, bottom = 8.dp),
             weather = state.weatherState!!,
             entityInteractor = entityInteractor
         )
