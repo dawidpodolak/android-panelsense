@@ -4,7 +4,6 @@ package com.panelsense.app.ui.main.panel.item
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,8 +42,8 @@ import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
-import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
 import com.panelsense.app.ui.main.panel.custom.CircleColorPickerView
 import com.panelsense.app.ui.main.panel.custom.KelvinVerticalSlider
 import com.panelsense.app.ui.main.panel.custom.SliderMotion
@@ -52,24 +51,28 @@ import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex.SimplePanelHeight
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
-import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.app.ui.theme.PanelSenseBottomSheet
+import com.panelsense.domain.entityToDomain
 import com.panelsense.domain.model.EntityDomain
 import com.panelsense.domain.model.PanelItem
 import com.panelsense.domain.model.entity.command.EntityCommand
 import com.panelsense.domain.model.entity.state.EntityState
 import com.panelsense.domain.model.entity.state.LightEntityState
 import com.panelsense.domain.model.entity.state.SwitchEntityState
-import com.panelsense.domain.toDomain
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
+
+const val START_GUIDE = 0.16f
+const val END_GUIDE = 1f - START_GUIDE
 
 data class SimplePanelItemState(
     val icon: Drawable? = null,
@@ -89,7 +92,8 @@ fun SimplePanelItemView(
     modifier: Modifier = Modifier,
     panelItem: PanelItem,
     entityInteractor: EntityInteractor,
-    initState: SimplePanelItemState = SimplePanelItemState()
+    initState: SimplePanelItemState = SimplePanelItemState(),
+    layoutRequest: PanelItemLayoutRequest
 ) {
 
     var state by remember { mutableStateOf(initState) }
@@ -122,20 +126,28 @@ fun SimplePanelItemView(
                     state.toggleCommand?.let(entityInteractor::sendCommand)
                 },
             )
-            .background(
-                color = PanelItemBackgroundColor,
-                shape = ButtonShape
-            )
+            .applyBackgroundForItem(panelItem, layoutRequest)
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
+            .applySizeForRequestLayout(layoutRequest, SimplePanelHeight)
     ) {
 
         StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
             state = it
         }
 
-        when (panelSizeHelper.orientation) {
-            PanelItemOrientation.HORIZONTAL -> HorizontalSimplePanelItemView(state = state)
-            PanelItemOrientation.VERTICAL -> VerticalSimplePanelItemView(state = state)
+        when {
+            layoutRequest is PanelItemLayoutRequest.Grid -> VerticalSimplePanelItemView(
+                state = state
+            )
+
+            panelSizeHelper.orientation == PanelItemOrientation.HORIZONTAL || layoutRequest is PanelItemLayoutRequest.Flex ->
+                HorizontalSimplePanelItemView(
+                    state = state
+                )
+
+            panelSizeHelper.orientation == PanelItemOrientation.VERTICAL -> VerticalSimplePanelItemView(
+                state = state
+            )
         }
     }
 }
@@ -148,11 +160,11 @@ private fun StateLaunchEffect(
 ) =
     LaunchedEffect(key1 = panelItem) {
         launch {
-            if (panelItem.entity.toDomain == EntityDomain.LIGHT) {
+            if (panelItem.entity!!.entityToDomain == EntityDomain.LIGHT) {
                 updateState<LightEntityState>(panelItem, entityInteractor) {
                     callback(it.toState(panelItem, entityInteractor))
                 }
-            } else if (panelItem.entity.toDomain == EntityDomain.SWITCH) {
+            } else if (panelItem.entity!!.entityToDomain == EntityDomain.SWITCH) {
                 updateState<SwitchEntityState>(panelItem, entityInteractor) {
                     callback(it.toState(panelItem, entityInteractor))
                 }
@@ -165,7 +177,7 @@ private suspend inline fun <reified ENTITY_STATE : EntityState> updateState(
     entityInteractor: EntityInteractor,
     noinline callback: suspend (ENTITY_STATE) -> Unit
 ) {
-    entityInteractor.listenOnState(panelItem.entity, ENTITY_STATE::class)
+    entityInteractor.listenOnState(panelItem.entity!!, ENTITY_STATE::class)
         .collect { entityState ->
             callback(entityState)
         }
@@ -253,6 +265,9 @@ fun HorizontalSimplePanelItemView(
     ) {
 
         val (image, text, brightness) = createRefs()
+        val startGuide = createGuidelineFromStart(START_GUIDE)
+        val endGuide = createGuidelineFromStart(END_GUIDE)
+
         Image(
             modifier = Modifier
                 .fillMaxHeight(0.5f)
@@ -260,8 +275,8 @@ fun HorizontalSimplePanelItemView(
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(text.start)
-                    start.linkTo(parent.start)
+                    end.linkTo(startGuide)
+                    start.linkTo(startGuide)
                 },
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
@@ -272,10 +287,14 @@ fun HorizontalSimplePanelItemView(
                 .constrainAs(text) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                    start.linkTo(parent.start)
+                    end.linkTo(endGuide, margin = 15.dp)
+                    start.linkTo(startGuide, margin = 15.dp)
+                    width = Dimension.fillToConstraints
                 },
+            maxLines = 1,
             text = state.title,
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis,
             color = PanelItemTitleColor,
             style = FontStyleH3_SemiBold,
         )
@@ -284,10 +303,10 @@ fun HorizontalSimplePanelItemView(
             Text(
                 modifier = Modifier
                     .constrainAs(brightness) {
-                        start.linkTo(text.end, margin = 5.dp)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 5.dp)
+                        start.linkTo(endGuide)
+                        end.linkTo(endGuide)
                         width = Dimension.wrapContent
                         height = Dimension.wrapContent
                     },
@@ -434,6 +453,7 @@ fun SimplePanelItemPreview() {
         initState = SimplePanelItemState(
             icon = LocalContext.current.getDrawable(R.drawable.ic_launcher_background),
             title = "Test"
-        )
+        ),
+        layoutRequest = PanelItemLayoutRequest.Standard
     )
 }

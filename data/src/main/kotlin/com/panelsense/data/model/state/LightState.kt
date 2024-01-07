@@ -1,5 +1,8 @@
 package com.panelsense.data.model.state
 
+import com.panelsense.data.mapper.toEntityState
+import com.panelsense.domain.model.entity.state.EntityState
+
 data class LightState(
     val entityId: String,
     val on: Boolean,
@@ -14,4 +17,7 @@ data class LightState(
     val friendlyName: String?,
     val icon: String?,
     val supportedFeatures: Int?
-)
+) : DataState {
+
+    override fun toDomainState(): EntityState = toEntityState()
+}

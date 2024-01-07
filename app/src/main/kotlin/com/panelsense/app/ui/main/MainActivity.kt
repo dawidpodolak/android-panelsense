@@ -31,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import com.panelsense.app.R
 import com.panelsense.app.disableSystemUI
 import com.panelsense.app.ui.login.LoginActivity
+import com.panelsense.app.ui.main.panel.FlexPanelView
 import com.panelsense.app.ui.main.panel.GridPanelView
 import com.panelsense.app.ui.main.panel.HomePanelView
 import com.panelsense.app.ui.main.panel.NavigationBar
@@ -68,7 +69,10 @@ class MainActivity : ComponentActivity() {
 
                 Box(
                     modifier = Modifier
-                        .applyBackground(senseConfig.system.background)
+                        .applyBackground(
+                            senseConfig.system.background,
+                            senseConfig.system.foreground
+                        )
                         .fillMaxSize()
                 ) {
                     if (senseConfig.panelList.isEmpty()) {
@@ -153,17 +157,26 @@ fun PagerPanels(
             when (val panelConfig = configuration.panelList[panelIndex]) {
                 is Panel.HomePanel -> HomePanelView(
                     modifier = Modifier
-                        .applyBackground(panelConfig.background)
+                        .applyBackground(panelConfig.background, panelConfig.foreground)
                         .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
                     panelConfig, entityInteractor
                 )
 
                 is Panel.GridPanel -> GridPanelView(
                     modifier = Modifier
-                        .applyBackground(panelConfig.background)
+                        .applyBackground(panelConfig.background, panelConfig.foreground)
                         .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
                     panelConfig, entityInteractor
                 )
+
+                is Panel.FlexPanel -> FlexPanelView(
+                    modifier = Modifier
+                        .applyBackground(panelConfig.background, panelConfig.foreground)
+                        .applyBottomPaddingIfNeeded(configuration.system.showNavBar),
+                    panelConfig, entityInteractor
+                )
+
+                is Panel.UnknownPanel -> {}
             }
         }
         if (configuration.system.showNavBar) {
@@ -197,6 +210,8 @@ val Panel.panelId: String?
     get() = when (this) {
         is Panel.HomePanel -> this.id
         is Panel.GridPanel -> this.id
+        is Panel.FlexPanel -> this.id
+        is Panel.UnknownPanel -> this.panelId
     }
 
 @Composable

@@ -4,6 +4,7 @@ package com.panelsense.app.ui.main.panel.item
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.offset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -15,10 +16,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
 import com.panelsense.app.ui.theme.FontStyleH3
 import com.panelsense.app.ui.theme.FontStyleLarge_Light
 import com.panelsense.app.ui.theme.FontStyleXLarge_Light
-import com.panelsense.domain.model.Panel
+import com.panelsense.app.ui.theme.FontStyleXXLarge_Light
+import com.panelsense.domain.model.PanelItem
 import kotlinx.coroutines.delay
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -37,27 +42,31 @@ const val DATE_FORMAT = "EEEE, dd MMMM"
 @Composable
 fun ClockItemView(
     modifier: Modifier,
-    homePanel: Panel.HomePanel,
+    panelItem: PanelItem = PanelItem(type = "clock"),
+    layoutRequest: PanelItemLayoutRequest = PanelItemLayoutRequest.Standard,
     initState: ClockItemState = ClockItemState()
 ) {
     var state by remember { mutableStateOf(initState) }
-    ClockItemLaunchEffect(homePanel = homePanel) {
+    ClockItemLaunchEffect(time24h = panelItem.time24h ?: false) {
         state = it
     }
 
     Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.End
+        modifier = modifier
+            .applySizeForRequestLayout(layoutRequest)
+            .applyBackgroundForItem(panelItem, layoutRequest),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(verticalAlignment = Alignment.Bottom) {
 
             Text(
-                style = FontStyleXLarge_Light,
+                style = if (layoutRequest is PanelItemLayoutRequest.Flex) FontStyleXXLarge_Light else FontStyleXLarge_Light,
                 color = Color.White,
                 text = state.time
             )
             if (state.timeAbbreviation != null) {
                 Text(
+                    modifier = Modifier.offset(y = (-8).dp),
                     style = FontStyleLarge_Light,
                     color = Color.White,
                     text = state.timeAbbreviation!!,
@@ -75,15 +84,15 @@ fun ClockItemView(
 
 @Composable
 fun ClockItemLaunchEffect(
-    homePanel: Panel.HomePanel,
+    time24h: Boolean = false,
     callback: (ClockItemState) -> Unit
-) = LaunchedEffect(key1 = homePanel) {
+) = LaunchedEffect(key1 = time24h) {
     while (true) {
         val zonedDateTime = ZonedDateTime.now()
         val time =
-            zonedDateTime.format(DateTimeFormatter.ofPattern(if (homePanel.time24h) TIME_FORMAT_24 else TIME_FORMAT_12))
+            zonedDateTime.format(DateTimeFormatter.ofPattern(if (time24h) TIME_FORMAT_24 else TIME_FORMAT_12))
         val timeAbbreviation = zonedDateTime.format(DateTimeFormatter.ofPattern(TIME_ABBREVIATION))
-            .takeIf { !homePanel.time24h }?.lowercase()
+            .takeIf { !time24h }?.lowercase()
         val date = zonedDateTime.format(DateTimeFormatter.ofPattern(DATE_FORMAT))
         callback(ClockItemState(time, timeAbbreviation, date))
         delay(6000)
@@ -95,7 +104,12 @@ fun ClockItemLaunchEffect(
 fun ClockItemPreview() {
     ClockItemView(
         modifier = Modifier,
-        homePanel = Panel.HomePanel(),
+        panelItem = PanelItem(
+            id = "1",
+            type = "clock",
+            entity = "sensor.time",
+            time24h = false
+        ),
         initState = ClockItemState(
             time = "12:00",
             timeAbbreviation = null,

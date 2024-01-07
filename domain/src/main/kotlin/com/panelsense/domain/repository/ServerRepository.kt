@@ -15,7 +15,7 @@ interface ServerRepository {
 
     fun connectionState(): Flow<ConnectionState>
 
-    fun observerEntitiesState(): Flow<EntityState>
+    fun observerEntitiesState(entityId: String): Flow<EntityState>
 
     suspend fun requestEntitiesState(delay: Boolean = false)
     fun sendCommand(command: EntityCommand)

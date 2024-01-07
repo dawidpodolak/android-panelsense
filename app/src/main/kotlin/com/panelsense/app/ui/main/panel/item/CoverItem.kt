@@ -38,20 +38,23 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.ui.main.EntityInteractor
-import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation.HORIZONTAL
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation.VERTICAL
+import com.panelsense.app.ui.main.panel.StateLaunchEffect
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
 import com.panelsense.app.ui.main.panel.custom.SliderMotion
 import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Grid
 import com.panelsense.app.ui.theme.CoverItemButtonActive
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
-import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.app.ui.theme.PanelSenseBottomSheet
 import com.panelsense.domain.model.PanelItem
@@ -70,7 +73,6 @@ import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_POS
 import com.panelsense.domain.model.entity.state.CoverEntityState.Feature.SET_TILT_POSITION
 import com.panelsense.domain.model.entity.state.CoverEntityState.State.OPEN
 import kotlinx.coroutines.flow.flowOf
-import timber.log.Timber
 
 data class CoverItemState(
     val icon: Drawable? = null,
@@ -84,31 +86,40 @@ fun CoverItemView(
     modifier: Modifier = Modifier,
     panelItem: PanelItem,
     entityInteractor: EntityInteractor,
-    initState: CoverItemState = CoverItemState()
+    initState: CoverItemState = CoverItemState(),
+    layoutRequest: PanelItemLayoutRequest
 ) {
     var state by remember { mutableStateOf(initState) }
-    val panelSizeHelper = getPanelSizeHelper()
+    val panelSizeHelper = getPanelSizeHelper(heightToWidthRatio = 1.3f)
 
-    StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
+    StateLaunchEffect<CoverEntityState, CoverItemState>(
+        panelItem = panelItem,
+        entityInteractor = entityInteractor,
+        mapper = ::entityToItemState
+    ) {
         state = it
     }
-    Timber.d("CoverItemView: state: $state")
     Box(
         modifier = modifier
-            .fillMaxSize()
-            .background(
-                color = PanelItemBackgroundColor,
-                shape = ButtonShape
-            )
+            .applySizeForRequestLayout(layoutRequest, Flex.CoverPanelHeight)
+            .applyBackgroundForItem(panelItem, layoutRequest)
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
-        when (panelSizeHelper.orientation) {
-            HORIZONTAL -> HorizontalCoverItemView(
+        when {
+            layoutRequest is Grid -> VerticalCoverItemView(
                 entityInteractor = entityInteractor,
                 state = state
             )
 
-            VERTICAL -> VerticalCoverItemView(entityInteractor = entityInteractor, state = state)
+            panelSizeHelper.orientation == HORIZONTAL || layoutRequest is Flex -> HorizontalCoverItemView(
+                entityInteractor = entityInteractor,
+                state = state
+            )
+
+            panelSizeHelper.orientation == VERTICAL -> VerticalCoverItemView(
+                entityInteractor = entityInteractor,
+                state = state
+            )
         }
     }
 }
@@ -122,6 +133,9 @@ fun HorizontalCoverItemView(
     ) {
         val (image, title, position) = createRefs()
         val showBottomSheet = remember { mutableStateOf(false) }
+
+        val startGuide = createGuidelineFromStart(START_GUIDE)
+        val endGuide = createGuidelineFromStart(END_GUIDE)
 
         state.entityState?.let {
             CoverControlButtons(
@@ -149,8 +163,8 @@ fun HorizontalCoverItemView(
                 .constrainAs(image) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(title.start)
-                    start.linkTo(parent.start)
+                    end.linkTo(startGuide)
+                    start.linkTo(startGuide)
                 },
             painter = rememberDrawablePainter(drawable = state.icon),
             contentDescription = state.title
@@ -159,13 +173,14 @@ fun HorizontalCoverItemView(
         Text(
             modifier = modifier
                 .constrainAs(title) {
-                    start.linkTo(parent.start)
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)
-                    end.linkTo(parent.end)
-                    width = Dimension.wrapContent
+                    start.linkTo(startGuide, margin = 15.dp)
+                    end.linkTo(endGuide, margin = 15.dp)
+                    width = Dimension.fillToConstraints
                     height = Dimension.wrapContent
                 },
+            textAlign = TextAlign.Center,
             text = state.title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -178,10 +193,10 @@ fun HorizontalCoverItemView(
             Text(
                 modifier = modifier
                     .constrainAs(position) {
-                        start.linkTo(title.end, margin = 5.dp)
+                        start.linkTo(endGuide)
+                        end.linkTo(endGuide)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
-                        end.linkTo(parent.end, margin = 5.dp)
                         width = Dimension.wrapContent
                         height = Dimension.wrapContent
                     },
@@ -431,26 +446,20 @@ fun CoverButton(
     }
 }
 
-@Composable
-private fun StateLaunchEffect(
+private suspend fun entityToItemState(
+    entityState: CoverEntityState,
     panelItem: PanelItem,
-    entityInteractor: EntityInteractor,
-    callback: (CoverItemState) -> Unit
-) = LaunchedEffect(key1 = panelItem) {
-    entityInteractor.listenOnState(panelItem.entity, CoverEntityState::class).collect {
-        callback.invoke(
-            CoverItemState(
-                icon = entityInteractor.getDrawable(
-                    panelItem.icon ?: it.getMdiIconName(),
-                    CoverItemButtonActive
-                ),
-                title = panelItem.title ?: it.friendlyName ?: it.entityId,
-                entityState = it,
-                position = it.position?.toString() ?: it.tiltPosition?.toString()
-            )
-        )
-    }
-}
+    entityInteractor: EntityInteractor
+): CoverItemState =
+    CoverItemState(
+        icon = entityInteractor.getDrawable(
+            panelItem.icon ?: entityState.getMdiIconName(),
+            CoverItemButtonActive
+        ),
+        title = panelItem.title ?: entityState.friendlyName ?: entityState.entityId,
+        entityState = entityState,
+        position = entityState.position?.toString() ?: entityState.tiltPosition?.toString()
+    )
 
 @Composable
 private fun CoverControlView(

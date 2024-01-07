@@ -23,5 +23,5 @@ class MessageTypeDeserializer : JsonDeserializer<MessageType> {
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): MessageType =
-        MessageType.values().first { it.value == json?.asString }
+        MessageType.values().firstOrNull { it.value == json?.asString } ?: MessageType.UNSUPPORTED
 }
