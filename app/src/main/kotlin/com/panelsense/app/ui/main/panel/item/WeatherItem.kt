@@ -42,8 +42,9 @@ import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
 import com.panelsense.app.ui.main.panel.getDrawable
-import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
 import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH1_SemiBold
@@ -53,6 +54,7 @@ import com.panelsense.app.ui.theme.FontStyleH6_SemiBold
 import com.panelsense.app.ui.theme.FontStyleLarge_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
 import com.panelsense.domain.model.Panel
+import com.panelsense.domain.model.PanelItem
 import com.panelsense.domain.model.entity.state.WeatherEntityState
 import com.panelsense.domain.model.entity.state.WeatherEntityState.WeatherCondition
 import org.threeten.bp.format.DateTimeFormatter
@@ -64,6 +66,7 @@ data class WeatherStateView(
 @Composable
 fun WeatherItemView(
     modifier: Modifier = Modifier,
+    panelItem: PanelItem = PanelItem(),
     weatherEntity: String?,
     entityInteractor: EntityInteractor,
     layoutRequest: PanelItemLayoutRequest = PanelItemLayoutRequest.Standard,
@@ -76,10 +79,11 @@ fun WeatherItemView(
     if (state.weatherState == null) return
     Column(
         modifier
+            .applyBackgroundForItem(panelItem, layoutRequest)
     ) {
         TodayWeatherView(
             modifier = Modifier
-                .applySizeIfFlex(layoutRequest)
+                .applySizeForRequestLayout(layoutRequest)
                 .wrapContentHeight(),
             stateView = state,
             layoutRequest = layoutRequest,

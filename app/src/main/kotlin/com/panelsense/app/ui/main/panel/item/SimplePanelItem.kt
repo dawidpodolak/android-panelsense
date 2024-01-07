@@ -4,7 +4,6 @@ package com.panelsense.app.ui.main.panel.item
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,8 +42,8 @@ import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
-import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
 import com.panelsense.app.ui.main.panel.custom.CircleColorPickerView
 import com.panelsense.app.ui.main.panel.custom.KelvinVerticalSlider
 import com.panelsense.app.ui.main.panel.custom.SliderMotion
@@ -52,14 +51,13 @@ import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
-import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
 import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex.SimplePanelHeight
 import com.panelsense.app.ui.main.panel.mockEntityInteractor
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
-import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.app.ui.theme.PanelSenseBottomSheet
 import com.panelsense.domain.entityToDomain
@@ -72,7 +70,6 @@ import com.panelsense.domain.model.entity.state.SwitchEntityState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 const val START_GUIDE = 0.16f
 const val END_GUIDE = 1f - START_GUIDE
@@ -129,12 +126,9 @@ fun SimplePanelItemView(
                     state.toggleCommand?.let(entityInteractor::sendCommand)
                 },
             )
-            .background(
-                color = PanelItemBackgroundColor,
-                shape = ButtonShape
-            )
+            .applyBackgroundForItem(panelItem, layoutRequest)
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
-            .applySizeIfFlex(layoutRequest, SimplePanelHeight)
+            .applySizeForRequestLayout(layoutRequest, SimplePanelHeight)
     ) {
 
         StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
@@ -142,6 +136,10 @@ fun SimplePanelItemView(
         }
 
         when {
+            layoutRequest is PanelItemLayoutRequest.Grid -> VerticalSimplePanelItemView(
+                state = state
+            )
+
             panelSizeHelper.orientation == PanelItemOrientation.HORIZONTAL || layoutRequest is PanelItemLayoutRequest.Flex ->
                 HorizontalSimplePanelItemView(
                     state = state
@@ -179,7 +177,6 @@ private suspend inline fun <reified ENTITY_STATE : EntityState> updateState(
     entityInteractor: EntityInteractor,
     noinline callback: suspend (ENTITY_STATE) -> Unit
 ) {
-    Timber.d("StateLaunchEffect: listenOnState: ${panelItem.entity}")
     entityInteractor.listenOnState(panelItem.entity!!, ENTITY_STATE::class)
         .collect { entityState ->
             callback(entityState)

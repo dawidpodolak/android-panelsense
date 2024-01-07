@@ -1,5 +1,5 @@
 package com.panelsense.domain.model
 
 enum class ItemTypeDomain {
-    CLOCK,
+    CLOCK, GRID
 }

@@ -49,7 +49,7 @@ fun HomePanelView(
                     end.linkTo(parent.end)
                     width = Dimension.wrapContent
                 },
-            time24h = homePanel.time24h,
+            panelItem = PanelItem(time24h = homePanel.time24h)
         )
 
         if (homePanel.itemList.isNotEmpty()) {

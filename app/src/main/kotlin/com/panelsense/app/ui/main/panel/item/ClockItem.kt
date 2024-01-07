@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
 import com.panelsense.app.ui.theme.FontStyleH3
 import com.panelsense.app.ui.theme.FontStyleLarge_Light
 import com.panelsense.app.ui.theme.FontStyleXLarge_Light
 import com.panelsense.app.ui.theme.FontStyleXXLarge_Light
+import com.panelsense.domain.model.PanelItem
 import kotlinx.coroutines.delay
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -40,17 +42,19 @@ const val DATE_FORMAT = "EEEE, dd MMMM"
 @Composable
 fun ClockItemView(
     modifier: Modifier,
-    time24h: Boolean = false,
+    panelItem: PanelItem = PanelItem(),
     layoutRequest: PanelItemLayoutRequest = PanelItemLayoutRequest.Standard,
     initState: ClockItemState = ClockItemState()
 ) {
     var state by remember { mutableStateOf(initState) }
-    ClockItemLaunchEffect(time24h = time24h) {
+    ClockItemLaunchEffect(time24h = panelItem.time24h ?: false) {
         state = it
     }
 
     Column(
-        modifier = modifier.applySizeIfFlex(layoutRequest),
+        modifier = modifier
+            .applySizeForRequestLayout(layoutRequest)
+            .applyBackgroundForItem(panelItem, layoutRequest),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(verticalAlignment = Alignment.Bottom) {
@@ -100,7 +104,12 @@ fun ClockItemLaunchEffect(
 fun ClockItemPreview() {
     ClockItemView(
         modifier = Modifier,
-        time24h = true,
+        panelItem = PanelItem(
+            id = "1",
+            type = "clock",
+            entity = "sensor.time",
+            time24h = false
+        ),
         initState = ClockItemState(
             time = "12:00",
             timeAbbreviation = null,

@@ -60,5 +60,8 @@ data class PanelItem(
     val type: String? = null,
     val title: String? = null,
     val icon: String? = null,
-    val time24h: Boolean? = null // Only for ItemPanelType.CLOCK
+    val time24h: Boolean? = null, // Only for ItemPanelType.CLOCK
+    val itemList: List<PanelItem>? = null, // Only for ItemPanelType.GRID
+    val background: String? = null,
+    val foreground: String? = null
 )

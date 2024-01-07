@@ -4,7 +4,6 @@ package com.panelsense.app.ui.main.panel.item
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
@@ -24,17 +23,17 @@ import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.R
 import com.panelsense.app.ui.main.EntityInteractor
-import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation.HORIZONTAL
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation.VERTICAL
 import com.panelsense.app.ui.main.panel.StateLaunchEffect
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
-import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
 import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Grid
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH4
-import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.domain.model.PanelItem
 import com.panelsense.domain.model.entity.state.BinarySensorEntityState
@@ -70,14 +69,16 @@ fun BinarySensorItemView(
 
     Box(
         modifier = modifier
-            .applySizeIfFlex(layoutRequest)
-            .background(
-                color = PanelItemBackgroundColor,
-                shape = ButtonShape
-            )
+            .applySizeForRequestLayout(layoutRequest)
+            .applyBackgroundForItem(panelItem, layoutRequest)
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
         when {
+            layoutRequest is Grid -> VerticalBinarySensorItemView(
+                modifier = Modifier.fillMaxSize(),
+                state = state
+            )
+
             panelSizeHelper.orientation == HORIZONTAL || layoutRequest is Flex -> HorizontalBinarySensorItemView(
                 modifier = Modifier.fillMaxSize(),
                 state = state

@@ -2,6 +2,7 @@ package com.panelsense.app.ui.main.panel.item
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -41,6 +42,7 @@ fun PanelItemView(
 
         PanelItemViewType.WEATHER -> WeatherItemView(
             modifier,
+            panelItem = panelItem,
             weatherEntity = panelItem.entity!!,
             entityInteractor = entityInteractor,
             layoutRequest = layoutRequest
@@ -48,8 +50,8 @@ fun PanelItemView(
 
         PanelItemViewType.CLOCK -> ClockItemView(
             modifier,
+            panelItem = panelItem,
             layoutRequest = layoutRequest,
-            time24h = panelItem.time24h ?: false
         )
 
         PanelItemViewType.SENSOR -> SensorItemView(
@@ -60,6 +62,13 @@ fun PanelItemView(
         )
 
         PanelItemViewType.BINARY_SENSOR -> BinarySensorItemView(
+            modifier,
+            panelItem = panelItem,
+            entityInteractor = entityInteractor,
+            layoutRequest = layoutRequest
+        )
+
+        PanelItemViewType.GRID -> GridItemView(
             modifier,
             panelItem = panelItem,
             entityInteractor = entityInteractor,
@@ -81,12 +90,14 @@ enum class PanelItemViewType {
     CLOCK,
     NONE,
     SENSOR,
-    BINARY_SENSOR
+    BINARY_SENSOR,
+    GRID
 }
 
 fun PanelItem.getItemViewType(): PanelItemViewType {
     val itemTypeFromType = when (this.type?.typeToDomain) {
         ItemTypeDomain.CLOCK -> PanelItemViewType.CLOCK
+        ItemTypeDomain.GRID -> PanelItemViewType.GRID
         else -> null
     }
 
@@ -120,12 +131,21 @@ interface PanelItemLayoutRequest {
         val CoverPanelHeight = 100.dp
     }
 
+    object Grid : PanelItemLayoutRequest {
+        val ItemHeight = 110.dp
+        val ItemWidth = 100.dp
+    }
+
     companion object {
-        fun Modifier.applySizeIfFlex(
+        fun Modifier.applySizeForRequestLayout(
             layoutRequest: PanelItemLayoutRequest,
             height: Dp? = null
         ): Modifier =
             when (layoutRequest) {
+                is Grid -> this
+                    .requiredHeight(Grid.ItemHeight)
+                    .requiredWidth(Grid.ItemWidth)
+
                 is Flex -> this
                     .fillMaxWidth()
                     .run { if (height != null) requiredHeight(height) else this }
