@@ -20,6 +20,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ScaleFactor
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest
 import com.panelsense.app.ui.main.panel.item.PanelItemViewType
@@ -52,11 +53,18 @@ fun Modifier.applyFinalBackgroundForItem(
             is BackgroundType.BackgroundColor -> this.background(backgroundType.color, ButtonShape)
             is BackgroundType.BackgroundURL -> {
                 var intSize by remember { mutableStateOf(IntSize.Zero) }
+                var sizeToIntrinsics by remember { mutableStateOf(false) }
+                var painter = rememberAsyncImagePainter(model = backgroundType.url)
                 this
-                    .onSizeChanged { intSize = it }
+                    .onSizeChanged {
+                        if (painter.state !is AsyncImagePainter.State.Success) {
+                            intSize = it
+                        }
+                    }
                     .paint(
-                        painter = rememberAsyncImagePainter(model = backgroundType.url),
-                        contentScale = BgCrop(intSize.height)
+                        painter = painter,
+                        contentScale = BgCrop(intSize.height) { sizeToIntrinsics = it },
+                        sizeToIntrinsics = sizeToIntrinsics
                     )
                     .applyForeground(foreground)
             }
@@ -105,13 +113,15 @@ fun Modifier.applyForeground(foreground: String?): Modifier = this.drawBehind {
     }
 }
 
-fun BgCrop(maxHeight: Int) = object : ContentScale {
+fun BgCrop(maxHeight: Int, sizeToIntrinsics: (Boolean) -> Unit) = object : ContentScale {
     override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor =
         if (srcSize.height > srcSize.width) {
             val widthScale = dstSize.width / srcSize.width
             val heightScale = dstSize.height / srcSize.height
+            sizeToIntrinsics(false)
             max(widthScale, heightScale)
         } else {
+            sizeToIntrinsics(true)
             maxHeight.toFloat() / srcSize.height
         }.run {
             ScaleFactor(this, this)
