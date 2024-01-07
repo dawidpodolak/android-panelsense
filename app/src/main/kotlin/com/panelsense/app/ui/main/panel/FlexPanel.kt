@@ -1,5 +1,6 @@
 package com.panelsense.app.ui.main.panel
 
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import kotlinx.coroutines.launch
 val ROW_ITEM_HEIGHT = 120.dp
 const val ROW_COUNT = 3
 val MIN_COLUMN_WIDTH = 250.dp
+
 const val SCROLL_RESET_DELAY = 60_000L // 1 minute
 
 @Composable
@@ -192,7 +195,7 @@ fun FlexColumnsView(
 
 @OptIn(FlowPreview::class)
 @Composable
-private fun scrollReset(state: LazyListState): NestedScrollConnection {
+fun <T : ScrollableState> scrollReset(state: T): NestedScrollConnection {
     val scope = rememberCoroutineScope()
     val resetFlow by remember { mutableStateOf(MutableStateFlow<Float?>(null)) }
     LaunchedEffect(key1 = null) {
@@ -200,7 +203,10 @@ private fun scrollReset(state: LazyListState): NestedScrollConnection {
             .filter { it != null }
             .debounce(SCROLL_RESET_DELAY)
             .collect {
-                state.animateScrollToItem(0, 0)
+                when (state) {
+                    is LazyListState -> state.animateScrollToItem(0)
+                    is LazyGridState -> state.animateScrollToItem(0)
+                }
             }
     }
     return remember {

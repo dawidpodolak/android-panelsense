@@ -2,7 +2,7 @@
     <string name="app_name">PanelSense</string>
 
     <!--  Login scree  -->
-    <string name="loginScreenProvideServerAddress">Provide server address and port</string>
+    <string name="loginScreenProvideServerAddress">Adres serwera oraz port</string>
     <string name="loginScreenProvideUserAndPass">Provide user name and password</string>
     <string name="loginScreenServerAddress">Server IP</string>
     <string name="loginScreenServerPort">Port</string>
@@ -37,6 +37,6 @@
 
     <!-- PanelItem  -->
     <string name="unknownPanel">Not supported entity or type:\n%s</string>
-    <string name="on_short">On</string>
-    <string name="off_short">Off</string>
+    <string name="on_short">Wł</string>
+    <string name="off_short">Wył</string>
 </resources>

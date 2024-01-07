@@ -38,22 +38,23 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 import com.panelsense.app.ui.main.EntityInteractor
-import com.panelsense.app.ui.main.panel.ButtonShape
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation.HORIZONTAL
 import com.panelsense.app.ui.main.panel.PanelSizeHelper.PanelItemOrientation.VERTICAL
+import com.panelsense.app.ui.main.panel.StateLaunchEffect
+import com.panelsense.app.ui.main.panel.applyBackgroundForItem
 import com.panelsense.app.ui.main.panel.custom.SliderMotion
 import com.panelsense.app.ui.main.panel.custom.VerticalSlider
 import com.panelsense.app.ui.main.panel.effectClickable
 import com.panelsense.app.ui.main.panel.getDrawable
 import com.panelsense.app.ui.main.panel.getPanelSizeHelper
-import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeIfFlex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Companion.applySizeForRequestLayout
 import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Flex
+import com.panelsense.app.ui.main.panel.item.PanelItemLayoutRequest.Grid
 import com.panelsense.app.ui.theme.CoverItemButtonActive
 import com.panelsense.app.ui.theme.FontStyleH2_SemiBold
 import com.panelsense.app.ui.theme.FontStyleH3_Regular
 import com.panelsense.app.ui.theme.FontStyleH3_SemiBold
 import com.panelsense.app.ui.theme.MdiIcons
-import com.panelsense.app.ui.theme.PanelItemBackgroundColor
 import com.panelsense.app.ui.theme.PanelItemTitleColor
 import com.panelsense.app.ui.theme.PanelSenseBottomSheet
 import com.panelsense.domain.model.PanelItem
@@ -89,21 +90,27 @@ fun CoverItemView(
     layoutRequest: PanelItemLayoutRequest
 ) {
     var state by remember { mutableStateOf(initState) }
-    val panelSizeHelper = getPanelSizeHelper()
+    val panelSizeHelper = getPanelSizeHelper(heightToWidthRatio = 1.3f)
 
-    StateLaunchEffect(panelItem = panelItem, entityInteractor = entityInteractor) {
+    StateLaunchEffect<CoverEntityState, CoverItemState>(
+        panelItem = panelItem,
+        entityInteractor = entityInteractor,
+        mapper = ::entityToItemState
+    ) {
         state = it
     }
     Box(
         modifier = modifier
-            .applySizeIfFlex(layoutRequest, Flex.CoverPanelHeight)
-            .background(
-                color = PanelItemBackgroundColor,
-                shape = ButtonShape
-            )
+            .applySizeForRequestLayout(layoutRequest, Flex.CoverPanelHeight)
+            .applyBackgroundForItem(panelItem, layoutRequest)
             .onGloballyPositioned(panelSizeHelper::onGlobalLayout)
     ) {
         when {
+            layoutRequest is Grid -> VerticalCoverItemView(
+                entityInteractor = entityInteractor,
+                state = state
+            )
+
             panelSizeHelper.orientation == HORIZONTAL || layoutRequest is Flex -> HorizontalCoverItemView(
                 entityInteractor = entityInteractor,
                 state = state
@@ -439,26 +446,20 @@ fun CoverButton(
     }
 }
 
-@Composable
-private fun StateLaunchEffect(
+private suspend fun entityToItemState(
+    entityState: CoverEntityState,
     panelItem: PanelItem,
-    entityInteractor: EntityInteractor,
-    callback: (CoverItemState) -> Unit
-) = LaunchedEffect(key1 = panelItem) {
-    entityInteractor.listenOnState(panelItem.entity!!, CoverEntityState::class).collect {
-        callback.invoke(
-            CoverItemState(
-                icon = entityInteractor.getDrawable(
-                    panelItem.icon ?: it.getMdiIconName(),
-                    CoverItemButtonActive
-                ),
-                title = panelItem.title ?: it.friendlyName ?: it.entityId,
-                entityState = it,
-                position = it.position?.toString() ?: it.tiltPosition?.toString()
-            )
-        )
-    }
-}
+    entityInteractor: EntityInteractor
+): CoverItemState =
+    CoverItemState(
+        icon = entityInteractor.getDrawable(
+            panelItem.icon ?: entityState.getMdiIconName(),
+            CoverItemButtonActive
+        ),
+        title = panelItem.title ?: entityState.friendlyName ?: entityState.entityId,
+        entityState = entityState,
+        position = entityState.position?.toString() ?: entityState.tiltPosition?.toString()
+    )
 
 @Composable
 private fun CoverControlView(

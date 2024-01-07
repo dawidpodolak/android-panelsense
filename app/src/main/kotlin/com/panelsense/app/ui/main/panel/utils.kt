@@ -8,6 +8,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -21,6 +23,7 @@ import com.panelsense.app.ui.theme.StateDisabledColor
 import com.panelsense.app.ui.theme.StateEnabledColor
 import com.panelsense.core.model.icon.IconSpec
 import com.panelsense.data.icons.IconProvider
+import com.panelsense.domain.model.PanelItem
 import com.panelsense.domain.model.entity.command.EntityCommand
 import com.panelsense.domain.model.entity.state.EntityState
 import kotlinx.coroutines.flow.Flow
@@ -92,3 +95,15 @@ fun Modifier.effectClickable(
         hapticFeedback?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
     },
 )
+
+@Composable
+inline fun <reified T : EntityState, ITEM_STATE> StateLaunchEffect(
+    panelItem: PanelItem,
+    entityInteractor: EntityInteractor,
+    crossinline mapper: suspend (T, PanelItem, EntityInteractor) -> ITEM_STATE,
+    crossinline callback: (ITEM_STATE) -> Unit
+) = LaunchedEffect(key1 = panelItem) {
+    entityInteractor.listenOnState(panelItem.entity!!, T::class).collect {
+        callback.invoke(mapper(it, panelItem, entityInteractor))
+    }
+}

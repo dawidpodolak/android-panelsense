@@ -7,7 +7,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.dp
 
-class PanelSizeHelper(private val remember: MutableState<LayoutCoordinates?>) {
+class PanelSizeHelper(
+    private val remember: MutableState<LayoutCoordinates?>,
+    private val heightToWidthRatio: Float
+) {
     val orientation: PanelItemOrientation
         get() = calculateOrientation()
 
@@ -30,7 +33,7 @@ class PanelSizeHelper(private val remember: MutableState<LayoutCoordinates?>) {
     private fun calculateOrientation(): PanelItemOrientation {
         val intSize = remember.value?.size ?: return PanelItemOrientation.VERTICAL
         if (remember.value == null) return PanelItemOrientation.VERTICAL
-        return if (intSize.width > intSize.height.times(2)) {
+        return if (intSize.width > intSize.height.times(heightToWidthRatio)) {
             PanelItemOrientation.HORIZONTAL
         } else {
             PanelItemOrientation.VERTICAL
@@ -49,5 +52,5 @@ class PanelSizeHelper(private val remember: MutableState<LayoutCoordinates?>) {
 }
 
 @Composable
-fun getPanelSizeHelper(): PanelSizeHelper =
-    PanelSizeHelper(remember { mutableStateOf<LayoutCoordinates?>(null) })
+fun getPanelSizeHelper(heightToWidthRatio: Float = 2f): PanelSizeHelper =
+    PanelSizeHelper(remember { mutableStateOf<LayoutCoordinates?>(null) }, heightToWidthRatio)
